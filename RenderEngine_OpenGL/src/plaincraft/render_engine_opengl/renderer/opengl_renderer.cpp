@@ -57,48 +57,19 @@ namespace plaincraft_render_engine_opengl {
 
 		modelObject->GetTexture()->UseTexture();
 
-		auto v = std::vector<float>{
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-			0.5f, 0.5f, -0.5f, 0.5f, 0.0f,
-			0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
-
-			-0.5f, -0.5f, 0.5f, 0.0f, 0.5f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.5f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-			-0.5f, 0.5f, 0.5f, 0.5f, 0.0f,
-			-0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-
-			0.5f, -0.5f, -0.5f, 0.0f, 0.5f,
-			0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.5f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-
-			-0.5f, -0.5f, -0.5f, 0.5f, 0.0f,
-			0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 1.0f, 0.5f,
-			-0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-
-			-0.5f, 0.5f, -0.5f, 0.0f, 0.5f,
-			0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-			0.5f, 0.5f, 0.5f, 0.5f, 1.0f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-		};
-
+		auto t = polygon->GetVertices().data();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * v.size(), v.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * polygon->GetVertices().size(), polygon->GetVertices().data(), GL_STATIC_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * polygon->GetIndices().size(), polygon->GetIndices().data(), GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr); // position
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(3 * sizeof(float))); // color
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(6 * sizeof(float))); // text coord
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 
 		glDrawElements(GL_TRIANGLES, static_cast<uint32_t>(polygon->GetIndices().size()), GL_UNSIGNED_INT, nullptr);
 

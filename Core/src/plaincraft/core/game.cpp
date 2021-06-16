@@ -40,8 +40,8 @@ SOFTWARE.
 namespace plaincraft_core {
 	Game::Game() {
 		const auto camera = std::shared_ptr<plaincraft_render_engine::Camera>(new plaincraft_render_engine::Camera());
-		render_engine_ = std::shared_ptr<plaincraft_render_engine_opengl::OpenGLRenderEngine>(new plaincraft_render_engine_opengl::OpenGLRenderEngine(1024, 768));
-		//render_engine_ = std::shared_ptr<plaincraft_render_engine_vulkan::VulkanRenderEngine>(new plaincraft_render_engine_vulkan::VulkanRenderEngine(1024, 768, true));
+		//render_engine_ = std::shared_ptr<plaincraft_render_engine_opengl::OpenGLRenderEngine>(new plaincraft_render_engine_opengl::OpenGLRenderEngine(1024, 768));
+		render_engine_ = std::shared_ptr<plaincraft_render_engine_vulkan::VulkanRenderEngine>(new plaincraft_render_engine_vulkan::VulkanRenderEngine(1024, 768, true));
 		render_engine_->GetShadersRepository()->RegisterShader("default", render_engine_->CreateDefaultShader());
 		glfwSetWindowUserPointer(render_engine_->GetWindow(), this);
 
@@ -92,7 +92,6 @@ namespace plaincraft_core {
 			last_cursor_position_y_ = cursor_position_y;
 
 			should_close = glfwGetKey(window_instance, GLFW_KEY_ESCAPE) == GLFW_PRESS;
-
 
 			++frame_ticks;
 

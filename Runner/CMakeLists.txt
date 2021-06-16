@@ -1,3 +1,3 @@
-add_executable(${PROJECT_NAME} "src/runner/main.cpp")
+add_executable("Runner" "src/runner/main.cpp")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE "Core")
+target_link_libraries("Runner" PRIVATE "Core")

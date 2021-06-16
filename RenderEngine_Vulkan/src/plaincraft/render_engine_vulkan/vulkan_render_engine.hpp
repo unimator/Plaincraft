@@ -60,7 +60,8 @@ namespace plaincraft_render_engine_vulkan {
 		VkDeviceMemory vertex_buffer_memory_;
 		VkBuffer index_buffer_;
 		VkDeviceMemory index_buffer_memory_;
-		
+		VkDescriptorPool descriptor_pool_;
+
 		std::vector<VkSemaphore> image_available_semaphores_;
 		std::vector<VkSemaphore> render_finished_semaphores_;
 		std::vector<VkFence> in_flight_fences_;
@@ -71,6 +72,7 @@ namespace plaincraft_render_engine_vulkan {
 		std::vector<VkCommandBuffer> command_buffers_;
 		std::vector<VkBuffer> uniform_buffers_;
 		std::vector<VkDeviceMemory> uniform_buffers_memory_;
+		std::vector<VkDescriptorSet> descriptor_sets_;
 
 		bool enable_debug_ = false;
 		bool frame_buffer_resized_ = false;
@@ -139,6 +141,7 @@ namespace plaincraft_render_engine_vulkan {
 		void CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size);
 
 		void CreateDescriptorPool();
+		void CreateDescriptorSets();
 
 		void UpdateUniformBuffer(uint32_t image_index);
 

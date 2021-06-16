@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin GÃ³rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,6 +81,8 @@ namespace plaincraft_render_engine_vulkan {
 		CreateVertexBuffer();
 		CreateIndexBuffer();
 		CreateUniformBuffers();
+		CreateDescriptorPool();
+		CreateDescriptorSets();
 		CreateCommandBuffers();
 		CreateSyncObjects();
 
@@ -134,10 +136,12 @@ namespace plaincraft_render_engine_vulkan {
 
 		vkDestroySwapchainKHR(device_, swap_chain_, nullptr);
 
-		for (size_t i = 0; swap_chain_images_.size(); ++i) {
+		for (size_t i = 0; i < swap_chain_images_.size(); ++i) {
 			vkDestroyBuffer(device_, uniform_buffers_[i], nullptr);
 			vkFreeMemory(device_, uniform_buffers_memory_[i], nullptr);
 		}
+
+		vkDestroyDescriptorPool(device_, descriptor_pool_, nullptr);
 	}
 
 	void VulkanRenderEngine::CreateWindow() {
@@ -504,7 +508,7 @@ namespace plaincraft_render_engine_vulkan {
 		rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterization_info.lineWidth = 1.0f;
 		rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT;
-		rasterization_info.frontFace = VK_FRONT_FACE_CLOCKWISE;
+		rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		rasterization_info.depthBiasEnable = VK_FALSE;
 		rasterization_info.depthBiasConstantFactor = 0.0f;
 		rasterization_info.depthBiasClamp = 0.0f;
@@ -667,6 +671,7 @@ namespace plaincraft_render_engine_vulkan {
 			vkCmdBindVertexBuffers(command_buffers_[i], 0, 1, vertex_buffers, offsets);
 			vkCmdBindIndexBuffer(command_buffers_[i], index_buffer_, 0, VK_INDEX_TYPE_UINT16);
 
+			vkCmdBindDescriptorSets(command_buffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_sets_[i], 0, nullptr);
 			//vkCmdDraw(command_buffers_[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 			vkCmdDrawIndexed(command_buffers_[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 			vkCmdEndRenderPass(command_buffers_[i]);
@@ -720,6 +725,8 @@ namespace plaincraft_render_engine_vulkan {
 		CreateGraphicsPipeline();
 		CreateFrameBuffers();
 		CreateUniformBuffers();
+		CreateDescriptorPool();
+		CreateDescriptorSets();
 		CreateCommandBuffers();
 	}
 
@@ -939,7 +946,7 @@ namespace plaincraft_render_engine_vulkan {
 
 		void* data;
 		vkMapMemory(device_, staging_buffer_memory, 0, buffer_size, 0, &data);
-		memcpy(data, vertices.data(), buffer_size);
+			memcpy(data, vertices.data(), buffer_size);
 		vkUnmapMemory(device_, staging_buffer_memory);
 
 		CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertex_buffer_, vertex_buffer_memory_);
@@ -1051,6 +1058,51 @@ namespace plaincraft_render_engine_vulkan {
 		VkDescriptorPoolSize pool_size{};
 		pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		pool_size.descriptorCount = static_cast<uint32_t>(swap_chain_images_.size());
+
+		VkDescriptorPoolCreateInfo pool_info{};
+		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		pool_info.poolSizeCount = 1;
+		pool_info.pPoolSizes = &pool_size;
+		pool_info.maxSets = static_cast<uint32_t>(swap_chain_images_.size());
+
+		if(vkCreateDescriptorPool(device_, &pool_info, nullptr, &descriptor_pool_) != VK_SUCCESS) {
+			throw std::runtime_error("Failed to create shader module"); 
+		}
+	}
+
+	void VulkanRenderEngine::CreateDescriptorSets()
+	{
+		std::vector<VkDescriptorSetLayout> layouts(swap_chain_images_.size(), descriptor_set_layout_);
+		VkDescriptorSetAllocateInfo descriptor_set_allocate_info{};
+		descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptor_set_allocate_info.descriptorPool = descriptor_pool_;
+		descriptor_set_allocate_info.descriptorSetCount = static_cast<uint32_t>(swap_chain_images_.size());
+		descriptor_set_allocate_info.pSetLayouts = layouts.data();
+
+		descriptor_sets_.resize(swap_chain_images_.size());
+		if(vkAllocateDescriptorSets(device_, &descriptor_set_allocate_info, descriptor_sets_.data()) != VK_SUCCESS) {
+			throw std::runtime_error("Failed to allocate descriptor sets");
+		}
+
+		for(size_t i = 0; i < swap_chain_images_.size(); ++i) {
+			VkDescriptorBufferInfo descriptor_buffer_info{};
+			descriptor_buffer_info.buffer = uniform_buffers_[i];
+			descriptor_buffer_info.offset = 0;
+			descriptor_buffer_info.range = sizeof(ModelViewProjectionMatrix);
+
+			VkWriteDescriptorSet write_descriptor_set{};
+			write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			write_descriptor_set.dstSet = descriptor_sets_[i];
+			write_descriptor_set.dstBinding = 0;
+			write_descriptor_set.dstArrayElement = 0;
+			write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			write_descriptor_set.descriptorCount = 1;
+			write_descriptor_set.pBufferInfo = &descriptor_buffer_info;
+			write_descriptor_set.pImageInfo = nullptr;
+			write_descriptor_set.pTexelBufferView = nullptr;
+
+			vkUpdateDescriptorSets(device_, 1, &write_descriptor_set, 0, nullptr);
+		}
 	}
 
 	void VulkanRenderEngine::UpdateUniformBuffer(uint32_t image_index)
@@ -1061,11 +1113,16 @@ namespace plaincraft_render_engine_vulkan {
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
 
 		ModelViewProjectionMatrix mvp_matrix{};
-		mvp_matrix.model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		mvp_matrix.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		mvp_matrix.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		mvp_matrix.projection = glm::perspective(glm::radians(45.0f), swap_chain_extent_.width / (float)swap_chain_extent_.height, 0.1f, 10.0f);
 		mvp_matrix.projection[1][1] *= -1;
 	
+		//mvp_matrix.model = glm::mat4x4(1.0f);
+		mvp_matrix.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		mvp_matrix.projection = glm::perspective(glm::radians(45.0f), swap_chain_extent_.width / (float) swap_chain_extent_.height, 0.1f, 10.0f);
+		mvp_matrix.projection[1][1] *= -1;
+
 		void* data;
 		vkMapMemory(device_, uniform_buffers_memory_[image_index], 0, sizeof(mvp_matrix), 0, &data);
 		memcpy(data, &mvp_matrix, sizeof(mvp_matrix));
