@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,15 +34,6 @@ namespace plaincraft_render_engine {
 
 	std::shared_ptr<Model> Drawable::GetModel() const {
 		return model_;
-	}
-
-
-	void Drawable::SetShader(std::shared_ptr<Shader> shader) {
-		shader_ = std::move(shader);
-	}
-
-	std::shared_ptr<Shader> Drawable::GetShader() const {
-		return shader_;
 	}
 
 	void Drawable::SetPosition(Vector3d position) {

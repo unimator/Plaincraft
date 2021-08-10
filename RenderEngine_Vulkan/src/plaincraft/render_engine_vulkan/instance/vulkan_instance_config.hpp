@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_SWAP_CHAIN_SUPPORT_DETAILS
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_SWAP_CHAIN_SUPPORT_DETAILS
-#include "common.hpp"
-#include <vulkan\vulkan.h>
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_INSTANCE_CONFIG
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_INSTANCE_CONFIG
 
-namespace plaincraft_render_engine_vulkan {
-    struct SwapChainSupportDetails {
-        VkSurfaceCapabilitiesKHR capabilities;
-        std::vector<VkSurfaceFormatKHR> formats;
-        std::vector<VkPresentModeKHR> present_modes;
+#include <string>
+
+namespace plaincraft_render_engine_vulkan 
+{
+    struct VulkanInstanceConfig 
+    {
+        std::string application_name;
+        uint32_t application_version;
+        
+        std::string engine_name;
+        uint32_t engine_version;
+
+        bool enable_debug;
+
+        VulkanInstanceConfig();
     };
 }
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_SWAP_CHAIN_SUPPORT_DETAILS
+
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_INSTANCE_CONFIG

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,7 +116,7 @@ namespace plaincraft_core {
 		return false;
 	}
 
-	Vector3d CollisionsDetector::MinimumDistance(
+	Vector3d CollisionsDetector::MinimalDistance(
 		const std::shared_ptr<Collider>& first, const Vector3d& first_position,
 		const std::shared_ptr<Collider>& second, const Vector3d& second_position,
 		const Vector3d& translation_vector)
@@ -124,13 +124,13 @@ namespace plaincraft_core {
 		const auto first_box = std::dynamic_pointer_cast<BoxCollider>(first);
 		const auto second_box = std::dynamic_pointer_cast<BoxCollider>(second);
 		if (first_box != nullptr && second_box != nullptr) {
-			return MinimumDistance(first_box, first_position, second_box, second_position, translation_vector);
+			return MinimalDistance(first_box, first_position, second_box, second_position, translation_vector);
 		}
 
 		return Vector3d(0.0f, 0.0f, 0.0f);
 	}
 
-	Vector3d CollisionsDetector::MinimumDistance(
+	Vector3d CollisionsDetector::MinimalDistance(
 		const std::shared_ptr<BoxCollider>& first, const Vector3d& first_position,
 		const std::shared_ptr<BoxCollider>& second, const Vector3d& second_position,
 		const Vector3d& translation_vector)
@@ -222,11 +222,6 @@ namespace plaincraft_core {
 			const auto plane_point_projection_to_plane_point = plane_point - point_projection;
 			const auto plane_point_projection_to_point_a = plane_point_a - point_projection;
 			const auto plane_point_projection_to_point_b = plane_point_b - point_projection;
-
-			auto dot1 = glm::dot(plane_vector_a, plane_point_projection_to_plane_point);
-			auto dot2 = glm::dot(plane_vector_a, plane_point_projection_to_point_b);
-			auto dot3 = glm::dot(plane_vector_b, plane_point_projection_to_plane_point);
-			auto dot4 = glm::dot(plane_vector_b, plane_point_projection_to_point_a);
 			
 
 			if (glm::dot(plane_vector_a, plane_point_projection_to_plane_point) * glm::dot(plane_vector_a, plane_point_projection_to_point_b) < 0
@@ -239,7 +234,6 @@ namespace plaincraft_core {
 
 					auto determinant = calculate_determinant(plane_normal, plane_vector_a, plane_vector_b);
 
-					auto determinant_plane_normal = calculate_determinant(translation_vector, plane_vector_a, plane_vector_b);
 					auto determinant_plane_vector_a = calculate_determinant(plane_normal, translation_vector, plane_vector_b);
 					auto determinant_plane_vector_b = calculate_determinant(plane_normal, plane_vector_a, translation_vector);
 

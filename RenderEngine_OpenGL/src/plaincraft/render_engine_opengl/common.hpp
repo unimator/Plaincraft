@@ -27,12 +27,6 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_OPENGL_COMMON
 #define PLAINCRAFT_RENDER_ENGINE_OPENGL_COMMON
 
-#ifdef PLAINCRAFT_RENDER_ENGINE_OPENGL
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_OPENGL //__declspec(dllexport)
-#else
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_OPENGL //__declspec(dllimport)
-#endif
-
 #include <plaincraft_common.hpp>
 using namespace plaincraft_common;
 

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,14 +47,6 @@ namespace plaincraft_render_engine_vulkan {
 
 		vkDestroyShaderModule(device, fragment_shader_module, nullptr);
 		vkDestroyShaderModule(device, vertex_shader_module, nullptr);
-	}
-
-	void VulkanShader::Use() {
-
-	}
-
-	void VulkanShader::SetModelViewProjection(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
-
 	}
 
 	VkShaderModule VulkanShader::CreateShaderModule(VkDevice& device, const std::vector<char>& code)

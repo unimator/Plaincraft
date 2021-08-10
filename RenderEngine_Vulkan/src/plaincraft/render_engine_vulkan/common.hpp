@@ -27,12 +27,6 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_COMMON
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_COMMON
 
-#ifdef PLAINCRAFT_RENDER_ENGINE_VULKAN
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_VULKAN //__declspec(dllexport)
-#else
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_VULKAN //__declspec(dllimport)
-#endif
-
 #include <plaincraft_common.hpp>
 using namespace plaincraft_common;
 

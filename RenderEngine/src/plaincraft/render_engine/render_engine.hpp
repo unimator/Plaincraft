@@ -31,49 +31,44 @@ SOFTWARE.
 #include <GLFW\glfw3.h>
 #include "renderer\drawable.hpp"
 #include "renderer\renderer.hpp"
-#include "shader\shaders_repository.hpp"
 #include "texture\textures_factory.hpp"
 #include "texture\textures_repository.hpp"
+#include "window\window.hpp"
 
 namespace plaincraft_render_engine {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE RenderEngine {
+	class RenderEngine {
 	protected:
-		GLFWwindow* window_;
-		uint32_t width_ = 1024, height_ = 768;
+		std::shared_ptr<Window> window_;
 		std::string title_ = "Plaincraft";
 
 		std::shared_ptr<Camera> camera_;
 		std::shared_ptr<Renderer> renderer_;
 		std::vector<std::shared_ptr<Drawable>> drawables_list_;
 
-		std::shared_ptr<ShadersRepository> shaders_repository_;
-
 		std::shared_ptr<TexturesRepository> textures_repository_;
 		std::shared_ptr<TexturesFactory> textures_factory_;
 
 	public:
-		RenderEngine(uint32_t width, uint32_t height);
-
 		virtual ~RenderEngine();
-
-		auto GetWindow() -> GLFWwindow* { return window_; }
-
-		auto GetWidth() -> uint32_t { return width_; }
-		auto GetHeight() -> uint32_t { return height_; }
-
-		virtual void RenderFrame() = 0;
-		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
-
+		
 		auto GetCamera() const -> const std::shared_ptr<Camera>& { return camera_; }
-
+		auto GetWindow() -> std::shared_ptr<Window> { return window_; }
+		
 		void AddDrawable(std::shared_ptr<Drawable> drawable);
 
-		virtual std::unique_ptr<Shader> CreateDefaultShader() = 0;
-
-		auto GetShadersRepository() const -> std::shared_ptr<ShadersRepository> { return shaders_repository_; }
-
+		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
 		auto GetTexturesFactory() const -> std::shared_ptr<TexturesFactory> { return textures_factory_; }
 		auto GetTexturesRepository() const -> std::shared_ptr<TexturesRepository> { return textures_repository_; }
+
+		virtual void RenderFrame() = 0;
+	protected:
+		RenderEngine(std::shared_ptr<Window> window);
+
+		RenderEngine(const RenderEngine& other) = delete;
+		RenderEngine(RenderEngine&& other);
+
+		RenderEngine& operator=(const RenderEngine& other) = default;		
+		RenderEngine& operator=(RenderEngine&& other);
 	};
 }
 #endif // PLAINCRAFT_RENDER_ENGINE_RENDER_ENGINE

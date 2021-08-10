@@ -65,7 +65,7 @@ namespace plaincraft_core {
 
 					if (!collisions_detector_.Detect(body_collider, body_position, body_translation_vector, other_collider, other_position, other_translation_vector)) {
 						
-						const auto translation_vector = collisions_detector_.MinimumDistance(body_collider, body_position, other_collider, other_position, body_translation_vector);
+						const auto translation_vector = collisions_detector_.MinimalDistance(body_collider, body_position, other_collider, other_position, body_translation_vector);
 						body_translation_vector = translation_vector;
 						body->SetVelocity(translation_vector / delta_time);
 					}

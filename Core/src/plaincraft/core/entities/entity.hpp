@@ -35,7 +35,7 @@ SOFTWARE.
 namespace plaincraft_core {
 	using namespace plaincraft_render_engine;
 
-	class DLLEXPORT_PLAINCRAFT_CORE Entity
+	class Entity
 	{
 	private:
 		std::shared_ptr<Drawable> drawable_;

@@ -28,14 +28,12 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_SHADER
 
 #include "../common.hpp"
-#include <plaincraft_render_engine.hpp>
 #include <vulkan\vulkan.h>
 
 namespace plaincraft_render_engine_vulkan {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_VULKAN VulkanShader : public plaincraft_render_engine::Shader
+	class VulkanShader
 	{
 	private:
-		//friend class VulkanRenderEngine;
 
 	public:
 		VulkanShader(VkDevice& device, const std::vector<char>& vertex_shader, const std::vector<char>& fragment_shader);
@@ -46,10 +44,6 @@ namespace plaincraft_render_engine_vulkan {
 
 		VulkanShader(VulkanShader&& other) noexcept {}
 		VulkanShader& operator=(VulkanShader&& other) noexcept { return *this; }
-
-
-		void Use() override;
-		void SetModelViewProjection(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) override;
 
 	private:
 

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "shaders_repository.hpp"
+#include "window.hpp"
+#include <iostream>
 
-namespace plaincraft_render_engine {
-	void ShadersRepository::RegisterShader(std::string name, const std::shared_ptr<Shader>& shader) {
-		shaders_collection_.insert(std::pair<std::string, std::shared_ptr<Shader>>(name, shader));
-	}
+namespace plaincraft_render_engine
+{
+    Window::Window(std::string title, uint32_t width, uint32_t height)
+        : instance_(nullptr), title_(title), width_(width), height_(height)
+    {
+    }
 
-	std::shared_ptr<Shader> ShadersRepository::GetShader(std::string name) const {
-		return shaders_collection_.at(name);
-	}
+    Window::~Window()
+    {
+        if (instance_)
+        {
+            glfwDestroyWindow(instance_);
+            glfwTerminate();
+        }
+    }
+
+    Window::Window(Window &&other)
+    {
+        this->width_ = other.width_;
+        this->height_ = other.height_;
+        this->title_ = std::move(other.title_);
+        this->instance_ = other.instance_;
+        other.instance_ = nullptr;
+    }
+
+    Window& Window::operator=(Window &&other)
+    {
+        this->width_ = other.width_;
+        this->height_ = other.height_;
+        this->title_ = other.title_;
+        other.title_ = nullptr;
+        this->instance_ = other.instance_;
+        other.instance_ = nullptr;
+        return *this;
+    }
 }

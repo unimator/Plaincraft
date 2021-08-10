@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ SOFTWARE.
 #include "texture.hpp"
 
 namespace plaincraft_render_engine {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE TexturesFactory {
+	class TexturesFactory {
 	public:
 		virtual std::unique_ptr<Texture> LoadFromImage(const Image& image) = 0;
 	};

@@ -27,15 +27,10 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_COMMON
 #define PLAINCRAFT_RENDER_ENGINE_COMMON
 
-#ifdef PLAINCRAFT_RENDER_ENGINE
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE //__declspec(dllexport)
-#else
-#define DLLEXPORT_PLAINCRAFT_RENDER_ENGINE //__declspec(dllimport)
-#endif
-
 #include <plaincraft_common.hpp>
 using namespace plaincraft_common;
 
-
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #endif // PLAINCRAFT_RENDER_ENGINE_COMMON

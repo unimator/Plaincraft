@@ -8,4 +8,9 @@ namespace plaincraft_render_engine {
 	void Renderer::Batch(std::shared_ptr<Drawable> drawable) {
 		drawables_list_.push_back(drawable);
 	}
+
+	void Renderer::HasRendered() 
+	{
+		drawables_list_.clear();
+	}
 }

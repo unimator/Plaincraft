@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "shader.hpp"
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VALIDATION_LAYERS
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VALIDATION_LAYERS
 
-namespace plaincraft_render_engine {
-	/*Shader::~Shader() {}*/
+#include <vector>
+
+namespace plaincraft_render_engine_vulkan
+{
+    const std::vector<const char*> VALIDATION_LAYERS = {
+		"VK_LAYER_KHRONOS_validation"
+	};
 }
+
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VALIDATION_LAYERS

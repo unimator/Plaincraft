@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,17 +34,18 @@ SOFTWARE.
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
-	class DLLEXPORT_PLAINCRAFT_CORE Game {
+	class Game {
 		friend class InputManager;
 
 	private:
-		std::shared_ptr<Scene> scene_;
+		std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::shared_ptr<EventsManager> events_manager_;
-		std::shared_ptr<InputManager> input_manager_;
-		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
+		std::shared_ptr<PhysicsEngine> physics_engine_;
+		Scene scene_;
+		InputManager input_manager_;
 
 	public:
-		Game();
+		Game(std::unique_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
 		~Game();
 
 		void Run();

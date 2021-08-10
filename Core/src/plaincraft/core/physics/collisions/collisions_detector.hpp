@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace plaincraft_core {
 			const std::shared_ptr<Collider>& first, const Vector3d& first_position, const Vector3d& first_translation,
 			const std::shared_ptr<Collider>& second, const Vector3d& second_position, const Vector3d& second_translation) const;
 
-		Vector3d MinimumDistance(
+		Vector3d MinimalDistance(
 			const std::shared_ptr<Collider>& first, const Vector3d& first_position,
 			const std::shared_ptr<Collider>& second, const Vector3d& second_position,
 			const Vector3d& translation_vector);
@@ -51,7 +51,7 @@ namespace plaincraft_core {
 			const std::shared_ptr<BoxCollider>& first, const Vector3d& first_position, const Vector3d& first_translation,
 			const std::shared_ptr<BoxCollider>& second, const Vector3d& second_position, const Vector3d& second_translation) const;
 
-		Vector3d MinimumDistance(
+		Vector3d MinimalDistance(
 			const std::shared_ptr<BoxCollider>& first, const Vector3d& first_position,
 			const std::shared_ptr<BoxCollider>& second, const Vector3d& second_position,
 			const Vector3d& translation_vector);

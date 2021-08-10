@@ -29,9 +29,6 @@ SOFTWARE.
 
 #include "../src/plaincraft/render_engine/render_engine.hpp"
 
-#include "../src/plaincraft/render_engine/shader/shader.hpp"
-#include "../src/plaincraft/render_engine/shader/shaders_repository.hpp"
-
 #include "../src/plaincraft/render_engine/texture/texture.hpp"
 #include "../src/plaincraft/render_engine/texture/textures_repository.hpp"
 #include "../src/plaincraft/render_engine/texture/textures_factory.hpp"
@@ -48,5 +45,7 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/renderer/objects/cube.hpp"
 #include "../src/plaincraft/render_engine/renderer/objects/no_draw.hpp"
 #include "../src/plaincraft/render_engine/renderer/objects/polygon.hpp"
+
+#include "../src/plaincraft/render_engine/window/window.hpp"
 
 #endif // PLAINCRAFT_RENDER_ENGINE_PLAINCRAFT_RENDER_ENGINE

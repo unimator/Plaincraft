@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,19 +28,24 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_RENDERER
 
 #include "../common.hpp"
+#include "../shader/opengl_shader.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_render_engine_opengl {
 	using namespace plaincraft_render_engine;
 
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_OPENGL OpenGLRenderer : public Renderer {
+	class OpenGLRenderer : public Renderer {
 	private:
 		uint32_t vbo_, ebo_, vao_;
+		std::unique_ptr<OpenGLShader> shader_;
 
 	public:
 		OpenGLRenderer(std::shared_ptr<Camera> camera);
 
 		virtual void Render() override;
+
+	private:
+		OpenGLShader CreateDefaultShader();
 	};
 }
 

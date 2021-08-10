@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,48 +28,18 @@ SOFTWARE.
 #include "shader\opengl_shader.hpp"
 #include "renderer\opengl_renderer.hpp"
 #include "texture\opengl_textures_factory.hpp"
+#include "window\opengl_window.hpp"
 
-namespace plaincraft_render_engine_opengl {
-	OpenGLRenderEngine::OpenGLRenderEngine(uint32_t width, uint32_t height) : RenderEngine(width, height) {
-		CreateWindow();
+namespace plaincraft_render_engine_opengl 
+{
+	OpenGLRenderEngine::OpenGLRenderEngine(std::shared_ptr<OpenGLWindow> window) 
+	: RenderEngine(std::move(window))
+	{
 		renderer_ = std::make_shared<OpenGLRenderer>(OpenGLRenderer(camera_));
 		textures_factory_ = std::make_shared<OpenGLTexturesFactory>(OpenGLTexturesFactory());
 	}
 
-	OpenGLRenderEngine::~OpenGLRenderEngine() {
-		glfwDestroyWindow(window_);
-		glfwTerminate();
-	}
-
-	void OpenGLRenderEngine::CreateWindow() {
-		glewExperimental = true;
-
-		glfwInit();
-
-		glfwWindowHint(GLFW_SAMPLES, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-		//glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
-
-		window_ = glfwCreateWindow(width_, height_, title_.c_str(), nullptr, nullptr);
-		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_FALSE);
-
-		glfwMakeContextCurrent(window_);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glfwSwapInterval(0);
-		if (glewInit() != GLEW_OK) {
-			fprintf(stderr, "Failed to initialize GLEW\n");
-			throw std::runtime_error("Failed to initialize GLEW");
-		}
-
-		glEnable(GL_DEPTH_TEST);
-	}
+	OpenGLRenderEngine::~OpenGLRenderEngine() { }
 
 	void OpenGLRenderEngine::RenderFrame() {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -77,14 +47,7 @@ namespace plaincraft_render_engine_opengl {
 
 		RenderEngine::RenderFrame();
 		
-		glfwSwapBuffers(window_);
+		glfwSwapBuffers(window_->GetInstance());
 		glfwPollEvents();
-	}
-
-	std::unique_ptr<plaincraft_render_engine::Shader> OpenGLRenderEngine::CreateDefaultShader() {
-		auto vertex_shader = read_file("..\\..\\..\\Core\\resources\\vertexshader.shader"); // shaders should be copied to binary directory or something like this
-		auto fragment_shader = read_file("..\\..\\..\\Core\\resources\\fragmentshader.shader"); // shaders should be copied to binary directory or something like this
-
-		return std::make_unique<OpenGLShader>(std::move(OpenGLShader(vertex_shader, fragment_shader)));
 	}
 }

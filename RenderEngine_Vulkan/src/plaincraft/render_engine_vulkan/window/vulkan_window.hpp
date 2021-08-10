@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_QUEUE_FAMILY_INDICES
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_QUEUE_FAMILY_INDICES
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_WINDOW
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_WINDOW
 
-#include "common.hpp"
+#include "../common.hpp"
+#include <plaincraft_render_engine.hpp>
+#include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine_vulkan {
-	struct QueueFamilyIndices {
-		std::optional<uint32_t> graphics_family;
-		std::optional<uint32_t> present_family;
+namespace plaincraft_render_engine_vulkan
+{
+    using namespace plaincraft_render_engine;
+    class VulkanWindow final : public Window 
+    {
+    public:
+        VulkanWindow(std::string title, uint32_t width, uint32_t height);
 
-		bool IsComplete() {
-			return graphics_family.has_value() && present_family.has_value();
-		}
-	};
+        VulkanWindow(const VulkanWindow& other) = delete;
+        VulkanWindow(VulkanWindow&& other);
+        VulkanWindow& operator=(const VulkanWindow& other) = delete;
+        VulkanWindow& operator=(VulkanWindow&& other);
+
+        VkSurfaceKHR CreateSurface(VkInstance instance);
+
+    private:
+        void Initialize();
+    };
 }
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_QUEUE_FAMILY_INDICES
+
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_WINDOW

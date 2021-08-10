@@ -29,7 +29,7 @@ SOFTWARE.
 #include <plaincraft_render_engine_opengl.hpp>
 
 namespace plaincraft_core {
-	void WorldGenerator::GenerateWorld(std::shared_ptr<Scene> scene, std::shared_ptr<RenderEngine> render_engine) {
+	void WorldGenerator::GenerateWorld(Scene& scene, std::unique_ptr<RenderEngine>& render_engine) {
 		for (int i = -10; i < 10; ++i) {
 			for (int j = -10; j < 10; ++j) {
 				auto entity = std::shared_ptr<Entity>(new Entity());
@@ -45,7 +45,7 @@ namespace plaincraft_core {
 				//body->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
 				entity->SetBody(body);
 				entity->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
-				scene->AddEntity(entity);
+				scene.AddEntity(entity, render_engine);
 			}
 		}
 	}

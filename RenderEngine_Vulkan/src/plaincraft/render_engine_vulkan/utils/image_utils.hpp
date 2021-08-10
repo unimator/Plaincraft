@@ -24,27 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_SHADERS_REPOSITORY
-#define PLAINCRAFT_RENDER_ENGINE_SHADERS_REPOSITORY
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS
 
-#include <plaincraft_common.hpp>
-#include "../shader/shader.hpp"
+#include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE ShadersRepository
-	{
-	private:
-		std::map<std::string, std::shared_ptr<Shader>> shaders_collection_;
-
-	public:
-		ShadersRepository() = default;
-
-		void RegisterShader(std::string name, const std::shared_ptr<Shader>& shader);
-
-		std::shared_ptr<Shader> GetShader(std::string name) const;
-	};
+namespace plaincraft_render_engine_vulkan 
+{
+    VkImageView CreateImageView(VkDevice device, VkImage image, VkFormat format);
 }
 
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_SHADERS_REPOSITORY
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS

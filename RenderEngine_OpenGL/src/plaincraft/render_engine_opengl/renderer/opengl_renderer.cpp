@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ namespace plaincraft_render_engine_opengl {
 		glGenBuffers(1, &vbo_);
 		glGenBuffers(1, &ebo_);
 		glGenVertexArrays(1, &vao_);
+		shader_ = std::make_unique<OpenGLShader>(CreateDefaultShader());
 	}
 
 	void OpenGLRenderer::Render() {
@@ -41,7 +42,6 @@ namespace plaincraft_render_engine_opengl {
 		const auto scale = drawable->GetScale();
 		const auto position = drawable->GetPosition();
 		const auto rotation = drawable->GetRotation();
-		auto shader = drawable->GetShader();
 		//auto currentFrame = glfwGetTime();
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
@@ -50,8 +50,8 @@ namespace plaincraft_render_engine_opengl {
 		//glm::mat4 model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
 		//model = glm::toMat4(entity->GetBody()->GetCollider()->GetRotation()) * model;
 
-		shader->Use();
-		shader->SetModelViewProjection(model, view, projection);
+		shader_->Use();
+		shader_->SetModelViewProjection(model, view, projection);
 
 		glBindVertexArray(vao_);
 
@@ -74,5 +74,13 @@ namespace plaincraft_render_engine_opengl {
 		glDrawElements(GL_TRIANGLES, static_cast<uint32_t>(polygon->GetIndices().size()), GL_UNSIGNED_INT, nullptr);
 
 		drawables_list_.clear();
+	}
+
+	OpenGLShader OpenGLRenderer::CreateDefaultShader() 
+	{
+		auto vertex_shader = read_file("..\\..\\..\\Core\\resources\\vertexshader.shader"); // shaders should be copied to binary directory or something like this
+		auto fragment_shader = read_file("..\\..\\..\\Core\\resources\\fragmentshader.shader"); // shaders should be copied to binary directory or something like this
+
+		return OpenGLShader(vertex_shader, fragment_shader);
 	}
 }

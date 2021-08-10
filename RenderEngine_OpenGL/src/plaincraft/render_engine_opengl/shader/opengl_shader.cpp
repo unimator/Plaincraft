@@ -30,7 +30,6 @@ SOFTWARE.
 namespace plaincraft_render_engine_opengl {
 	OpenGLShader::OpenGLShader(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
-
 		int success;
 		char infoLog[512];
 

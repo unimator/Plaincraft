@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,5 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_PLAINCRAFT_RENDER_ENGINE_VULKAN
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_PLAINCRAFT_RENDER_ENGINE_VULKAN
 
+#include "../src/plaincraft/render_engine_vulkan/window/vulkan_window.hpp"
 #include "../src/plaincraft/render_engine_vulkan/vulkan_render_engine.hpp"
+
 #endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_PLAINCRAFT_RENDER_ENGINE_VULKAN

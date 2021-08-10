@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,28 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_SHADER
-#define PLAINCRAFT_RENDER_ENGINE_SHADER
-
+#include "opengl_window.hpp"
 #include "../common.hpp"
 
-namespace plaincraft_render_engine {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE Shader
+namespace plaincraft_render_engine_opengl
+{
+	OpenGLWindow::OpenGLWindow(std::string title, uint32_t width, uint32_t height)
+		: Window(title, width, height)
 	{
-	protected:
-		Shader() {}
+		Initialize();
+	}
 
-	public:
-		virtual ~Shader() {}
+	void OpenGLWindow::Initialize()
+	{
+		glewExperimental = true;
 
-		Shader(const Shader& other) = delete;
-		Shader operator=(const Shader& other) = delete;
+		glfwInit();
 
-		virtual void Use() = 0;
-		virtual void SetModelViewProjection(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) = 0;
-	};
+		glfwWindowHint(GLFW_SAMPLES, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+		//glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+
+		instance_ = glfwCreateWindow(width_, height_, title_.c_str(), nullptr, nullptr);
+		glfwSetInputMode(instance_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(instance_, GLFW_STICKY_KEYS, GL_FALSE);
+
+		glfwMakeContextCurrent(instance_);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glfwSwapInterval(0);
+		if (glewInit() != GLEW_OK)
+		{
+			fprintf(stderr, "Failed to initialize GLEW\n");
+			throw std::runtime_error("Failed to initialize GLEW");
+		}
+
+		glEnable(GL_DEPTH_TEST);
+	}
 }
-
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_SHADER

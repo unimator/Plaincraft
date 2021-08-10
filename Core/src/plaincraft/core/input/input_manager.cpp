@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,10 @@ SOFTWARE.
 */
 
 #include "input_manager.hpp"
+#include "../events/types/input_event.hpp"
+#include "../game.hpp"
 #include <cstdio>
 #include <iostream>
-#include "../events/types/input_event.hpp"
 
 namespace plaincraft_core {
 
@@ -38,7 +39,7 @@ namespace plaincraft_core {
 
 	void InputManager::ProcessInputWrapper(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		auto game = reinterpret_cast<Game*>(glfwGetWindowUserPointer(window));
-		game->input_manager_.get()->ProcessInput(window, key, scancode, action, mods);
+		game->input_manager_.ProcessInput(window, key, scancode, action, mods);
 	}
 
 	void InputManager::ProcessInput(GLFWwindow* window, int key, int scancode, int action, int mods) {

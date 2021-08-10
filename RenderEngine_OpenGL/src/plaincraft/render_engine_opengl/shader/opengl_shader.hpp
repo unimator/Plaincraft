@@ -30,10 +30,10 @@ SOFTWARE.
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_render_engine_opengl {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_OPENGL OpenGLShader : public plaincraft_render_engine::Shader
+	class OpenGLShader
 	{
 	private:
-		uint32_t program_id_ = -1;
+		uint32_t program_id_;
 
 	public:
 		OpenGLShader(const std::string& vertex_shader, const std::string& fragment_shader);
@@ -45,8 +45,8 @@ namespace plaincraft_render_engine_opengl {
 		OpenGLShader(OpenGLShader&& other) noexcept;
 		OpenGLShader& operator=(OpenGLShader&& other) noexcept;
 
-		void Use() override;
-		void SetModelViewProjection(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) override;
+		void Use();
+		void SetModelViewProjection(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
 		void SetMat4(const std::string& name, const glm::mat4& value);
 
 	private:

@@ -36,22 +36,19 @@ namespace plaincraft_core
 {
 	using namespace plaincraft_render_engine;
 
-	class DLLEXPORT_PLAINCRAFT_CORE Scene
+	class Scene
 	{
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
 		std::shared_ptr<EventsManager> events_manager_;
-		std::shared_ptr<RenderEngine> render_engine_;
 		std::shared_ptr<PhysicsEngine> physics_engine_;
 		
 
 	public:
-		Scene(std::shared_ptr<EventsManager> events_manager, std::shared_ptr<RenderEngine> render_engine);
+		Scene(std::shared_ptr<EventsManager> events_manager, std::shared_ptr<PhysicsEngine> physics_engine);
 
-		void AddEntity(std::shared_ptr<Entity> entity);
+		void AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine);
 	};
 }
-
-
 
 #endif // PLAINCRAFT_CORE_SCENE

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +28,13 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
 #include "../common.hpp"
 #include "model.hpp"
-#include "../shader/shader.hpp"
 
 namespace plaincraft_render_engine
 {
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE Drawable
+	class Drawable
 	{
 	private:
 		std::shared_ptr<Model> model_;
-		std::shared_ptr<Shader> shader_;
 		Vector3d position_;
 		Quaternion rotation_;
 		float scale_ = 1.0f;
@@ -45,9 +43,6 @@ namespace plaincraft_render_engine
 	public:
 		void SetModel(std::shared_ptr<Model> model);
 		std::shared_ptr<Model> GetModel() const;
-
-		void SetShader(std::shared_ptr<Shader> shader);
-		std::shared_ptr<Shader> GetShader() const;
 
 		auto SetScale(float scale) -> void { scale_ = scale; }
 		auto GetScale() const -> const float { return scale_; }

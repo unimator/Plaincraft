@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ SOFTWARE.
 #include "../../common.hpp"
 
 namespace plaincraft_render_engine {
-	struct DLLEXPORT_PLAINCRAFT_RENDER_ENGINE Image
+	struct Image
 	{
 		uint32_t width = 0;
 		uint32_t height = 0;
@@ -73,7 +73,7 @@ namespace plaincraft_render_engine {
 #pragma pack(pop)
 	};
 
-	Image DLLEXPORT_PLAINCRAFT_RENDER_ENGINE load_bmp_image_from_file(const std::string& path);
+	Image load_bmp_image_from_file(const std::string& path);
 }
 
 

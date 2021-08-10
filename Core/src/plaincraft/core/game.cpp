@@ -38,16 +38,18 @@ SOFTWARE.
 #include <ctime>
 
 namespace plaincraft_core {
-	Game::Game() {
-		const auto camera = std::shared_ptr<plaincraft_render_engine::Camera>(new plaincraft_render_engine::Camera());
-		//render_engine_ = std::shared_ptr<plaincraft_render_engine_opengl::OpenGLRenderEngine>(new plaincraft_render_engine_opengl::OpenGLRenderEngine(1024, 768));
-		render_engine_ = std::shared_ptr<plaincraft_render_engine_vulkan::VulkanRenderEngine>(new plaincraft_render_engine_vulkan::VulkanRenderEngine(1024, 768, true));
-		render_engine_->GetShadersRepository()->RegisterShader("default", render_engine_->CreateDefaultShader());
-		glfwSetWindowUserPointer(render_engine_->GetWindow(), this);
+	Game::Game(std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine) 
+		: render_engine_(std::move(render_engine)),
+		events_manager_(std::make_shared<EventsManager>()),
+		physics_engine_(std::make_shared<PhysicsEngine>()),		
+		scene_(Scene(events_manager_, physics_engine_)),
+		input_manager_(InputManager(events_manager_, render_engine_->GetWindow()->GetInstance()))
+	{
+		auto window = render_engine_->GetWindow();
 
-		events_manager_ = std::shared_ptr<EventsManager>(new EventsManager());
-		input_manager_ = std::shared_ptr<InputManager>(new InputManager(events_manager_, render_engine_->GetWindow()));
-		scene_ = std::shared_ptr<Scene>(new Scene(events_manager_, render_engine_));
+		glfwSetWindowUserPointer(window->GetInstance(), this);
+
+		events_manager_->Subscribe(EventTypes::LOOP_EVENT, physics_engine_);
 	}
 
 	Game::~Game() {
@@ -57,17 +59,43 @@ namespace plaincraft_core {
 		
 		WorldGenerator world_generator;
 		world_generator.GenerateWorld(scene_, render_engine_);
+
+		auto camera = render_engine_->GetCamera();
+		std::shared_ptr<Player> player;
+		player = std::make_shared<Player>(camera);
+
+		auto polygon = std::make_shared<Cube>();
+		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\player.png");
+		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
+
+		auto drawable = std::make_shared<Drawable>();
+		drawable->SetModel(std::make_shared<Model>(polygon, player_texture));
+		drawable->SetScale(0.5f);
+		player->SetDrawable(drawable);		
+
+		auto body = std::shared_ptr<Body>(new Body());
+		auto player_position = Vector3d(2.0f, 3.0f, 2.0f);
+		auto box_collider = BoxCollider(Quaternion(1.0f, 0.0f, 0.0f, 0.0f), 0.25f, 0.25f, 0.25f);
+		body->SetCollider(std::make_shared<BoxCollider>(std::move(box_collider)));
+		player->SetBody(body);
+		player->SetPosition(player_position);
+
+		scene_.AddEntity(player, render_engine_);
+
+		events_manager_->Subscribe(EventTypes::INPUT_EVENT, player);
+		events_manager_->Subscribe(EventTypes::LOOP_EVENT, player);
+
 		MainLoop();
 	}
 
 	void Game::MainLoop() {
 		double cursor_position_x, cursor_position_y;
 		double last_cursor_position_x_ = 1024 / 2, last_cursor_position_y_ = 768 / 8;
-		auto window_instance = render_engine_->GetWindow();
+		auto window_instance = render_engine_->GetWindow()->GetInstance();
 		double last_time, current_time = glfwGetTime();
 		float delta_time;
 		last_time = current_time;
-		uint32_t frame_ticks = 0, logic_ticks = 0;
+		uint32_t frame_ticks = 0;
 		auto camera = render_engine_->GetCamera();
 
 		auto fps_timer = glfwGetTime();

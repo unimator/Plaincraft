@@ -28,30 +28,72 @@ SOFTWARE.
 #include <iostream>
 #include <utility>
 
-namespace plaincraft_render_engine {
-	RenderEngine::RenderEngine(uint32_t width, uint32_t height) 
-		: width_(width), height_(height), window_(nullptr), camera_(std::shared_ptr<Camera>(new Camera())) {
-		shaders_repository_ = std::shared_ptr<ShadersRepository>(new ShadersRepository());
-		textures_repository_ = std::shared_ptr<TexturesRepository>(new TexturesRepository());
+namespace plaincraft_render_engine
+{
+	RenderEngine::RenderEngine(std::shared_ptr<Window> window)
+		: window_(std::move(window)),
+		  camera_(std::make_shared<Camera>())
+	{
+		textures_repository_ = std::make_shared<TexturesRepository>();
+
+		camera_->direction = glm::vec3(0.0f, 0.0f, -1.0f);
+		camera_->up = glm::vec3(0.0f, 1.0f, 0.0f);
+		camera_->fov = 45.0f;
 	}
 
-	RenderEngine::~RenderEngine() = default;
+	RenderEngine::~RenderEngine() 
+	{
 
-	void RenderEngine::GetCursorPosition(double* cursor_position_x, double* cursor_position_y) {
-		glfwGetCursorPos(window_, cursor_position_x, cursor_position_y);
+	};
+
+	RenderEngine::RenderEngine(RenderEngine&& other)
+		: window_(std::move(other.window_))
+	{
+		this->camera_ = other.camera_;
+		other.camera_ = nullptr;
+
+		this->drawables_list_ = std::move(other.drawables_list_);
+
+		this->textures_factory_ = other.textures_factory_;
+		other.textures_factory_ = nullptr;
+
+		this->textures_repository_ = other.textures_repository_;
+		other.textures_repository_ = nullptr;
 	}
 
-	void RenderEngine::RenderFrame() {
-		for (auto drawable : drawables_list_) {
+	RenderEngine& RenderEngine::operator=(RenderEngine&& other) 
+	{
+		this->camera_ = other.camera_;
+		other.camera_ = nullptr;
+
+		this->drawables_list_ = std::move(other.drawables_list_);
+
+		this->textures_factory_ = other.textures_factory_;
+		other.textures_factory_ = nullptr;
+
+		this->textures_repository_ = other.textures_repository_;
+		other.textures_repository_ = nullptr;
+
+		return *this;
+	}
+
+	void RenderEngine::GetCursorPosition(double *cursor_position_x, double *cursor_position_y)
+	{
+		glfwGetCursorPos(window_->GetInstance(), cursor_position_x, cursor_position_y);
+	}
+
+	void RenderEngine::RenderFrame()
+	{
+		for (auto drawable : drawables_list_)
+		{
 			renderer_->Batch(drawable);
 			renderer_->Render();
 		}
+		renderer_->HasRendered();
 	}
 
-	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable) {
-		if (!drawable->GetShader()) {
-			drawable->SetShader(shaders_repository_->GetShader("default"));
-		}
+	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable)
+	{
 		drawables_list_.push_back(drawable);
 	}
 }

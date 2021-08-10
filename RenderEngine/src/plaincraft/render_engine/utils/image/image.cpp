@@ -26,10 +26,10 @@ SOFTWARE.
 
 #include "image.hpp"
 #define STB_IMAGE_IMPLEMENTATION 
-#include <lib\stb_image.h>
+#include <lib/stb_image.h>
 
 namespace plaincraft_render_engine {
-	Image DLLEXPORT_PLAINCRAFT_RENDER_ENGINE load_bmp_image_from_file(const std::string& path) {
+	Image load_bmp_image_from_file(const std::string& path) {
 		int width, height, bpp;
 		uint8_t* data = stbi_load(path.c_str(), &width, &height, &bpp, STBI_rgb_alpha);
 

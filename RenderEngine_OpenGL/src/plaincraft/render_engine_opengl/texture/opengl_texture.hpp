@@ -34,7 +34,7 @@ namespace plaincraft_render_engine_opengl {
 
 	using namespace plaincraft_render_engine;
 
-	class DLLEXPORT_PLAINCRAFT_RENDER_ENGINE_OPENGL OpenGLTexture : public Texture
+	class OpenGLTexture : public Texture
 	{
 	private:
 		uint32_t texture_id_;
