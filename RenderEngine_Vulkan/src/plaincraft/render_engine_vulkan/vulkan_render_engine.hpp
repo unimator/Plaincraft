@@ -50,23 +50,26 @@ namespace plaincraft_render_engine_vulkan {
 		Swapchain swapchain_;
 		
 		std::unique_ptr<VulkanPipeline> pipeline_;
+		VkPipelineLayout pipeline_layout_;
 
 		std::vector<char> vertex_shader_code_;
 		std::vector<char> fragment_shader_code_;
 
 		VkDescriptorSetLayout descriptor_set_layout_;
-		VkPipelineLayout pipeline_layout_;
 		
-		VkCommandPool command_pool_;
 		VkBuffer vertex_buffer_;
-		VkDeviceMemory vertex_buffer_memory_;
 		VkBuffer index_buffer_;
+
+		VkDeviceMemory vertex_buffer_memory_;
 		VkDeviceMemory index_buffer_memory_;
-		VkDescriptorPool descriptor_pool_;
+
 		VkImage texture_image_;
-		VkDeviceMemory texture_image_memory_;
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
+		VkDeviceMemory texture_image_memory_;
+
+		VkDescriptorPool descriptor_pool_;
+		
 		VkImage depth_image_;
 		VkDeviceMemory depth_image_memory_;
 		VkImageView depth_image_view_;
@@ -98,6 +101,8 @@ namespace plaincraft_render_engine_vulkan {
 
 		void CreateDescriptorSetLayout();
 		void CreatePipelineLayout();
+		
+		void SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor);
 
 		bool CheckValidationLayerSupport();
 		std::vector<const char*> GetRequiredExtensions();
@@ -105,8 +110,6 @@ namespace plaincraft_render_engine_vulkan {
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
 
 		void CleanupSwapChain();
-
-		void CreateCommandPool();
 
 		void CreateCommandBuffers();
 

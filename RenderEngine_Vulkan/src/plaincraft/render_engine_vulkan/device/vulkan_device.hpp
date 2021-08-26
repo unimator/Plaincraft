@@ -39,6 +39,8 @@ namespace plaincraft_render_engine_vulkan {
         VkQueue graphics_queue_;
         VkQueue presentation_queue_;
 
+        VkCommandPool command_pool_;
+
         const std::vector<const char*> device_extensions_ = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
@@ -54,6 +56,8 @@ namespace plaincraft_render_engine_vulkan {
         auto GetGraphicsQueue() const -> VkQueue { return graphics_queue_; }
         auto GetPresentationQueue() const -> VkQueue { return presentation_queue_; }
 
+        auto GetCommandPool() const -> VkCommandPool { return command_pool_; }
+
         void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
 
     private:
@@ -64,6 +68,7 @@ namespace plaincraft_render_engine_vulkan {
         bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
 
         void CreateQueues(VkSurfaceKHR surface);
+		void CreateCommandPool(VkSurfaceKHR surface);
 
         uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
     };

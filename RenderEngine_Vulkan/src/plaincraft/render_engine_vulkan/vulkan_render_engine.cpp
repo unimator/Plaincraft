@@ -67,34 +67,16 @@ namespace plaincraft_render_engine_vulkan
 	{
 		vertex_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
 		fragment_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
-
+		
 		VulkanPipelineConfig pipeline_config{};
 		CreateDescriptorSetLayout();
 		CreatePipelineLayout();
-		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
-		pipeline_config.pipeline_layout = pipeline_layout_;
-		pipeline_config.render_pass = swapchain_.GetRenderPass();
-
-
-		VulkanPipeline::CreateDefaultPipelineConfig(pipeline_config);		
-		auto swapchain_extent = swapchain_.GetSwapchainExtent();
 		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(swapchain_extent.width);
-		viewport.height = static_cast<float>(swapchain_extent.height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-
 		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = swapchain_extent;
-		pipeline_config.viewport_info.pViewports = &viewport;
-		pipeline_config.viewport_info.pScissors = &scissor;
+		SetupPipelineConfig(pipeline_config, viewport, scissor);
 
 		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
 		
-		CreateCommandPool();
 		CreateTextureImage();
 		CreateTextureImageView();
 		CreateTextureSampler();
@@ -130,14 +112,13 @@ namespace plaincraft_render_engine_vulkan
 			vkDestroySemaphore(device_.GetDevice(), image_available_semaphores_[i], nullptr);
 			vkDestroyFence(device_.GetDevice(), in_flight_fences_[i], nullptr);
 		}
-		vkDestroyCommandPool(device_.GetDevice(), command_pool_, nullptr);
 
 		vkDestroySurfaceKHR(instance_.GetInstance(), surface_, nullptr);
 	}
 
 	void VulkanRenderEngine::CleanupSwapChain()
 	{
-		vkFreeCommandBuffers(device_.GetDevice(), command_pool_, static_cast<uint32_t>(command_buffers_.size()), command_buffers_.data());
+		vkFreeCommandBuffers(device_.GetDevice(), device_.GetCommandPool(), static_cast<uint32_t>(command_buffers_.size()), command_buffers_.data());
 		
 		for (size_t i = 0; i < swapchain_.GetSwapchainImages().size(); ++i)
 		{
@@ -194,19 +175,25 @@ namespace plaincraft_render_engine_vulkan
 		}
 	}
 
-	void VulkanRenderEngine::CreateCommandPool()
+	void VulkanRenderEngine::SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor)
 	{
-		QueueFamilyIndices indices = FindQueueFamilyIndices(device_.GetPhysicalDevice(), surface_);
+		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
+		pipeline_config.pipeline_layout = pipeline_layout_;
+		pipeline_config.render_pass = swapchain_.GetRenderPass();
 
-		VkCommandPoolCreateInfo command_pool_info{};
-		command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		command_pool_info.queueFamilyIndex = indices.graphics_family.value();
-		command_pool_info.flags = 0;
+		VulkanPipeline::CreateDefaultPipelineConfig(pipeline_config);		
+		auto swapchain_extent = swapchain_.GetSwapchainExtent();
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapchain_extent.width);
+		viewport.height = static_cast<float>(swapchain_extent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
 
-		if (vkCreateCommandPool(device_.GetDevice(), &command_pool_info, nullptr, &command_pool_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create command pool");
-		}
+		scissor.offset = {0, 0};
+		scissor.extent = swapchain_extent;
+		pipeline_config.viewport_info.pViewports = &viewport;
+		pipeline_config.viewport_info.pScissors = &scissor;
 	}
 
 	void VulkanRenderEngine::CreateCommandBuffers()
@@ -215,7 +202,7 @@ namespace plaincraft_render_engine_vulkan
 
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocate_info.commandPool = command_pool_;
+		allocate_info.commandPool = device_.GetCommandPool();
 		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocate_info.commandBufferCount = static_cast<uint32_t>(command_buffers_.size());
 
@@ -305,26 +292,13 @@ namespace plaincraft_render_engine_vulkan
 		CleanupSwapChain();
 
 		swapchain_.RecreateSwapchain();
-		VulkanPipelineConfig pipeline_config{};
-		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
-		pipeline_config.pipeline_layout = pipeline_layout_;
-		pipeline_config.render_pass = swapchain_.GetRenderPass();
-		VulkanPipeline::CreateDefaultPipelineConfig(pipeline_config);
-		auto swapchain_extent = swapchain_.GetSwapchainExtent();
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(swapchain_extent.width);
-		viewport.height = static_cast<float>(swapchain_extent.height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
 
+		VulkanPipelineConfig pipeline_config{};
+		VkViewport viewport{};
 		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = swapchain_extent;
-		pipeline_config.viewport_info.pViewports = &viewport;
-		pipeline_config.viewport_info.pScissors = &scissor;
+		SetupPipelineConfig(pipeline_config, viewport, scissor);
 		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
+		
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();
@@ -393,7 +367,7 @@ namespace plaincraft_render_engine_vulkan
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocate_info.commandPool = command_pool_;
+		allocate_info.commandPool = device_.GetCommandPool();
 		allocate_info.commandBufferCount = 1;
 
 		VkCommandBuffer command_buffer;
@@ -422,7 +396,7 @@ namespace plaincraft_render_engine_vulkan
 		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
 		vkQueueWaitIdle(graphics_queue);
 
-		vkFreeCommandBuffers(device_.GetDevice(), command_pool_, 1, &command_buffer);
+		vkFreeCommandBuffers(device_.GetDevice(), device_.GetCommandPool(), 1, &command_buffer);
 	}
 
 	void VulkanRenderEngine::CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size)

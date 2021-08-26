@@ -14,8 +14,6 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp
     src/plaincraft/render_engine_vulkan/renderer/vertex_utils.cpp
     src/plaincraft/render_engine_vulkan/renderer/vertex_utils.hpp
-    src/plaincraft/render_engine_vulkan/renderer/vulkan_renderer.cpp
-    src/plaincraft/render_engine_vulkan/renderer/vulkan_renderer.hpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.cpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.hpp
     src/plaincraft/render_engine_vulkan/swapchain/swapchain.cpp

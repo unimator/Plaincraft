@@ -39,11 +39,14 @@ namespace plaincraft_render_engine_vulkan {
         PickPhysicalDevice(instance, surface);
         CreateLogicalDevice(surface);
 		CreateQueues(surface);
+		CreateCommandPool(surface);
     }
 
     VulkanDevice::~VulkanDevice()
     {
 		vkDestroyDevice(device_, nullptr);
+		
+		vkDestroyCommandPool(device_, command_pool_, nullptr);
     }
 
 	void VulkanDevice::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory)
@@ -188,6 +191,21 @@ namespace plaincraft_render_engine_vulkan {
 		auto indices = FindQueueFamilyIndices(physical_device_, surface);
 		vkGetDeviceQueue(device_, indices.graphics_family.value(), 0, &graphics_queue_);
 		vkGetDeviceQueue(device_, indices.present_family.value(), 0, &presentation_queue_);
+	}
+
+	void VulkanDevice::CreateCommandPool(VkSurfaceKHR surface)
+	{
+		QueueFamilyIndices indices = FindQueueFamilyIndices(physical_device_, surface);
+
+		VkCommandPoolCreateInfo command_pool_info{};
+		command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		command_pool_info.queueFamilyIndex = indices.graphics_family.value();
+		command_pool_info.flags = 0;
+
+		if (vkCreateCommandPool(device_, &command_pool_info, nullptr, &command_pool_) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create command pool");
+		}
 	}
 
 	uint32_t VulkanDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties)
