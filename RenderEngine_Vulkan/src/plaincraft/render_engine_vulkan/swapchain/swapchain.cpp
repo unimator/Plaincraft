@@ -33,6 +33,8 @@ namespace plaincraft_render_engine_vulkan
 		: window_(window), device_(device), surface_(surface)
     {
         RecreateSwapchain();
+		CreateRenderPass();
+		CreateFrameBuffers();
     }
 
 	Swapchain::Swapchain(Swapchain&& other) 
@@ -44,6 +46,21 @@ namespace plaincraft_render_engine_vulkan
 		other.swapchain_image_format_ = VK_FORMAT_UNDEFINED;
 
 		this->swapchain_extent_ = other.swapchain_extent_;
+	}
+
+	void Swapchain::CleanupSwapchain()
+	{
+		for (auto framebuffer : swapchain_frame_buffers_)
+		{
+			vkDestroyFramebuffer(device_.GetDevice(), framebuffer, nullptr);
+		}
+
+		for (auto image_view : swapchain_images_views_)
+		{
+			vkDestroyImageView(device_.GetDevice(), image_view, nullptr);
+		}
+
+		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_, nullptr);
 	}
 
     void Swapchain::RecreateSwapchain()
@@ -104,6 +121,7 @@ namespace plaincraft_render_engine_vulkan
 		swapchain_extent_ = extent;
 
 		CreateImageViews();
+		CreateFrameBuffers();
     }
 
     VkSurfaceFormatKHR Swapchain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats)
@@ -163,6 +181,76 @@ namespace plaincraft_render_engine_vulkan
 		for (size_t i = 0; i < swapchain_images_.size(); ++i)
 		{
 			swapchain_images_views_[i] = CreateImageView(device_.GetDevice(), swapchain_images_[i], swapchain_image_format_);
+		}
+	}
+
+	void Swapchain::CreateRenderPass()
+    {
+        VkAttachmentDescription color_attachment{};
+		color_attachment.format = swapchain_image_format_;
+		color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+		VkAttachmentReference color_attachment_reference{};
+		color_attachment_reference.attachment = 0;
+		color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkSubpassDescription subpass_description{};
+		subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass_description.colorAttachmentCount = 1;
+		subpass_description.pColorAttachments = &color_attachment_reference;
+
+		VkSubpassDependency dependency{};
+		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass = 0;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcAccessMask = 0;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+		VkRenderPassCreateInfo render_pass_info{};
+		render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		render_pass_info.attachmentCount = 1;
+		render_pass_info.pAttachments = &color_attachment;
+		render_pass_info.subpassCount = 1;
+		render_pass_info.pSubpasses = &subpass_description;
+		render_pass_info.dependencyCount = 1;
+		render_pass_info.pDependencies = &dependency;
+
+		if (vkCreateRenderPass(device_.GetDevice(), &render_pass_info, nullptr, &render_pass_) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create render pass");
+		}
+    }
+
+	void Swapchain::CreateFrameBuffers()
+	{
+		swapchain_frame_buffers_.resize(swapchain_images_.size());
+		auto swapchain_extent = swapchain_extent_;
+
+		for (size_t i = 0; i < swapchain_images_views_.size(); ++i)
+		{
+			VkImageView attachments[] = {
+				swapchain_images_views_[i]};
+
+			VkFramebufferCreateInfo framebuffer_info{};
+			framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			framebuffer_info.renderPass = render_pass_;
+			framebuffer_info.attachmentCount = 1;
+			framebuffer_info.pAttachments = attachments;
+			framebuffer_info.width = swapchain_extent_.width;
+			framebuffer_info.height = swapchain_extent_.height;
+			framebuffer_info.layers = 1;
+
+			if (vkCreateFramebuffer(device_.GetDevice(), &framebuffer_info, nullptr, &swapchain_frame_buffers_[i]) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create framebuffer");
+			}
 		}
 	}
 

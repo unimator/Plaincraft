@@ -30,7 +30,7 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan
 {
     VulkanInstanceConfig::VulkanInstanceConfig()
-        : enable_debug(false),
+        : enable_debug(true),
           application_name("Plaincraft"),
           application_version(VK_MAKE_VERSION(1, 0, 0)),
           engine_name("Plaincraft engine"),

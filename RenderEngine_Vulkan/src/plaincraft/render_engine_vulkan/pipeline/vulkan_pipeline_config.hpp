@@ -27,8 +27,27 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE_CONFIG
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE_CONFIG
 
+#include <vulkan/vulkan.h>
+#include <vector>
 namespace plaincraft_render_engine_vulkan {
+    struct VulkanPipelineConfig {
+        VulkanPipelineConfig(const VulkanPipelineConfig& other) = delete;
+        VulkanPipelineConfig& operator=(const VulkanPipelineConfig& other) = delete;
 
+        VkPipelineViewportStateCreateInfo viewport_info;
+        VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
+        VkPipelineRasterizationStateCreateInfo rasterization_info;
+        VkPipelineMultisampleStateCreateInfo multisample_info;
+        VkPipelineColorBlendAttachmentState color_blend_attachment;
+        VkPipelineColorBlendStateCreateInfo color_blend_info;
+        VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
+        std::vector<VkDynamicState> dynamic_state_enables;
+        VkPipelineDynamicStateCreateInfo dynamic_state_info;
+        VkPipelineLayout pipeline_layout = nullptr;
+        VkDescriptorSetLayout descriptor_set_layout = nullptr;
+        VkRenderPass render_pass = nullptr;
+        uint32_t subpass = 0;
+    };
 }
 
 #endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE_CONFIG

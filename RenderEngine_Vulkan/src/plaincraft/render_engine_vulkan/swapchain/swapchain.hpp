@@ -53,6 +53,8 @@ namespace plaincraft_render_engine_vulkan
 		std::vector<VkImageView> swapchain_images_views_;
 		std::vector<VkFramebuffer> swapchain_frame_buffers_;
 
+        VkRenderPass render_pass_;
+
     public:
         Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface);
 
@@ -70,13 +72,20 @@ namespace plaincraft_render_engine_vulkan
         auto GetSwapchainImagesViews() -> std::vector<VkImageView>& { return swapchain_images_views_; }
         auto GetSwapchainFrameBuffers() -> std::vector<VkFramebuffer>& { return swapchain_frame_buffers_; }
 
+        auto GetRenderPass() -> VkRenderPass {return render_pass_;}
+
+        void CleanupSwapchain();
         void RecreateSwapchain();
 
     private:
+
         VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats);
         VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& available_present_modes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+        
         void CreateImageViews();
+        void CreateRenderPass();
+        void CreateFrameBuffers();
     };
 
     struct SwapchainSupportDetails {

@@ -62,15 +62,38 @@ namespace plaincraft_render_engine_vulkan
 		  enable_debug_(enable_debug),
 		  instance_(VulkanInstance(VulkanInstanceConfig())),
 		  surface_(GetVulkanWindow()->CreateSurface(instance_.GetInstance())),
-		  device_(VulkanDevice(instance_, surface_))
+		  device_(VulkanDevice(instance_, surface_)),
+		  swapchain_(Swapchain(GetVulkanWindow(), device_, surface_))
 	{
-		glfwSetFramebufferSizeCallback(window_->GetInstance(), FramebufferResizeCallback);
-		swapchain_ = std::make_unique<Swapchain>(GetVulkanWindow(), device_, surface_);
-		CreateQueues();
-		CreateRenderPass();
+		vertex_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
+		fragment_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
+
+		VulkanPipelineConfig pipeline_config{};
 		CreateDescriptorSetLayout();
-		CreateGraphicsPipeline();
-		CreateFrameBuffers();
+		CreatePipelineLayout();
+		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
+		pipeline_config.pipeline_layout = pipeline_layout_;
+		pipeline_config.render_pass = swapchain_.GetRenderPass();
+
+
+		VulkanPipeline::CreateDefaultPipelineConfig(pipeline_config);		
+		auto swapchain_extent = swapchain_.GetSwapchainExtent();
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapchain_extent.width);
+		viewport.height = static_cast<float>(swapchain_extent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = swapchain_extent;
+		pipeline_config.viewport_info.pViewports = &viewport;
+		pipeline_config.viewport_info.pScissors = &scissor;
+
+		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
+		
 		CreateCommandPool();
 		CreateTextureImage();
 		CreateTextureImageView();
@@ -95,8 +118,6 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyImage(device_.GetDevice(), texture_image_, nullptr);
 		vkFreeMemory(device_.GetDevice(), texture_image_memory_, nullptr);
 
-		vkDestroyDescriptorSetLayout(device_.GetDevice(), descriptor_set_layout_, nullptr);
-
 		vkDestroyBuffer(device_.GetDevice(), vertex_buffer_, nullptr);
 		vkFreeMemory(device_.GetDevice(), vertex_buffer_memory_, nullptr);
 
@@ -116,75 +137,17 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderEngine::CleanupSwapChain()
 	{
-		for (auto framebuffer : swapchain_->GetSwapchainFrameBuffers())
-		{
-			vkDestroyFramebuffer(device_.GetDevice(), framebuffer, nullptr);
-		}
-
 		vkFreeCommandBuffers(device_.GetDevice(), command_pool_, static_cast<uint32_t>(command_buffers_.size()), command_buffers_.data());
-
-		vkDestroyPipeline(device_.GetDevice(), graphics_pipeline_, nullptr);
-		vkDestroyPipelineLayout(device_.GetDevice(), pipeline_layout_, nullptr);
-		vkDestroyRenderPass(device_.GetDevice(), render_pass_, nullptr);
-
-		for (auto image_view : swapchain_->GetSwapchainImagesViews())
-		{
-			vkDestroyImageView(device_.GetDevice(), image_view, nullptr);
-		}
-
-		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_->GetSwapchain(), nullptr);
-
-		for (size_t i = 0; i < swapchain_->GetSwapchainImages().size(); ++i)
+		
+		for (size_t i = 0; i < swapchain_.GetSwapchainImages().size(); ++i)
 		{
 			vkDestroyBuffer(device_.GetDevice(), uniform_buffers_[i], nullptr);
 			vkFreeMemory(device_.GetDevice(), uniform_buffers_memory_[i], nullptr);
 		}
 
+		swapchain_.CleanupSwapchain();
+
 		vkDestroyDescriptorPool(device_.GetDevice(), descriptor_pool_, nullptr);
-	}
-
-	void VulkanRenderEngine::CreateRenderPass()
-	{
-		VkAttachmentDescription color_attachment{};
-		color_attachment.format = swapchain_->GetSwapchainImageFormat();
-		color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-		VkAttachmentReference color_attachment_reference{};
-		color_attachment_reference.attachment = 0;
-		color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		VkSubpassDescription subpass_description{};
-		subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass_description.colorAttachmentCount = 1;
-		subpass_description.pColorAttachments = &color_attachment_reference;
-
-		VkSubpassDependency dependency{};
-		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.dstSubpass = 0;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.srcAccessMask = 0;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-		VkRenderPassCreateInfo render_pass_info{};
-		render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		render_pass_info.attachmentCount = 1;
-		render_pass_info.pAttachments = &color_attachment;
-		render_pass_info.subpassCount = 1;
-		render_pass_info.pSubpasses = &subpass_description;
-		render_pass_info.dependencyCount = 1;
-		render_pass_info.pDependencies = &dependency;
-
-		if (vkCreateRenderPass(device_.GetDevice(), &render_pass_info, nullptr, &render_pass_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create render pass");
-		}
 	}
 
 	void VulkanRenderEngine::CreateDescriptorSetLayout()
@@ -215,178 +178,19 @@ namespace plaincraft_render_engine_vulkan
 		}
 	}
 
-	void VulkanRenderEngine::CreateGraphicsPipeline()
+	void VulkanRenderEngine::CreatePipelineLayout() 
 	{
-		//auto shader = CreateDefaultShader();
-		auto vertex_shader_code = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
-		auto fragment_shader_code = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
+		VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
+		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipeline_layout_create_info.setLayoutCount = 1;
+		pipeline_layout_create_info.pSetLayouts = &descriptor_set_layout_;
+		pipeline_layout_create_info.pushConstantRangeCount = 0;
+		pipeline_layout_create_info.pPushConstantRanges = nullptr;
+		pipeline_layout_create_info.pNext = VK_NULL_HANDLE;
 
-		VkShaderModule vertex_shader_module = CreateShaderModule(device_.GetDevice(), vertex_shader_code);
-		VkShaderModule fragment_shader_module = CreateShaderModule(device_.GetDevice(), fragment_shader_code);
-
-		VkPipelineShaderStageCreateInfo vertex_shader_stage_info{};
-		vertex_shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		vertex_shader_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		vertex_shader_stage_info.module = vertex_shader_module;
-		vertex_shader_stage_info.pName = "main";
-
-		VkPipelineShaderStageCreateInfo fragment_shader_stage_info{};
-		fragment_shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		fragment_shader_stage_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		fragment_shader_stage_info.module = fragment_shader_module;
-		fragment_shader_stage_info.pName = "main";
-
-		VkPipelineShaderStageCreateInfo shader_stages[] = {vertex_shader_stage_info, fragment_shader_stage_info};
-
-		auto binding_description = VertexUtils::GetBindingDescription();
-		auto attribute_description = VertexUtils::GetAttributeDescription();
-
-		VkPipelineVertexInputStateCreateInfo vertex_input_info{};
-		vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertex_input_info.vertexBindingDescriptionCount = 1;
-		vertex_input_info.pVertexBindingDescriptions = &binding_description;
-		vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_description.size());
-		vertex_input_info.pVertexAttributeDescriptions = attribute_description.data();
-
-		VkPipelineInputAssemblyStateCreateInfo input_assembly_info{};
-		input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		input_assembly_info.primitiveRestartEnable = VK_FALSE;
-
-		auto swapchain_extent = swapchain_->GetSwapchainExtent();
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(swapchain_extent.width);
-		viewport.height = static_cast<float>(swapchain_extent.height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-
-		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = swapchain_extent;
-
-		VkPipelineViewportStateCreateInfo viewport_info{};
-		viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewport_info.viewportCount = 1;
-		viewport_info.pViewports = &viewport;
-		viewport_info.scissorCount = 1;
-		viewport_info.pScissors = &scissor;
-
-		VkPipelineRasterizationStateCreateInfo rasterization_info{};
-		rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-		rasterization_info.depthClampEnable = VK_FALSE;
-		rasterization_info.rasterizerDiscardEnable = VK_FALSE;
-		rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
-		rasterization_info.lineWidth = 1.0f;
-		rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT;
-		rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-		rasterization_info.depthBiasEnable = VK_FALSE;
-		rasterization_info.depthBiasConstantFactor = 0.0f;
-		rasterization_info.depthBiasClamp = 0.0f;
-		rasterization_info.depthBiasSlopeFactor = 0.0f;
-
-		VkPipelineMultisampleStateCreateInfo multisample_info{};
-		multisample_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		multisample_info.sampleShadingEnable = VK_FALSE;
-		multisample_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-		multisample_info.minSampleShading = 1.0f;
-		multisample_info.pSampleMask = nullptr;
-		multisample_info.alphaToCoverageEnable = VK_FALSE;
-		multisample_info.alphaToOneEnable = VK_FALSE;
-
-		VkPipelineColorBlendAttachmentState color_blend_attachment_state{};
-		color_blend_attachment_state.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		color_blend_attachment_state.blendEnable = VK_FALSE;
-		color_blend_attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		color_blend_attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		color_blend_attachment_state.colorBlendOp = VK_BLEND_OP_ADD;
-		color_blend_attachment_state.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		color_blend_attachment_state.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		color_blend_attachment_state.alphaBlendOp = VK_BLEND_OP_ADD;
-
-		VkPipelineColorBlendStateCreateInfo color_blend_attachment_info{};
-		color_blend_attachment_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		color_blend_attachment_info.logicOpEnable = VK_FALSE;
-		color_blend_attachment_info.logicOp = VK_LOGIC_OP_COPY;
-		color_blend_attachment_info.attachmentCount = 1;
-		color_blend_attachment_info.pAttachments = &color_blend_attachment_state;
-		color_blend_attachment_info.blendConstants[0] = 0.0f;
-		color_blend_attachment_info.blendConstants[1] = 0.0f;
-		color_blend_attachment_info.blendConstants[2] = 0.0f;
-		color_blend_attachment_info.blendConstants[3] = 0.0f;
-
-		/*VkDynamicState dynamic_states[] = {
-			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH
-		};
-
-		VkPipelineDynamicStateCreateInfo dynamic_state_info{};
-		dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamic_state_info.dynamicStateCount = 2;
-		dynamic_state_info.pDynamicStates = dynamic_states;*/
-
-		VkPipelineLayoutCreateInfo pipeline_layout_info{};
-		pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipeline_layout_info.setLayoutCount = 1;
-		pipeline_layout_info.pSetLayouts = &descriptor_set_layout_;
-		pipeline_layout_info.pushConstantRangeCount = 0;
-		pipeline_layout_info.pPushConstantRanges = nullptr;
-
-		if (vkCreatePipelineLayout(device_.GetDevice(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+		if(vkCreatePipelineLayout(device_.GetDevice(), &pipeline_layout_create_info, nullptr, &pipeline_layout_) != VK_SUCCESS) 
 		{
 			throw std::runtime_error("Failed to create pipeline layout");
-		}
-
-		VkGraphicsPipelineCreateInfo pipeline_info{};
-		pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipeline_info.stageCount = 2;
-		pipeline_info.pStages = shader_stages;
-		pipeline_info.pVertexInputState = &vertex_input_info;
-		pipeline_info.pInputAssemblyState = &input_assembly_info;
-		pipeline_info.pViewportState = &viewport_info;
-		pipeline_info.pRasterizationState = &rasterization_info;
-		pipeline_info.pMultisampleState = &multisample_info;
-		pipeline_info.pDepthStencilState = nullptr;
-		pipeline_info.pColorBlendState = &color_blend_attachment_info;
-		pipeline_info.pDynamicState = nullptr;
-		pipeline_info.layout = pipeline_layout_;
-		pipeline_info.renderPass = render_pass_;
-		pipeline_info.subpass = 0;
-		pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
-		pipeline_info.basePipelineIndex = -1;
-
-		if (vkCreateGraphicsPipelines(device_.GetDevice(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create graphics pipeline");
-		}
-
-		vkDestroyShaderModule(device_.GetDevice(), fragment_shader_module, nullptr);
-		vkDestroyShaderModule(device_.GetDevice(), vertex_shader_module, nullptr);
-	}
-
-	void VulkanRenderEngine::CreateFrameBuffers()
-	{
-		swapchain_->GetSwapchainFrameBuffers().resize(swapchain_->GetSwapchainImagesViews().size());
-		auto swapchain_extent = swapchain_->GetSwapchainExtent();
-
-		for (size_t i = 0; i < swapchain_->GetSwapchainImagesViews().size(); ++i)
-		{
-			VkImageView attachments[] = {
-				swapchain_->GetSwapchainImagesViews()[i]};
-
-			VkFramebufferCreateInfo framebuffer_info{};
-			framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-			framebuffer_info.renderPass = render_pass_;
-			framebuffer_info.attachmentCount = 1;
-			framebuffer_info.pAttachments = attachments;
-			framebuffer_info.width = swapchain_extent.width;
-			framebuffer_info.height = swapchain_extent.height;
-			framebuffer_info.layers = 1;
-
-			if (vkCreateFramebuffer(device_.GetDevice(), &framebuffer_info, nullptr, &swapchain_->GetSwapchainFrameBuffers()[i]) != VK_SUCCESS)
-			{
-				throw std::runtime_error("Failed to create framebuffer");
-			}
 		}
 	}
 
@@ -407,7 +211,7 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderEngine::CreateCommandBuffers()
 	{
-		command_buffers_.resize(swapchain_->GetSwapchainFrameBuffers().size());
+		command_buffers_.resize(swapchain_.GetSwapchainFrameBuffers().size());
 
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -434,17 +238,17 @@ namespace plaincraft_render_engine_vulkan
 
 			VkRenderPassBeginInfo render_pass_info{};
 			render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			render_pass_info.renderPass = render_pass_;
-			render_pass_info.framebuffer = swapchain_->GetSwapchainFrameBuffers()[i];
+			render_pass_info.renderPass = swapchain_.GetRenderPass();
+			render_pass_info.framebuffer = swapchain_.GetSwapchainFrameBuffers()[i];
 			render_pass_info.renderArea.offset = {0, 0};
-			render_pass_info.renderArea.extent = swapchain_->GetSwapchainExtent();
+			render_pass_info.renderArea.extent = swapchain_.GetSwapchainExtent();
 
 			VkClearValue clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 			render_pass_info.clearValueCount = 1;
 			render_pass_info.pClearValues = &clear_color;
 
 			vkCmdBeginRenderPass(command_buffers_[i], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(command_buffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline_);
+			vkCmdBindPipeline(command_buffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_->GetPipeline());
 
 			VkBuffer vertex_buffers[] = {vertex_buffer_};
 			VkDeviceSize offsets[] = {0};
@@ -468,7 +272,7 @@ namespace plaincraft_render_engine_vulkan
 		image_available_semaphores_.resize(MAX_FRAMES_IN_FLIGHT);
 		render_finished_semaphores_.resize(MAX_FRAMES_IN_FLIGHT);
 		in_flight_fences_.resize(MAX_FRAMES_IN_FLIGHT);
-		images_in_flight_.resize(swapchain_->GetSwapchainImages().size(), VK_NULL_HANDLE);
+		images_in_flight_.resize(swapchain_.GetSwapchainImages().size(), VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo semaphore_info{};
 		semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -500,31 +304,31 @@ namespace plaincraft_render_engine_vulkan
 
 		CleanupSwapChain();
 
-		swapchain_->RecreateSwapchain();
-		CreateRenderPass();
-		CreateGraphicsPipeline();
-		CreateFrameBuffers();
+		swapchain_.RecreateSwapchain();
+		VulkanPipelineConfig pipeline_config{};
+		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
+		pipeline_config.pipeline_layout = pipeline_layout_;
+		pipeline_config.render_pass = swapchain_.GetRenderPass();
+		VulkanPipeline::CreateDefaultPipelineConfig(pipeline_config);
+		auto swapchain_extent = swapchain_.GetSwapchainExtent();
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapchain_extent.width);
+		viewport.height = static_cast<float>(swapchain_extent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = swapchain_extent;
+		pipeline_config.viewport_info.pViewports = &viewport;
+		pipeline_config.viewport_info.pScissors = &scissor;
+		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();
 		CreateCommandBuffers();
-	}
-
-	void VulkanRenderEngine::CreateQueues()
-	{
-		auto indices = FindQueueFamilyIndices(device_.GetPhysicalDevice(), surface_);
-		vkGetDeviceQueue(device_.GetDevice(), indices.graphics_family.value(), 0, &graphics_queue_);
-		vkGetDeviceQueue(device_.GetDevice(), indices.present_family.value(), 0, &presentation_queue_);
-	}
-
-	void VulkanRenderEngine::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &create_info)
-	{
-		create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-		create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		create_info.pfnUserCallback = DebugCallback;
-		create_info.pUserData = nullptr;
 	}
 
 	void VulkanRenderEngine::CreateVertexBuffer()
@@ -573,7 +377,7 @@ namespace plaincraft_render_engine_vulkan
 	{
 		VkDeviceSize buffer_size = sizeof(plaincraft_render_engine::ModelViewProjectionMatrix);
 
-		auto swapchain_images = swapchain_->GetSwapchainImages();
+		auto swapchain_images = swapchain_.GetSwapchainImages();
 		uniform_buffers_.resize(swapchain_images.size());
 		uniform_buffers_memory_.resize(swapchain_images.size());
 
@@ -613,8 +417,10 @@ namespace plaincraft_render_engine_vulkan
 		submit_info.commandBufferCount = 1;
 		submit_info.pCommandBuffers = &command_buffer;
 
-		vkQueueSubmit(graphics_queue_, 1, &submit_info, VK_NULL_HANDLE);
-		vkQueueWaitIdle(graphics_queue_);
+		auto graphics_queue = device_.GetGraphicsQueue();
+
+		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+		vkQueueWaitIdle(graphics_queue);
 
 		vkFreeCommandBuffers(device_.GetDevice(), command_pool_, 1, &command_buffer);
 	}
@@ -701,7 +507,7 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderEngine::CreateDescriptorPool()
 	{
-		auto swapchain_images = swapchain_->GetSwapchainImages();
+		auto swapchain_images = swapchain_.GetSwapchainImages();
 		std::array<VkDescriptorPoolSize, 2> pool_sizes{};
 		pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		pool_sizes[0].descriptorCount = static_cast<uint32_t>(swapchain_images.size());
@@ -722,7 +528,7 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderEngine::CreateDescriptorSets()
 	{
-		auto swapchain_images = swapchain_->GetSwapchainImages();
+		auto swapchain_images = swapchain_.GetSwapchainImages();
 		std::vector<VkDescriptorSetLayout> layouts(swapchain_images.size(), descriptor_set_layout_);
 		VkDescriptorSetAllocateInfo descriptor_set_allocate_info{};
 		descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -780,7 +586,7 @@ namespace plaincraft_render_engine_vulkan
 		auto current_time = std::chrono::high_resolution_clock::now();
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
 
-		auto swapchain_extent = swapchain_->GetSwapchainExtent();
+		auto swapchain_extent = swapchain_.GetSwapchainExtent();
 		ModelViewProjectionMatrix mvp_matrix{};
 		mvp_matrix.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		mvp_matrix.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -899,22 +705,6 @@ namespace plaincraft_render_engine_vulkan
 	{
 	}
 
-	VkShaderModule VulkanRenderEngine::CreateShaderModule(VkDevice device, const std::vector<char> &code)
-	{
-		VkShaderModuleCreateInfo create_info{};
-		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		create_info.codeSize = code.size();
-		create_info.pCode = reinterpret_cast<const uint32_t *>(code.data());
-
-		VkShaderModule shader_module;
-		if (vkCreateShaderModule(device, &create_info, nullptr, &shader_module) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create shader module");
-		}
-
-		return shader_module;
-	}
-
 	uint32_t VulkanRenderEngine::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties)
 	{
 		VkPhysicalDeviceMemoryProperties device_memory_properties;
@@ -937,7 +727,7 @@ namespace plaincraft_render_engine_vulkan
 
 		glfwPollEvents();
 		uint32_t image_index;
-		VkResult result = vkAcquireNextImageKHR(device_.GetDevice(), swapchain_->GetSwapchain(), UINT64_MAX, image_available_semaphores_[current_frame_], VK_NULL_HANDLE, &image_index);
+		VkResult result = vkAcquireNextImageKHR(device_.GetDevice(), swapchain_.GetSwapchain(), UINT64_MAX, image_available_semaphores_[current_frame_], VK_NULL_HANDLE, &image_index);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
@@ -974,7 +764,7 @@ namespace plaincraft_render_engine_vulkan
 		submit_info.pSignalSemaphores = signal_semaphores;
 
 		vkResetFences(device_.GetDevice(), 1, &in_flight_fences_[current_frame_]);
-		if (vkQueueSubmit(graphics_queue_, 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)
+		if (vkQueueSubmit(device_.GetGraphicsQueue(), 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to submitt draw command buffer");
 		}
@@ -984,17 +774,18 @@ namespace plaincraft_render_engine_vulkan
 		presentation_info.waitSemaphoreCount = 1;
 		presentation_info.pWaitSemaphores = signal_semaphores;
 
-		VkSwapchainKHR swap_chains[] = {swapchain_->GetSwapchain()};
+		VkSwapchainKHR swap_chains[] = {swapchain_.GetSwapchain()};
 		presentation_info.swapchainCount = 1;
 		presentation_info.pSwapchains = swap_chains;
 		presentation_info.pImageIndices = &image_index;
 		presentation_info.pResults = nullptr;
 
-		result = vkQueuePresentKHR(presentation_queue_, &presentation_info);
+		auto presentation_queue = device_.GetPresentationQueue();
+		result = vkQueuePresentKHR(presentation_queue, &presentation_info);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || frame_buffer_resized_)
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || GetVulkanWindow()->WasResized())
 		{
-			frame_buffer_resized_ = false;
+			GetVulkanWindow()->ResetWasResized();
 			RecreateSwapChain();
 		}
 		else if (result != VK_SUCCESS)
@@ -1002,21 +793,8 @@ namespace plaincraft_render_engine_vulkan
 			throw std::runtime_error("Failed to present swap chain image");
 		}
 
-		vkQueueWaitIdle(presentation_queue_);
+		vkQueueWaitIdle(presentation_queue);
 
 		current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
-	}
-
-	VKAPI_ATTR VkBool32 VKAPI_CALL VulkanRenderEngine::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity, VkDebugUtilsMessageTypeFlagsEXT message_type, const VkDebugUtilsMessengerCallbackDataEXT *callback_data, void *user_data)
-	{
-		std::cerr << "Validation layer: " << callback_data->pMessage << std::endl;
-
-		return VK_FALSE;
-	}
-
-	void VulkanRenderEngine::FramebufferResizeCallback(GLFWwindow *window, int width, int height)
-	{
-		auto render_engine = reinterpret_cast<VulkanRenderEngine *>(glfwGetWindowUserPointer(window));
-		render_engine->frame_buffer_resized_ = true;
 	}
 }

@@ -62,21 +62,14 @@ namespace plaincraft_render_engine_vulkan
 		instance_ = glfwCreateWindow(width_, height_, title_.c_str(), nullptr, nullptr);
 		glfwSetWindowUserPointer(instance_, this);
 
-		//glfwMakeContextCurrent(window_);
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glfwSwapInterval(0);
-		/*auto init_result = glewInit();
-		if (init_result != GLEW_OK) {
-			fprintf(stderr, "Failed to initialize GLEW\n");
-			throw std::runtime_error("Failed to initialize GLEW");
-		}*/
 
-		//glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetInputMode(instance_, GLFW_STICKY_KEYS, GL_FALSE);
 
 		glEnable(GL_DEPTH_TEST);
+		
+		glfwSetFramebufferSizeCallback(instance_, FramebufferResizeCallback);
     }
 
 	VkSurfaceKHR VulkanWindow::CreateSurface(VkInstance instance)
@@ -88,5 +81,14 @@ namespace plaincraft_render_engine_vulkan
 			throw std::runtime_error("Failed to create window surface");
 		}
 		return surface;
+	}
+
+	
+	void VulkanWindow::FramebufferResizeCallback(GLFWwindow *instance, int width, int height)
+	{
+		auto window = reinterpret_cast<VulkanWindow *>(glfwGetWindowUserPointer(instance));
+		window->width_ = width;
+		window->height_ = height;
+		window->was_resized_ = true;
 	}
 }

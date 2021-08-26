@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,8 @@ namespace plaincraft_render_engine {
 	{
 	public:
 		virtual void UseTexture() const = 0;
+
+		~Texture() {}
 	};
 
 	using TextureRef = std::shared_ptr<Texture>;

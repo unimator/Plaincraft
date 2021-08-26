@@ -32,6 +32,8 @@ SOFTWARE.
 #include "swapchain/swapchain.hpp"
 #include "device/vulkan_device.hpp"
 #include "window/vulkan_window.hpp"
+#include "pipeline/vulkan_pipeline.hpp"
+#include "pipeline/vulkan_pipeline_config.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -45,14 +47,16 @@ namespace plaincraft_render_engine_vulkan {
 		VulkanInstance instance_;
 		VkSurfaceKHR surface_;
 		VulkanDevice device_;
-		std::unique_ptr<Swapchain> swapchain_;
-
-		VkQueue graphics_queue_, presentation_queue_;
+		Swapchain swapchain_;
 		
-		VkRenderPass render_pass_;
+		std::unique_ptr<VulkanPipeline> pipeline_;
+
+		std::vector<char> vertex_shader_code_;
+		std::vector<char> fragment_shader_code_;
+
 		VkDescriptorSetLayout descriptor_set_layout_;
 		VkPipelineLayout pipeline_layout_;
-		VkPipeline graphics_pipeline_;
+		
 		VkCommandPool command_pool_;
 		VkBuffer vertex_buffer_;
 		VkDeviceMemory vertex_buffer_memory_;
@@ -77,7 +81,6 @@ namespace plaincraft_render_engine_vulkan {
 		std::vector<VkDescriptorSet> descriptor_sets_;
 
 		bool enable_debug_ = false;
-		bool frame_buffer_resized_ = false;
 		size_t current_frame_ = 0;
 
 	public:
@@ -93,22 +96,15 @@ namespace plaincraft_render_engine_vulkan {
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 
 
+		void CreateDescriptorSetLayout();
+		void CreatePipelineLayout();
+
 		bool CheckValidationLayerSupport();
 		std::vector<const char*> GetRequiredExtensions();
-		VkShaderModule CreateShaderModule(VkDevice device, const std::vector<char>& code);
+		
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
 
 		void CleanupSwapChain();
-
-		void CreateQueues();
-
-		void CreateRenderPass();
-
-		void CreateDescriptorSetLayout();
-
-		void CreateGraphicsPipeline();
-
-		void CreateFrameBuffers();
 
 		void CreateCommandPool();
 
@@ -117,8 +113,6 @@ namespace plaincraft_render_engine_vulkan {
 		void CreateSyncObjects();
 
 		void RecreateSwapChain();
-
-		void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& create_info);
 
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();
@@ -142,10 +136,6 @@ namespace plaincraft_render_engine_vulkan {
 
 		void CreateDepthResources();
 
-
-		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity, VkDebugUtilsMessageTypeFlagsEXT message_type, const VkDebugUtilsMessengerCallbackDataEXT* callback_data, void* user_data);
-
-		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }
 

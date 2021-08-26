@@ -36,6 +36,9 @@ namespace plaincraft_render_engine_vulkan
     using namespace plaincraft_render_engine;
     class VulkanWindow final : public Window 
     {
+    private:
+        bool was_resized_ = false;
+
     public:
         VulkanWindow(std::string title, uint32_t width, uint32_t height);
 
@@ -46,8 +49,13 @@ namespace plaincraft_render_engine_vulkan
 
         VkSurfaceKHR CreateSurface(VkInstance instance);
 
+        auto WasResized() -> bool const {return was_resized_;}
+        void ResetWasResized() {was_resized_ = false;}  
+
     private:
         void Initialize();
+
+        static void FramebufferResizeCallback(GLFWwindow* instance, int width, int height);
     };
 }
 

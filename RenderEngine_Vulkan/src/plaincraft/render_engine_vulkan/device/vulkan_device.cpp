@@ -34,10 +34,11 @@ SOFTWARE.
 #include <string>
 
 namespace plaincraft_render_engine_vulkan {
-    VulkanDevice::VulkanDevice(const VulkanInstance& instance, VkSurfaceKHR surface) 
+    VulkanDevice::VulkanDevice(const VulkanInstance& instance, VkSurfaceKHR surface)
     {
         PickPhysicalDevice(instance, surface);
         CreateLogicalDevice(surface);
+		CreateQueues(surface);
     }
 
     VulkanDevice::~VulkanDevice()
@@ -129,12 +130,13 @@ namespace plaincraft_render_engine_vulkan {
 		device_create_info.enabledExtensionCount = static_cast<uint32_t>(device_extensions_.size());
 		device_create_info.ppEnabledExtensionNames = device_extensions_.data();
 
-#ifndef NDEBUG
+#define NODEBUG
+#ifndef NODEBUG
         device_create_info.enabledLayerCount = 0;
 #else
         device_create_info.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
         device_create_info.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-#endif // NDEBUG
+#endif // NODEBUG
 
 		if (vkCreateDevice(physical_device_, &device_create_info, nullptr, &device_) != VK_SUCCESS)
 		{
@@ -179,6 +181,13 @@ namespace plaincraft_render_engine_vulkan {
 		}
 
 		return required_extensions.empty();
+	}
+
+	void VulkanDevice::CreateQueues(VkSurfaceKHR surface)
+	{
+		auto indices = FindQueueFamilyIndices(physical_device_, surface);
+		vkGetDeviceQueue(device_, indices.graphics_family.value(), 0, &graphics_queue_);
+		vkGetDeviceQueue(device_, indices.present_family.value(), 0, &presentation_queue_);
 	}
 
 	uint32_t VulkanDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties)

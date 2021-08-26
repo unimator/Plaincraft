@@ -27,16 +27,37 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE
 
-#include <vulkan\vulkan.h>
+#include "../device/vulkan_device.hpp"
+#include "../swapchain/swapchain.hpp"
+#include "vulkan_pipeline_config.hpp"
+#include <vulkan/vulkan.h>
 #include <vector>
 
 namespace plaincraft_render_engine_vulkan {
     class VulkanPipeline {
     private:
-        VkPipeline pipeline_;
+        VulkanDevice& device_;
+
+		VkPipeline graphics_pipeline_;
+        VkShaderModule vertex_shader_;        
+        VkShaderModule fragment_shader_;
 
     public:
-        VulkanPipeline(const VkDevice& device, const std::vector<char>& vertex_shader, const std::vector<char>& fragment_shader);
+        VulkanPipeline(VulkanDevice& device, const std::vector<char>& vertex_shader_code, const std::vector<char>& fragment_shader_code, const VulkanPipelineConfig& pipeline_config);
+
+        ~VulkanPipeline();
+
+        void Bind(VkCommandBuffer command_buffer);
+
+        auto GetPipeline() -> VkPipeline {return graphics_pipeline_;}
+
+        static void CreateDefaultPipelineConfig(VulkanPipelineConfig& pipeline_config);
+    private:
+        VkShaderModule CreateShaderModule(const std::vector<char>& code);
+
+        void CreateGraphicsPipeline(const std::vector<char>& vertex_shader_code, const std::vector<char>& fragment_shader_code, const VulkanPipelineConfig& pipeline_config);
+
+        void CreateDescriptorSetLayout();
     };
 }
 
