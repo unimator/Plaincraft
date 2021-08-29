@@ -25,20 +25,19 @@ SOFTWARE.
 */
 
 #include "swapchain.hpp"
-#include "../utils/image_utils.hpp"
 
 namespace plaincraft_render_engine_vulkan 
 {
     Swapchain::Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface)
-		: window_(window), device_(device), surface_(surface)
+		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device))
     {
-        RecreateSwapchain();
+        CreateSwapchain();
 		CreateRenderPass();
 		CreateFrameBuffers();
     }
 
 	Swapchain::Swapchain(Swapchain&& other) 
-		: swapchain_(other.swapchain_), window_(other.window_), device_(other.device_), surface_(other.surface_)
+		: swapchain_(other.swapchain_), window_(other.window_), device_(other.device_), surface_(other.surface_), image_manager_(other.image_manager_)
 	{
 		other.swapchain_ = VK_NULL_HANDLE;
 
@@ -63,8 +62,8 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_, nullptr);
 	}
 
-    void Swapchain::RecreateSwapchain()
-    {
+	void Swapchain::CreateSwapchain()
+	{
 		auto swapchain_support = QuerySwapChainSupport(device_.GetPhysicalDevice(), surface_);
 
 		auto surface_format = ChooseSwapSurfaceFormat(swapchain_support.formats);
@@ -121,6 +120,11 @@ namespace plaincraft_render_engine_vulkan
 		swapchain_extent_ = extent;
 
 		CreateImageViews();
+	}
+
+    void Swapchain::RecreateSwapchain()
+    {
+		CreateSwapchain();
 		CreateFrameBuffers();
     }
 
@@ -180,7 +184,7 @@ namespace plaincraft_render_engine_vulkan
 
 		for (size_t i = 0; i < swapchain_images_.size(); ++i)
 		{
-			swapchain_images_views_[i] = CreateImageView(device_.GetDevice(), swapchain_images_[i], swapchain_image_format_);
+			image_manager_.CreateImageView(swapchain_images_[i], swapchain_image_format_, swapchain_images_views_[i]);
 		}
 	}
 

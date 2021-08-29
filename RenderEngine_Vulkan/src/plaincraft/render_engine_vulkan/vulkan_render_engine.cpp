@@ -35,7 +35,6 @@ SOFTWARE.
 #include "renderer/vertex_utils.hpp"
 #include "window/vulkan_window.hpp"
 #include "utils/queue_family.hpp"
-#include "utils/image_utils.hpp"
 #include "swapchain/swapchain.hpp"
 
 const std::vector<plaincraft_render_engine::Vertex> vertices = {
@@ -63,7 +62,9 @@ namespace plaincraft_render_engine_vulkan
 		  instance_(VulkanInstance(VulkanInstanceConfig())),
 		  surface_(GetVulkanWindow()->CreateSurface(instance_.GetInstance())),
 		  device_(VulkanDevice(instance_, surface_)),
-		  swapchain_(Swapchain(GetVulkanWindow(), device_, surface_))
+		  swapchain_(Swapchain(GetVulkanWindow(), device_, surface_)),
+		  buffer_manager_(VulkanBufferManager(device_)),
+		  image_manager_(VulkanImageManager(device_))
 	{
 		vertex_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
 		fragment_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
@@ -77,9 +78,10 @@ namespace plaincraft_render_engine_vulkan
 
 		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
 		
-		CreateTextureImage();
-		CreateTextureImageView();
-		CreateTextureSampler();
+		auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
+		image_manager_.CreateTextureImage(image, texture_image_, texture_image_memory_);
+		image_manager_.CreateTextureImageView(texture_image_, texture_image_view_);
+		image_manager_.CreateTextureSampler(texture_sampler_);
 		CreateVertexBuffer();
 		CreateIndexBuffer();
 		CreateUniformBuffers();
@@ -311,16 +313,16 @@ namespace plaincraft_render_engine_vulkan
 
 		VkBuffer staging_buffer;
 		VkDeviceMemory staging_buffer_memory;
-		device_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
+		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
 
 		void *data;
 		vkMapMemory(device_.GetDevice(), staging_buffer_memory, 0, buffer_size, 0, &data);
 		memcpy(data, vertices.data(), buffer_size);
 		vkUnmapMemory(device_.GetDevice(), staging_buffer_memory);
 
-		device_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertex_buffer_, vertex_buffer_memory_);
+		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertex_buffer_, vertex_buffer_memory_);
 
-		CopyBuffer(staging_buffer, vertex_buffer_, buffer_size);
+		buffer_manager_.CopyBuffer(staging_buffer, vertex_buffer_, buffer_size);
 
 		vkDestroyBuffer(device_.GetDevice(), staging_buffer, nullptr);
 		vkFreeMemory(device_.GetDevice(), staging_buffer_memory, nullptr);
@@ -332,16 +334,15 @@ namespace plaincraft_render_engine_vulkan
 
 		VkBuffer staging_buffer;
 		VkDeviceMemory staging_buffer_memory;
-		device_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
+		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
 
 		void *data;
 		vkMapMemory(device_.GetDevice(), staging_buffer_memory, 0, buffer_size, 0, &data);
 		memcpy(data, indices.data(), buffer_size);
 		vkUnmapMemory(device_.GetDevice(), staging_buffer_memory);
 
-		device_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, index_buffer_, index_buffer_memory_);
-
-		CopyBuffer(staging_buffer, index_buffer_, buffer_size);
+		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, index_buffer_, index_buffer_memory_);
+		buffer_manager_.CopyBuffer(staging_buffer, index_buffer_, buffer_size);
 
 		vkDestroyBuffer(device_.GetDevice(), staging_buffer, nullptr);
 		vkFreeMemory(device_.GetDevice(), staging_buffer_memory, nullptr);
@@ -357,126 +358,8 @@ namespace plaincraft_render_engine_vulkan
 
 		for (size_t i = 0; i < swapchain_images.size(); ++i)
 		{
-			device_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniform_buffers_[i], uniform_buffers_memory_[i]);
+			buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniform_buffers_[i], uniform_buffers_memory_[i]);
 		}
-	}
-
-	
-	VkCommandBuffer VulkanRenderEngine::BeginSingleTimeCommands()
-	{
-		VkCommandBufferAllocateInfo allocate_info{};
-		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocate_info.commandPool = device_.GetCommandPool();
-		allocate_info.commandBufferCount = 1;
-
-		VkCommandBuffer command_buffer;
-		vkAllocateCommandBuffers(device_.GetDevice(), &allocate_info, &command_buffer);
-
-		VkCommandBufferBeginInfo begin_info{};
-		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-		vkBeginCommandBuffer(command_buffer, &begin_info);
-
-		return command_buffer;
-	}
-
-	void VulkanRenderEngine::EndSingleTimeCommands(VkCommandBuffer command_buffer)
-	{
-		vkEndCommandBuffer(command_buffer);
-
-		VkSubmitInfo submit_info{};
-		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submit_info.commandBufferCount = 1;
-		submit_info.pCommandBuffers = &command_buffer;
-
-		auto graphics_queue = device_.GetGraphicsQueue();
-
-		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-		vkQueueWaitIdle(graphics_queue);
-
-		vkFreeCommandBuffers(device_.GetDevice(), device_.GetCommandPool(), 1, &command_buffer);
-	}
-
-	void VulkanRenderEngine::CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size)
-	{
-		auto command_buffer = BeginSingleTimeCommands();
-
-		VkBufferCopy copy_region{};
-		copy_region.srcOffset = 0;
-		copy_region.dstOffset = 0;
-		copy_region.size = size;
-
-		vkCmdCopyBuffer(command_buffer, source_buffer, destination_buffer, 1, &copy_region);
-
-		EndSingleTimeCommands(command_buffer);
-	}
-
-	void VulkanRenderEngine::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout)
-	{
-		auto command_buffer = BeginSingleTimeCommands();
-
-		VkImageMemoryBarrier image_memory_barrier{};
-		image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		image_memory_barrier.oldLayout = old_image_layout;
-		image_memory_barrier.newLayout = new_image_layout;
-		image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier.image = image;
-		image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		image_memory_barrier.subresourceRange.baseMipLevel = 0;
-		image_memory_barrier.subresourceRange.levelCount = 1;
-		image_memory_barrier.subresourceRange.baseArrayLayer = 0;
-		image_memory_barrier.subresourceRange.layerCount = 1;
-		image_memory_barrier.srcAccessMask = 0;
-		image_memory_barrier.dstAccessMask = 0;
-
-		VkPipelineStageFlags source_stage;
-		VkPipelineStageFlags destination_stage;
-
-		if (old_image_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_image_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
-		{
-			image_memory_barrier.srcAccessMask = 0;
-			image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-			source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-			destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		}
-		else if (old_image_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_image_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		{
-			image_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			image_memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-			source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		}
-
-		vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
-
-		EndSingleTimeCommands(command_buffer);
-	}
-
-	void VulkanRenderEngine::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
-	{
-		auto command_buffer = BeginSingleTimeCommands();
-
-		VkBufferImageCopy image_copy_region{};
-		image_copy_region.bufferOffset = 0;
-		image_copy_region.bufferRowLength = 0;
-		image_copy_region.bufferImageHeight = 0;
-
-		image_copy_region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		image_copy_region.imageSubresource.mipLevel = 0;
-		image_copy_region.imageSubresource.baseArrayLayer = 0;
-		image_copy_region.imageSubresource.layerCount = 1;
-
-		image_copy_region.imageOffset = {0, 0, 0};
-		image_copy_region.imageExtent = {width, height, 1};
-
-		vkCmdCopyBufferToImage(command_buffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &image_copy_region);
-
-		EndSingleTimeCommands(command_buffer);
 	}
 
 	void VulkanRenderEngine::CreateDescriptorPool()
@@ -571,108 +454,6 @@ namespace plaincraft_render_engine_vulkan
 		vkMapMemory(device_.GetDevice(), uniform_buffers_memory_[image_index], 0, sizeof(mvp_matrix), 0, &data);
 		memcpy(data, &mvp_matrix, sizeof(mvp_matrix));
 		vkUnmapMemory(device_.GetDevice(), uniform_buffers_memory_[image_index]);
-	}
-
-	void VulkanRenderEngine::CreateTextureImage()
-	{
-		auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
-
-		if (!image.data)
-		{
-			throw std::runtime_error("Failed to load image data");
-		}
-
-		VkDeviceSize image_size = image.width * image.height * 4;
-		VkBuffer staging_buffer;
-		VkDeviceMemory staging_buffer_memory;
-
-		device_.CreateBuffer(image_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
-		void *data;
-		vkMapMemory(device_.GetDevice(), staging_buffer_memory, 0, image_size, 0, &data);
-		memcpy(data, image.data.get(), static_cast<size_t>(image_size));
-		vkUnmapMemory(device_.GetDevice(), staging_buffer_memory);
-
-		CreateImage(image.width, image.height, VK_FORMAT_R8G8B8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture_image_, texture_image_memory_);
-
-		TransitionImageLayout(texture_image_, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		CopyBufferToImage(staging_buffer, texture_image_, image.width, image.height);
-		TransitionImageLayout(texture_image_, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-		vkDestroyBuffer(device_.GetDevice(), staging_buffer, nullptr);
-		vkFreeMemory(device_.GetDevice(), staging_buffer_memory, nullptr);
-	}
-
-	void VulkanRenderEngine::CreateTextureImageView()
-	{
-		texture_image_view_ = CreateImageView(device_.GetDevice(), texture_image_, VK_FORMAT_R8G8B8A8_SRGB);
-	}
-
-	void VulkanRenderEngine::CreateTextureSampler()
-	{
-		VkPhysicalDeviceProperties physical_device_properties{};
-		vkGetPhysicalDeviceProperties(device_.GetPhysicalDevice(), &physical_device_properties);
-
-		VkSamplerCreateInfo sampler_info{};
-		sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		sampler_info.magFilter = VK_FILTER_LINEAR;
-		sampler_info.minFilter = VK_FILTER_LINEAR;
-		sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		sampler_info.anisotropyEnable = VK_TRUE;
-		sampler_info.maxAnisotropy = physical_device_properties.limits.maxSamplerAnisotropy;
-		sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-		sampler_info.unnormalizedCoordinates = VK_FALSE;
-		sampler_info.compareEnable = VK_FALSE;
-		sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
-		sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		sampler_info.mipLodBias = 0.0f;
-		sampler_info.minLod = 0.0f;
-		sampler_info.maxLod = 0.0f;
-
-		if (vkCreateSampler(device_.GetDevice(), &sampler_info, nullptr, &texture_sampler_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create texture sampler");
-		}
-	}
-
-	void VulkanRenderEngine::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling image_tiling, VkImageUsageFlags image_usage_flags, VkMemoryPropertyFlags memory_property_flags, VkImage &image, VkDeviceMemory &image_memory)
-	{
-		VkImageCreateInfo image_create_info{};
-		image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		image_create_info.imageType = VK_IMAGE_TYPE_2D;
-		image_create_info.extent.width = width;
-		image_create_info.extent.height = height;
-		image_create_info.extent.depth = 1;
-		image_create_info.mipLevels = 1;
-		image_create_info.arrayLayers = 1;
-		image_create_info.format = VK_FORMAT_R8G8B8A8_SRGB;
-		image_create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-		image_create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;
-		image_create_info.flags = 0;
-
-		if (vkCreateImage(device_.GetDevice(), &image_create_info, nullptr, &texture_image_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create image");
-		}
-
-		VkMemoryRequirements memory_requirements;
-		vkGetImageMemoryRequirements(device_.GetDevice(), texture_image_, &memory_requirements);
-
-		VkMemoryAllocateInfo memory_allocate_info{};
-		memory_allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memory_allocate_info.allocationSize = memory_requirements.size;
-		memory_allocate_info.memoryTypeIndex = FindMemoryType(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-		if (vkAllocateMemory(device_.GetDevice(), &memory_allocate_info, nullptr, &texture_image_memory_) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to allocate image memory");
-		}
-
-		vkBindImageMemory(device_.GetDevice(), texture_image_, texture_image_memory_, 0);
 	}
 
 	void VulkanRenderEngine::CreateDepthResources()

@@ -30,6 +30,7 @@ SOFTWARE.
 #include "../device/vulkan_device.hpp"
 #include "../utils/queue_family.hpp"
 #include "../window/vulkan_window.hpp"
+#include "../memory/vulkan_image_manager.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -55,6 +56,8 @@ namespace plaincraft_render_engine_vulkan
 
         VkRenderPass render_pass_;
 
+        VulkanImageManager image_manager_;
+
     public:
         Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface);
 
@@ -78,6 +81,7 @@ namespace plaincraft_render_engine_vulkan
         void RecreateSwapchain();
 
     private:
+        void CreateSwapchain();
 
         VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats);
         VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& available_present_modes);

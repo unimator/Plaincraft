@@ -49,33 +49,6 @@ namespace plaincraft_render_engine_vulkan {
 		vkDestroyCommandPool(device_, command_pool_, nullptr);
     }
 
-	void VulkanDevice::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory)
-    {
-        VkBufferCreateInfo buffer_info{};
-		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		buffer_info.size = size;
-		buffer_info.usage = usage;
-		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		if (vkCreateBuffer(device_, &buffer_info, nullptr, &buffer) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to create vertex buffer");
-		}
-
-		VkMemoryRequirements memory_requirements;
-		vkGetBufferMemoryRequirements(device_, buffer, &memory_requirements);
-
-		VkMemoryAllocateInfo allocate_info{};
-		allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocate_info.allocationSize = memory_requirements.size;
-		allocate_info.memoryTypeIndex = FindMemoryType(memory_requirements.memoryTypeBits, memory_properties);
-
-		if (vkAllocateMemory(device_, &allocate_info, nullptr, &buffer_memory) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to allocate vertex buffer memory");
-		}
-
-		vkBindBufferMemory(device_, buffer, buffer_memory, 0);
-    }
-
     void VulkanDevice::PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface)
 	{
 		uint32_t device_count = 0;
@@ -208,7 +181,7 @@ namespace plaincraft_render_engine_vulkan {
 		}
 	}
 
-	uint32_t VulkanDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties)
+	uint32_t VulkanDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties) const
 	{
 		VkPhysicalDeviceMemoryProperties device_memory_properties;
 		vkGetPhysicalDeviceMemoryProperties(physical_device_, &device_memory_properties);

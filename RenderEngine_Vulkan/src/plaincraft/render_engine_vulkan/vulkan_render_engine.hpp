@@ -34,6 +34,8 @@ SOFTWARE.
 #include "window/vulkan_window.hpp"
 #include "pipeline/vulkan_pipeline.hpp"
 #include "pipeline/vulkan_pipeline_config.hpp"
+#include "memory/vulkan_image_manager.hpp"
+#include "memory/vulkan_buffer_manager.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -57,6 +59,9 @@ namespace plaincraft_render_engine_vulkan {
 
 		VkDescriptorSetLayout descriptor_set_layout_;
 		
+		VulkanBufferManager buffer_manager_;
+		VulkanImageManager image_manager_;
+
 		VkBuffer vertex_buffer_;
 		VkBuffer index_buffer_;
 
@@ -120,22 +125,11 @@ namespace plaincraft_render_engine_vulkan {
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();
 		void CreateUniformBuffers();
-		
-		VkCommandBuffer BeginSingleTimeCommands();
-		void EndSingleTimeCommands(VkCommandBuffer command_buffer);
-		void CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size);
-		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout);
-		void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
+				
 		void CreateDescriptorPool();
 		void CreateDescriptorSets();
 
 		void UpdateUniformBuffer(uint32_t image_index);
-
-		void CreateTextureImage();
-		void CreateTextureImageView();
-		void CreateTextureSampler();
-		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling image_tiling, VkImageUsageFlags image_usage_flags, VkMemoryPropertyFlags memory_property_flags, VkImage& image, VkDeviceMemory& image_memory);
 
 		void CreateDepthResources();
 

@@ -24,14 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER
 
+#include "../device/vulkan_device.hpp"
 #include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine_vulkan 
-{
-    VkImageView CreateImageView(VkDevice device, VkImage image, VkFormat format);
+namespace plaincraft_render_engine_vulkan {
+    class VulkanBufferManager final {
+        friend class VulkanImageManager;
+    private:
+        const VulkanDevice& device_;
+
+    public:
+        VulkanBufferManager(const VulkanDevice& device);
+
+        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
+        void CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size);
+
+    private:
+        VkCommandBuffer BeginSingleTimeCommands();
+		void EndSingleTimeCommands(VkCommandBuffer command_buffer);
+    };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_IMAGE_UTILS
+#endif //PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER 

@@ -58,7 +58,7 @@ namespace plaincraft_render_engine_vulkan {
 
         auto GetCommandPool() const -> VkCommandPool { return command_pool_; }
 
-        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
+        uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties) const;
 
     private:
         void PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface);
@@ -69,8 +69,6 @@ namespace plaincraft_render_engine_vulkan {
 
         void CreateQueues(VkSurfaceKHR surface);
 		void CreateCommandPool(VkSurfaceKHR surface);
-
-        uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
     };
 }
 
