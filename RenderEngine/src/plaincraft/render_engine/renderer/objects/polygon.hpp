@@ -26,6 +26,7 @@ SOFTWARE.
 
 #ifndef PLAINCRAFT_RENDER_ENGINE_POLYGON
 #define PLAINCRAFT_RENDER_ENGINE_POLYGON
+
 #include <cstdint>
 #include "../../common.hpp"
 #include "../vertex.hpp"

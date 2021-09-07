@@ -36,6 +36,7 @@ SOFTWARE.
 #include "pipeline/vulkan_pipeline_config.hpp"
 #include "memory/vulkan_image_manager.hpp"
 #include "memory/vulkan_buffer_manager.hpp"
+#include "model/vulkan_model.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -88,6 +89,8 @@ namespace plaincraft_render_engine_vulkan {
 		std::vector<VkDeviceMemory> uniform_buffers_memory_;
 		std::vector<VkDescriptorSet> descriptor_sets_;
 
+		std::unique_ptr<VulkanModel> model_;
+
 		bool enable_debug_ = false;
 		size_t current_frame_ = 0;
 
@@ -133,6 +136,7 @@ namespace plaincraft_render_engine_vulkan {
 
 		void CreateDepthResources();
 
+		void LoadModel();
 	};
 }
 

@@ -73,7 +73,7 @@ namespace plaincraft_render_engine_vulkan {
 		vkBindImageMemory(device, image, image_memory, 0);
 	}
 
-    void VulkanImageManager::CreateImageView(VkImage image, VkFormat format, VkImageView& image_view)
+    void VulkanImageManager::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags, VkImageView& image_view)
 	{
         auto device = device_.GetDevice();
 		VkImageViewCreateInfo create_info{};
@@ -85,7 +85,7 @@ namespace plaincraft_render_engine_vulkan {
 		create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 		create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 		create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		create_info.subresourceRange.aspectMask = aspect_flags;
 		create_info.subresourceRange.baseMipLevel = 0;
 		create_info.subresourceRange.levelCount = 1;
 		create_info.subresourceRange.baseArrayLayer = 0;
@@ -149,7 +149,7 @@ namespace plaincraft_render_engine_vulkan {
 
 	void VulkanImageManager::CreateTextureImageView(VkImage texture_image, VkImageView& texture_image_view)
 	{
-		CreateImageView(texture_image, VK_FORMAT_R8G8B8A8_SRGB, texture_image_view);
+		CreateImageView(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, texture_image_view);
 	}
 
 	void VulkanImageManager::CreateTextureSampler(VkSampler& texture_sampler)
@@ -192,13 +192,26 @@ namespace plaincraft_render_engine_vulkan {
 		image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		image_memory_barrier.image = image;
-		image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		image_memory_barrier.subresourceRange.baseMipLevel = 0;
 		image_memory_barrier.subresourceRange.levelCount = 1;
 		image_memory_barrier.subresourceRange.baseArrayLayer = 0;
 		image_memory_barrier.subresourceRange.layerCount = 1;
 		image_memory_barrier.srcAccessMask = 0;
 		image_memory_barrier.dstAccessMask = 0;
+
+		if(new_image_layout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) 
+		{
+			image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+			if(device_.HasStencilComponent(format))
+			{
+				image_memory_barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+		}
+		else 
+		{
+			image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		}
 
 		VkPipelineStageFlags source_stage;
 		VkPipelineStageFlags destination_stage;
@@ -218,6 +231,18 @@ namespace plaincraft_render_engine_vulkan {
 
 			source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 			destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		}
+		else if (old_image_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_image_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+		{
+			image_memory_barrier.srcAccessMask = 0;
+			image_memory_barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			destination_stage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		}
+		else 
+		{
+			throw std::invalid_argument("Unsupported layout transition");
 		}
 
 		vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);

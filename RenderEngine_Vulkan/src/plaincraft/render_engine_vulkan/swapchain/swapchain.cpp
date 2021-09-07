@@ -33,6 +33,7 @@ namespace plaincraft_render_engine_vulkan
     {
         CreateSwapchain();
 		CreateRenderPass();
+		CreateDepthResources();
 		CreateFrameBuffers();
     }
 
@@ -57,6 +58,11 @@ namespace plaincraft_render_engine_vulkan
 		for (auto image_view : swapchain_images_views_)
 		{
 			vkDestroyImageView(device_.GetDevice(), image_view, nullptr);
+		}
+
+		for (auto depth_view : depth_images_views_)
+		{
+			vkDestroyImageView(device_.GetDevice(), depth_view, nullptr);
 		}
 
 		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_, nullptr);
@@ -125,6 +131,7 @@ namespace plaincraft_render_engine_vulkan
     void Swapchain::RecreateSwapchain()
     {
 		CreateSwapchain();
+		CreateDepthResources();
 		CreateFrameBuffers();
     }
 
@@ -184,7 +191,7 @@ namespace plaincraft_render_engine_vulkan
 
 		for (size_t i = 0; i < swapchain_images_.size(); ++i)
 		{
-			image_manager_.CreateImageView(swapchain_images_[i], swapchain_image_format_, swapchain_images_views_[i]);
+			image_manager_.CreateImageView(swapchain_images_[i], swapchain_image_format_, VK_IMAGE_ASPECT_COLOR_BIT, swapchain_images_views_[i]);
 		}
 	}
 
@@ -204,23 +211,39 @@ namespace plaincraft_render_engine_vulkan
 		color_attachment_reference.attachment = 0;
 		color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+		VkAttachmentDescription depth_attachment{};
+		depth_attachment.format = FindDepthFormat();
+		depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		VkAttachmentReference depth_attachment_reference{};
+		depth_attachment_reference.attachment = 1;
+		depth_attachment_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
 		VkSubpassDescription subpass_description{};
 		subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpass_description.colorAttachmentCount = 1;
 		subpass_description.pColorAttachments = &color_attachment_reference;
+		subpass_description.pDepthStencilAttachment = &depth_attachment_reference;
 
 		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 		dependency.dstSubpass = 0;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		dependency.srcAccessMask = 0;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
+		std::array<VkAttachmentDescription, 2> attachments = {color_attachment, depth_attachment};
 		VkRenderPassCreateInfo render_pass_info{};
 		render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		render_pass_info.attachmentCount = 1;
-		render_pass_info.pAttachments = &color_attachment;
+		render_pass_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+		render_pass_info.pAttachments = attachments.data();
 		render_pass_info.subpassCount = 1;
 		render_pass_info.pSubpasses = &subpass_description;
 		render_pass_info.dependencyCount = 1;
@@ -239,14 +262,16 @@ namespace plaincraft_render_engine_vulkan
 
 		for (size_t i = 0; i < swapchain_images_views_.size(); ++i)
 		{
-			VkImageView attachments[] = {
-				swapchain_images_views_[i]};
+			std::array<VkImageView, 2> attachments = {
+				swapchain_images_views_[i],
+				depth_images_views_[i]
+			};
 
 			VkFramebufferCreateInfo framebuffer_info{};
 			framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebuffer_info.renderPass = render_pass_;
-			framebuffer_info.attachmentCount = 1;
-			framebuffer_info.pAttachments = attachments;
+			framebuffer_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+			framebuffer_info.pAttachments = attachments.data();
 			framebuffer_info.width = swapchain_extent_.width;
 			framebuffer_info.height = swapchain_extent_.height;
 			framebuffer_info.layers = 1;
@@ -255,6 +280,33 @@ namespace plaincraft_render_engine_vulkan
 			{
 				throw std::runtime_error("Failed to create framebuffer");
 			}
+		}
+	}
+
+
+	VkFormat Swapchain::FindDepthFormat() const
+	{
+		return device_.FindSupportedFormat(
+			{VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+			VK_IMAGE_TILING_OPTIMAL,
+			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+		);
+	}
+
+	void Swapchain::CreateDepthResources()
+	{
+		auto depth_format = FindDepthFormat();
+		auto images_count = swapchain_images_.size();
+
+		depth_images_.resize(images_count);
+		depth_images_views_.resize(images_count);
+		depth_images_memories_.resize(images_count);
+
+		for(size_t i = 0; i < images_count; ++i)
+		{
+			image_manager_.CreateImage(swapchain_extent_.width, swapchain_extent_.height, depth_format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depth_images_[i], depth_images_memories_[i]);
+			image_manager_.CreateImageView(depth_images_[i], depth_format, VK_IMAGE_ASPECT_DEPTH_BIT, depth_images_views_[i]);
+			image_manager_.TransitionImageLayout(depth_images_[i], depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 		}
 	}
 

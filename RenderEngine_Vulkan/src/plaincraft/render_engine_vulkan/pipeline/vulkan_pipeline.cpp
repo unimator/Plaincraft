@@ -72,51 +72,6 @@ namespace plaincraft_render_engine_vulkan
 		vertex_input_info.pVertexBindingDescriptions = &binding_description;
 		vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_description.size());
 		vertex_input_info.pVertexAttributeDescriptions = attribute_description.data();
-
-		// auto extent = swapchain_.GetSwapchainExtent();
-		// VkViewport viewport{};
-		// viewport.x = 0.0f;
-		// viewport.y = 0.0f;
-		// viewport.width = static_cast<float>(extent.width);
-		// viewport.height = static_cast<float>(extent.height);
-		// viewport.minDepth = 0.0f;
-		// viewport.maxDepth = 1.0f;
-
-		// VkRect2D scissor{};
-		// scissor.offset = {0, 0};
-		// scissor.extent = extent;
-
-		// VkPipelineColorBlendAttachmentState color_blend_attachment_state{};
-		// color_blend_attachment_state.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		// color_blend_attachment_state.blendEnable = VK_FALSE;
-		// color_blend_attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		// color_blend_attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		// color_blend_attachment_state.colorBlendOp = VK_BLEND_OP_ADD;
-		// color_blend_attachment_state.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		// color_blend_attachment_state.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		// color_blend_attachment_state.alphaBlendOp = VK_BLEND_OP_ADD;
-
-		/*VkDynamicState dynamic_states[] = {
-			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH
-		};
-
-		VkPipelineDynamicStateCreateInfo dynamic_state_info{};
-		dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamic_state_info.dynamicStateCount = 2;
-		dynamic_state_info.pDynamicStates = dynamic_states;*/
-
-		// VkPipelineLayoutCreateInfo pipeline_layout_info{};
-		// pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		// pipeline_layout_info.setLayoutCount = 1;
-		// pipeline_layout_info.pSetLayouts = &descriptor_set_layout_;
-		// pipeline_layout_info.pushConstantRangeCount = 0;
-		// pipeline_layout_info.pPushConstantRanges = nullptr;
-
-		// if (vkCreatePipelineLayout(vk_device, &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
-		// {
-		// 	throw std::runtime_error("Failed to create pipeline layout");
-		// }
-
 		
 		VkDynamicState dynamic_states[] = {
 			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH
@@ -189,7 +144,7 @@ namespace plaincraft_render_engine_vulkan
 		pipeline_config.rasterization_info.rasterizerDiscardEnable = VK_FALSE;
 		pipeline_config.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
 		pipeline_config.rasterization_info.lineWidth = 1.0f;
-		pipeline_config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT;
+		pipeline_config.rasterization_info.cullMode = VK_CULL_MODE_NONE; //VK_CULL_MODE_BACK_BIT;
 		pipeline_config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		pipeline_config.rasterization_info.depthBiasEnable = VK_FALSE;
 		pipeline_config.rasterization_info.depthBiasConstantFactor = 0.0f;

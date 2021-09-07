@@ -24,34 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
 
-#include "vulkan_buffer_manager.hpp"
+#include "../device/vulkan_device.hpp"
+#include "../memory/vulkan_buffer_manager.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
 namespace plaincraft_render_engine_vulkan {
     using namespace plaincraft_render_engine;
-
-    class VulkanImageManager {
+    
+    class VulkanModel : Model {
     private:
-        const VulkanDevice& device_;
-        VulkanBufferManager buffer_manager_;
+        VulkanDevice& device_;
 
+        VkBuffer vertex_buffer_;
+        VkDeviceMemory vertex_buffer_memory_;
+        uint32_t vertex_count_;
+
+        VkBuffer index_buffer_;
+        VkDeviceMemory index_buffer_memory_;
+        uint32_t index_count_;
+
+        VulkanBufferManager& buffer_manager_;
+    
     public:
-        VulkanImageManager(const VulkanDevice& device);
+        VulkanModel(VulkanDevice& device, std::shared_ptr<Polygon const> polygon);
+        ~VulkanModel();
 
-		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling image_tiling, VkImageUsageFlags image_usage_flags, VkMemoryPropertyFlags memory_property_flags, VkImage& image, VkDeviceMemory& image_memory);
-        void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags, VkImageView& image_view);
-        void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-        
-		void CreateTextureImage(const Image& image, VkImage& texture_image, VkDeviceMemory& texture_image_memory);
-		void CreateTextureImageView(VkImage texture_image, VkImageView& texture_image_view);
-		void CreateTextureSampler(VkSampler& texture_sampler);
+        VulkanModel(const VulkanModel& other) = delete;
+        VulkanModel& operator=(const VulkanModel& other) = delete;
 
-        void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout);
+        void Bind(VkCommandBuffer command_buffer);
+        void Draw(VkCommandBuffer command_buffer);
+
+    private:
+        void CreateVertexBuffer(const std::vector<Vertex>& vertices);
+        void CreateIndexBuffer(const std::vector<uint32_t>& indices);
     };
 }
 
-#endif //PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL

@@ -183,8 +183,9 @@ namespace plaincraft_render_engine_vulkan {
 
 	uint32_t VulkanDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties) const
 	{
+		auto physical_device = physical_device_;
 		VkPhysicalDeviceMemoryProperties device_memory_properties;
-		vkGetPhysicalDeviceMemoryProperties(physical_device_, &device_memory_properties);
+		vkGetPhysicalDeviceMemoryProperties(physical_device, &device_memory_properties);
 
 		for (uint32_t i = 0; i < device_memory_properties.memoryTypeCount; ++i) {
 			if ((type_filter & (1 << i)) && (device_memory_properties.memoryTypes[i].propertyFlags & memory_properties) == memory_properties) {
@@ -193,5 +194,32 @@ namespace plaincraft_render_engine_vulkan {
 		}
 
 		throw std::runtime_error("Failed to find suitable memory type");
+	}
+
+	VkFormat VulkanDevice::FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const
+	{
+		auto physical_device = physical_device_;
+
+		for(VkFormat format : candidates)
+		{
+			VkFormatProperties format_properties;
+			vkGetPhysicalDeviceFormatProperties(physical_device, format, &format_properties);
+
+			if(tiling == VK_IMAGE_TILING_LINEAR && (format_properties.linearTilingFeatures & features) == features)
+			{
+				return format;
+			}
+			else if(tiling == VK_IMAGE_TILING_OPTIMAL && (format_properties.optimalTilingFeatures & features) == features)
+			{
+				return format;
+			}
+		}
+
+		throw std::runtime_error("Failed to find supported format");
+	}
+
+	bool VulkanDevice::HasStencilComponent(VkFormat format) const
+	{
+		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
 }

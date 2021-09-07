@@ -76,6 +76,8 @@ namespace plaincraft_render_engine_vulkan
 		VkRect2D scissor{};
 		SetupPipelineConfig(pipeline_config, viewport, scissor);
 
+		LoadModel();
+
 		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
 		
 		auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
@@ -116,6 +118,9 @@ namespace plaincraft_render_engine_vulkan
 		}
 
 		vkDestroySurfaceKHR(instance_.GetInstance(), surface_, nullptr);
+
+		vkDestroyDescriptorSetLayout(device_.GetDevice(), descriptor_set_layout_, nullptr);
+		vkDestroyPipelineLayout(device_.GetDevice(), pipeline_layout_, nullptr);
 	}
 
 	void VulkanRenderEngine::CleanupSwapChain()
@@ -232,9 +237,11 @@ namespace plaincraft_render_engine_vulkan
 			render_pass_info.renderArea.offset = {0, 0};
 			render_pass_info.renderArea.extent = swapchain_.GetSwapchainExtent();
 
-			VkClearValue clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
-			render_pass_info.clearValueCount = 1;
-			render_pass_info.pClearValues = &clear_color;
+			std::array<VkClearValue, 2> clear_colors{};
+			clear_colors[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+			clear_colors[1].depthStencil = {1.0f, 0};
+			render_pass_info.clearValueCount = static_cast<uint32_t>(clear_colors.size());
+			render_pass_info.pClearValues = clear_colors.data();
 
 			vkCmdBeginRenderPass(command_buffers_[i], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(command_buffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_->GetPipeline());
@@ -246,7 +253,9 @@ namespace plaincraft_render_engine_vulkan
 
 			vkCmdBindDescriptorSets(command_buffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_sets_[i], 0, nullptr);
 			//vkCmdDraw(command_buffers_[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-			vkCmdDrawIndexed(command_buffers_[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+			//vkCmdDrawIndexed(command_buffers_[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+			model_->Bind(command_buffers_[i]);
+			model_->Draw(command_buffers_[i]);
 			vkCmdEndRenderPass(command_buffers_[i]);
 
 			if (vkEndCommandBuffer(command_buffers_[i]) != VK_SUCCESS)
@@ -551,5 +560,11 @@ namespace plaincraft_render_engine_vulkan
 		vkQueueWaitIdle(presentation_queue);
 
 		current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
+	}
+
+	void VulkanRenderEngine::LoadModel()
+	{
+		auto polygon = std::make_shared<const Cube>(Cube());
+		model_ = std::make_unique<VulkanModel>(device_, polygon);
 	}
 }

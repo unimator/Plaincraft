@@ -7,6 +7,8 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/memory/vulkan_buffer_manager.hpp
     src/plaincraft/render_engine_vulkan/memory/vulkan_image_manager.cpp
     src/plaincraft/render_engine_vulkan/memory/vulkan_image_manager.hpp
+    src/plaincraft/render_engine_vulkan/model/vulkan_model.cpp
+    src/plaincraft/render_engine_vulkan/model/vulkan_model.hpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.cpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.cpp

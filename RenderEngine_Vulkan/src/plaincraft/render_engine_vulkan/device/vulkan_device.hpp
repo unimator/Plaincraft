@@ -59,6 +59,9 @@ namespace plaincraft_render_engine_vulkan {
         auto GetCommandPool() const -> VkCommandPool { return command_pool_; }
 
         uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties) const;
+        VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const;
+
+        bool HasStencilComponent(VkFormat format) const;
 
     private:
         void PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface);

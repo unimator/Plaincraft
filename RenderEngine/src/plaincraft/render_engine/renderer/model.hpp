@@ -26,6 +26,7 @@ SOFTWARE.
 
 #ifndef PLAINCRAFT_RENDER_ENGINE_MODEL
 #define PLAINCRAFT_RENDER_ENGINE_MODEL
+
 #include "objects/polygon.hpp"
 #include "../texture/texture.hpp"
 
@@ -37,6 +38,7 @@ namespace plaincraft_render_engine {
 		std::shared_ptr<Texture const> texture_;
 
 	public:
+		Model();
 		Model(std::shared_ptr<Polygon const> polygon, std::shared_ptr<Texture const> texture);
 
 		~Model() { }

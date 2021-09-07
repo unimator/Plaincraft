@@ -54,6 +54,10 @@ namespace plaincraft_render_engine_vulkan
 		std::vector<VkImageView> swapchain_images_views_;
 		std::vector<VkFramebuffer> swapchain_frame_buffers_;
 
+        std::vector<VkImage> depth_images_;
+        std::vector<VkImageView> depth_images_views_; 
+        std::vector<VkDeviceMemory> depth_images_memories_;
+
         VkRenderPass render_pass_;
 
         VulkanImageManager image_manager_;
@@ -90,6 +94,9 @@ namespace plaincraft_render_engine_vulkan
         void CreateImageViews();
         void CreateRenderPass();
         void CreateFrameBuffers();
+        void CreateDepthResources();
+
+        VkFormat FindDepthFormat() const;
     };
 
     struct SwapchainSupportDetails {

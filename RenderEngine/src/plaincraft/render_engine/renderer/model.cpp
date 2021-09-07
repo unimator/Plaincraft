@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,5 +27,7 @@ SOFTWARE.
 #include "model.hpp"
 
 namespace plaincraft_render_engine {
+	Model::Model() {}
+
 	Model::Model(std::shared_ptr<Polygon const> polygon, std::shared_ptr<Texture const> texture) : polygon_(polygon), texture_(texture) {}
 }
