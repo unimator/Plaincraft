@@ -79,7 +79,7 @@ namespace plaincraft_render_engine_vulkan
         auto GetSwapchainImagesViews() -> std::vector<VkImageView>& { return swapchain_images_views_; }
         auto GetSwapchainFrameBuffers() -> std::vector<VkFramebuffer>& { return swapchain_frame_buffers_; }
 
-        auto GetRenderPass() -> VkRenderPass {return render_pass_;}
+        auto GetRenderPass() const -> VkRenderPass {return render_pass_;}
 
         void CleanupSwapchain();
         void RecreateSwapchain();

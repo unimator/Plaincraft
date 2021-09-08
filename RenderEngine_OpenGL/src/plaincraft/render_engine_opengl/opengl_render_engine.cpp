@@ -35,7 +35,7 @@ namespace plaincraft_render_engine_opengl
 	OpenGLRenderEngine::OpenGLRenderEngine(std::shared_ptr<OpenGLWindow> window) 
 	: RenderEngine(std::move(window))
 	{
-		renderer_ = std::make_shared<OpenGLRenderer>(OpenGLRenderer(camera_));
+		renderer_ = std::make_unique<OpenGLRenderer>(OpenGLRenderer(camera_));
 		textures_factory_ = std::make_shared<OpenGLTexturesFactory>(OpenGLTexturesFactory());
 	}
 

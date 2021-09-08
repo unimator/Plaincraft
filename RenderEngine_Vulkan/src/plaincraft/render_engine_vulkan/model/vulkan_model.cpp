@@ -28,7 +28,7 @@ SOFTWARE.
 #include <cstring>
 
 namespace plaincraft_render_engine_vulkan {
-    VulkanModel::VulkanModel(VulkanDevice& device, std::shared_ptr<Polygon const> polygon) 
+    VulkanModel::VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon) 
         : device_(device), buffer_manager_(VulkanBufferManager(device)) {
         CreateVertexBuffer(polygon->GetVertices());
         CreateIndexBuffer(polygon->GetIndices());

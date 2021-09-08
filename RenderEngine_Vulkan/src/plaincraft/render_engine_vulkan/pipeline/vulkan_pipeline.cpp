@@ -31,7 +31,7 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-	VulkanPipeline::VulkanPipeline(VulkanDevice &device, const std::vector<char> &vertex_shader_code, const std::vector<char> &fragment_shader_code, const VulkanPipelineConfig &pipeline_config)
+	VulkanPipeline::VulkanPipeline(const VulkanDevice &device, const std::vector<char> &vertex_shader_code, const std::vector<char> &fragment_shader_code, const VulkanPipelineConfig &pipeline_config)
 		: device_(device)
 	{
 		CreateGraphicsPipeline(vertex_shader_code, fragment_shader_code, pipeline_config);

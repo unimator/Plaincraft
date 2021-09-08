@@ -36,20 +36,20 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan {
     class VulkanPipeline {
     private:
-        VulkanDevice& device_;
+        const VulkanDevice& device_;
 
 		VkPipeline graphics_pipeline_;
         VkShaderModule vertex_shader_;        
         VkShaderModule fragment_shader_;
 
     public:
-        VulkanPipeline(VulkanDevice& device, const std::vector<char>& vertex_shader_code, const std::vector<char>& fragment_shader_code, const VulkanPipelineConfig& pipeline_config);
+        VulkanPipeline(const VulkanDevice& device, const std::vector<char>& vertex_shader_code, const std::vector<char>& fragment_shader_code, const VulkanPipelineConfig& pipeline_config);
 
         ~VulkanPipeline();
 
         void Bind(VkCommandBuffer command_buffer);
 
-        auto GetPipeline() -> VkPipeline {return graphics_pipeline_;}
+        auto GetPipeline() const -> VkPipeline {return graphics_pipeline_;}
 
         static void CreateDefaultPipelineConfig(VulkanPipelineConfig& pipeline_config);
     private:

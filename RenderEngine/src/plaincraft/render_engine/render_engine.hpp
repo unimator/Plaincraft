@@ -42,7 +42,7 @@ namespace plaincraft_render_engine {
 		std::string title_ = "Plaincraft";
 
 		std::shared_ptr<Camera> camera_;
-		std::shared_ptr<Renderer> renderer_;
+		std::unique_ptr<Renderer> renderer_;
 		std::vector<std::shared_ptr<Drawable>> drawables_list_;
 
 		std::shared_ptr<TexturesRepository> textures_repository_;

@@ -37,6 +37,7 @@ SOFTWARE.
 #include "memory/vulkan_image_manager.hpp"
 #include "memory/vulkan_buffer_manager.hpp"
 #include "model/vulkan_model.hpp"
+#include "renderer/vulkan_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -51,14 +52,9 @@ namespace plaincraft_render_engine_vulkan {
 		VkSurfaceKHR surface_;
 		VulkanDevice device_;
 		Swapchain swapchain_;
-		
-		std::unique_ptr<VulkanPipeline> pipeline_;
+
+        std::unique_ptr<VulkanPipeline> pipeline_;
 		VkPipelineLayout pipeline_layout_;
-
-		std::vector<char> vertex_shader_code_;
-		std::vector<char> fragment_shader_code_;
-
-		VkDescriptorSetLayout descriptor_set_layout_;
 		
 		VulkanBufferManager buffer_manager_;
 		VulkanImageManager image_manager_;
@@ -74,22 +70,10 @@ namespace plaincraft_render_engine_vulkan {
 		VkSampler texture_sampler_;
 		VkDeviceMemory texture_image_memory_;
 
-		VkDescriptorPool descriptor_pool_;
-		
-		VkImage depth_image_;
-		VkDeviceMemory depth_image_memory_;
-		VkImageView depth_image_view_;
-
 		std::vector<VkSemaphore> image_available_semaphores_;
 		std::vector<VkSemaphore> render_finished_semaphores_;
 		std::vector<VkFence> in_flight_fences_;
 		std::vector<VkFence> images_in_flight_;
-		std::vector<VkCommandBuffer> command_buffers_;
-		std::vector<VkBuffer> uniform_buffers_;
-		std::vector<VkDeviceMemory> uniform_buffers_memory_;
-		std::vector<VkDescriptorSet> descriptor_sets_;
-
-		std::unique_ptr<VulkanModel> model_;
 
 		bool enable_debug_ = false;
 		size_t current_frame_ = 0;
@@ -106,20 +90,12 @@ namespace plaincraft_render_engine_vulkan {
 
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 
-
-		void CreateDescriptorSetLayout();
-		void CreatePipelineLayout();
-		
-		void SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor);
+		//auto GetVulkanRenderer() -> std::unique_ptr<VulkanRenderer> { return std::static_pointer_cast<VulkanRenderer>(renderer_); }
 
 		bool CheckValidationLayerSupport();
 		std::vector<const char*> GetRequiredExtensions();
 		
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
-
-		void CleanupSwapChain();
-
-		void CreateCommandBuffers();
 
 		void CreateSyncObjects();
 
@@ -127,16 +103,6 @@ namespace plaincraft_render_engine_vulkan {
 
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();
-		void CreateUniformBuffers();
-				
-		void CreateDescriptorPool();
-		void CreateDescriptorSets();
-
-		void UpdateUniformBuffer(uint32_t image_index);
-
-		void CreateDepthResources();
-
-		void LoadModel();
 	};
 }
 
