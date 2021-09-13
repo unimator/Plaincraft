@@ -44,14 +44,13 @@ namespace plaincraft_render_engine_vulkan {
         VkBuffer buffers[] = {vertex_buffer_};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
-
-        //vkCmdBindIndexBuffer(command_buffer, index_buffer_, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(command_buffer, index_buffer_, 0, VK_INDEX_TYPE_UINT32);
     }
 
     void VulkanModel::Draw(VkCommandBuffer command_buffer)
     {
-        vkCmdDraw(command_buffer, vertex_count_, 1, 0, 0);
-        //vkCmdDrawIndexed(command_buffer, index_count_, 1, 0, 0, 0);
+        //vkCmdDraw(command_buffer, vertex_count_, 1, 0, 0);
+        vkCmdDrawIndexed(command_buffer, index_count_, 1, 0, 0, 0);
     }
 
     void VulkanModel::CreateVertexBuffer(const std::vector<Vertex>& vertices)

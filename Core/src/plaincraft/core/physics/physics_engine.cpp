@@ -41,7 +41,7 @@ namespace plaincraft_core {
 
 		switch (event_type) {
 		case EventTypes::LOOP_EVENT: {
-			/*const LoopEvent& loop_event = static_cast<const LoopEvent&>(event);
+			const LoopEvent& loop_event = static_cast<const LoopEvent&>(event);
 			const auto delta_time = loop_event.GetDeltaTime();
 			const static Vector3d horizontal_movement_vector(1.0f, 0.0f, 1.0f);
 
@@ -73,7 +73,7 @@ namespace plaincraft_core {
 
 				body->SetPosition(body->GetPosition() + body_translation_vector);
 				body->SetVelocity(body->GetVelocity() - horizontal_movement_vector * body->GetVelocity() * body->GetFriction() * delta_time);
-			}*/
+			}
 
 			break;
 		}

@@ -84,6 +84,7 @@ namespace plaincraft_render_engine_vulkan
 	{
 		pipeline_->Bind(command_buffer);
 		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
+		projection[1][1] *= -1;
 		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
 
 		for (auto drawable : drawables_list_)
@@ -96,7 +97,7 @@ namespace plaincraft_render_engine_vulkan
 
 			SimplePushConstants push{};
 			auto model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), Vector3d(scale, scale, scale)) * glm::toMat4(rotation);
-			push.transform = model;
+			push.transform = projection * view * model;
 			vkCmdPushConstants(
 				command_buffer,
 				pipeline_layout_,
