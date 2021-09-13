@@ -32,6 +32,7 @@ namespace plaincraft_render_engine_vulkan
 		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device))
     {
         CreateSwapchain();
+		CreateImageViews();
 		CreateRenderPass();
 		CreateDepthResources();
 		CreateFrameBuffers();
@@ -48,21 +49,32 @@ namespace plaincraft_render_engine_vulkan
 		this->swapchain_extent_ = other.swapchain_extent_;
 	}
 
-	void Swapchain::CleanupSwapchain()
+	Swapchain::~Swapchain()
 	{
+		auto device = device_.GetDevice();
+		for(auto i = 0; i < depth_images_.size(); ++i)
+		{
+			vkDestroyImageView(device, depth_images_views_[i], nullptr);
+			vkDestroyImage(device, depth_images_[i], nullptr);
+			vkFreeMemory(device, depth_images_memories_[i], nullptr);
+		}
+
 		for (auto framebuffer : swapchain_frame_buffers_)
 		{
-			vkDestroyFramebuffer(device_.GetDevice(), framebuffer, nullptr);
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
 		}
+
+		vkDestroyRenderPass(device, render_pass_, nullptr);
 
 		for (auto image_view : swapchain_images_views_)
 		{
 			vkDestroyImageView(device_.GetDevice(), image_view, nullptr);
 		}
 
-		for (auto depth_view : depth_images_views_)
+		for (auto i = 0; i < swapchain_images_.size(); ++i) 
 		{
-			vkDestroyImageView(device_.GetDevice(), depth_view, nullptr);
+			vkDestroyImageView(device, swapchain_images_views_[i], nullptr);
+			vkDestroyImage(device, swapchain_images_[i], nullptr);
 		}
 
 		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_, nullptr);
@@ -124,16 +136,7 @@ namespace plaincraft_render_engine_vulkan
 
 		swapchain_image_format_ = surface_format.format;
 		swapchain_extent_ = extent;
-
-		CreateImageViews();
 	}
-
-    void Swapchain::RecreateSwapchain()
-    {
-		CreateSwapchain();
-		CreateDepthResources();
-		CreateFrameBuffers();
-    }
 
     VkSurfaceFormatKHR Swapchain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats)
 	{
@@ -283,7 +286,6 @@ namespace plaincraft_render_engine_vulkan
 		}
 	}
 
-
 	VkFormat Swapchain::FindDepthFormat() const
 	{
 		return device_.FindSupportedFormat(
@@ -306,7 +308,7 @@ namespace plaincraft_render_engine_vulkan
 		{
 			image_manager_.CreateImage(swapchain_extent_.width, swapchain_extent_.height, depth_format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depth_images_[i], depth_images_memories_[i]);
 			image_manager_.CreateImageView(depth_images_[i], depth_format, VK_IMAGE_ASPECT_DEPTH_BIT, depth_images_views_[i]);
-			image_manager_.TransitionImageLayout(depth_images_[i], depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+			//image_manager_.TransitionImageLayout(depth_images_[i], depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 		}
 	}
 

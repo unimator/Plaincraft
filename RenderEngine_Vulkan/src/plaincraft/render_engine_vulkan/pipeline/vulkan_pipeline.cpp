@@ -42,6 +42,11 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyPipeline(device_.GetDevice(), graphics_pipeline_, nullptr);
 	}
 
+	void VulkanPipeline::Bind(VkCommandBuffer command_buffer)
+	{
+		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline_);
+	}
+
 	void VulkanPipeline::CreateGraphicsPipeline(const std::vector<char> &vertex_shader_code, const std::vector<char> &fragment_shader_code, const VulkanPipelineConfig &pipeline_config)
 	{
 		auto vk_device = device_.GetDevice();
@@ -77,10 +82,10 @@ namespace plaincraft_render_engine_vulkan
 			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH
 		};
 
-		VkPipelineDynamicStateCreateInfo dynamic_state_info{};
+		/*VkPipelineDynamicStateCreateInfo dynamic_state_info{};
 		dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamic_state_info.dynamicStateCount = 2;
-		dynamic_state_info.pDynamicStates = dynamic_states;
+		dynamic_state_info.pDynamicStates = dynamic_states;*/
 
 		VkGraphicsPipelineCreateInfo pipeline_info{};
 		pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -92,7 +97,7 @@ namespace plaincraft_render_engine_vulkan
 		pipeline_info.pMultisampleState = &pipeline_config.multisample_info;
 		pipeline_info.pDepthStencilState = &pipeline_config.depth_stencil_info;
 		pipeline_info.pColorBlendState = &pipeline_config.color_blend_info;
-		pipeline_info.pDynamicState = &dynamic_state_info;
+		//pipeline_info.pDynamicState = &dynamic_state_info;
 		pipeline_info.pViewportState = &pipeline_config.viewport_info;
 		pipeline_info.layout = pipeline_config.pipeline_layout;
 		pipeline_info.renderPass = pipeline_config.render_pass;
@@ -189,10 +194,10 @@ namespace plaincraft_render_engine_vulkan
 		pipeline_config.depth_stencil_info.front = {};
 		pipeline_config.depth_stencil_info.back = {};
 
-		pipeline_config.dynamic_state_enables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		/*pipeline_config.dynamic_state_enables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 		pipeline_config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		pipeline_config.dynamic_state_info.pDynamicStates = pipeline_config.dynamic_state_enables.data();
 		pipeline_config.dynamic_state_info.dynamicStateCount = static_cast<uint32_t>(pipeline_config.dynamic_state_enables.size());
-		pipeline_config.dynamic_state_info.flags = 0;
+		pipeline_config.dynamic_state_info.flags = 0;*/
 	}
 }

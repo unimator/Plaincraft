@@ -173,7 +173,7 @@ namespace plaincraft_render_engine_vulkan {
 		VkCommandPoolCreateInfo command_pool_info{};
 		command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		command_pool_info.queueFamilyIndex = indices.graphics_family.value();
-		command_pool_info.flags = 0;
+		command_pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 		if (vkCreateCommandPool(device_, &command_pool_info, nullptr, &command_pool_) != VK_SUCCESS)
 		{

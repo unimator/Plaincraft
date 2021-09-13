@@ -64,6 +64,7 @@ namespace plaincraft_render_engine_vulkan
 
     public:
         Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface);
+        ~Swapchain();
 
         Swapchain(const Swapchain& other) = delete;
         Swapchain(Swapchain&& other);
@@ -80,9 +81,6 @@ namespace plaincraft_render_engine_vulkan
         auto GetSwapchainFrameBuffers() -> std::vector<VkFramebuffer>& { return swapchain_frame_buffers_; }
 
         auto GetRenderPass() const -> VkRenderPass {return render_pass_;}
-
-        void CleanupSwapchain();
-        void RecreateSwapchain();
 
     private:
         void CreateSwapchain();

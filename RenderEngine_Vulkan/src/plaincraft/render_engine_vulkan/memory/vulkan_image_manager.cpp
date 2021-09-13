@@ -42,17 +42,18 @@ namespace plaincraft_render_engine_vulkan {
 		image_create_info.extent.depth = 1;
 		image_create_info.mipLevels = 1;
 		image_create_info.arrayLayers = 1;
-		image_create_info.format = VK_FORMAT_R8G8B8A8_SRGB;
-		image_create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+		image_create_info.format = format;
+		image_create_info.tiling = image_tiling;
 		image_create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		image_create_info.usage = image_usage_flags;
 		image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;
 		image_create_info.flags = 0;
 
 		auto device = device_.GetDevice();
 
-		if (vkCreateImage(device, &image_create_info, nullptr, &image) != VK_SUCCESS)
+		auto result = vkCreateImage(device, &image_create_info, nullptr, &image);
+		if (result != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create image");
 		}
@@ -63,7 +64,7 @@ namespace plaincraft_render_engine_vulkan {
 		VkMemoryAllocateInfo memory_allocate_info{};
 		memory_allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		memory_allocate_info.allocationSize = memory_requirements.size;
-		memory_allocate_info.memoryTypeIndex = device_.FindMemoryType(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memory_allocate_info.memoryTypeIndex = device_.FindMemoryType(memory_requirements.memoryTypeBits, memory_property_flags);
 
 		if (vkAllocateMemory(device, &memory_allocate_info, nullptr, &image_memory) != VK_SUCCESS)
 		{
@@ -137,7 +138,7 @@ namespace plaincraft_render_engine_vulkan {
 		memcpy(data, image.data.get(), static_cast<size_t>(image_size));
 		vkUnmapMemory(device, staging_buffer_memory);
 
-		CreateImage(image.width, image.height, VK_FORMAT_R8G8B8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture_image, texture_image_memory);
+		CreateImage(image.width, image.height, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture_image, texture_image_memory);
 
 		TransitionImageLayout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		CopyBufferToImage(staging_buffer, texture_image, image.width, image.height);

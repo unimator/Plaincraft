@@ -39,55 +39,56 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan {
     using namespace plaincraft_render_engine;
 
+    struct SimplePushConstants 
+    {
+        glm::mat4 transform;
+    };
+
     class VulkanRenderer : public Renderer {
     private:
         const VulkanDevice& device_;
-        Swapchain& swapchain_;
+        VkRenderPass render_pass_;
+        VkExtent2D extent_;
+        
+		std::vector<char> vertex_shader_code_;
+		std::vector<char> fragment_shader_code_;
 
         std::unique_ptr<VulkanPipeline> pipeline_;
 		VkPipelineLayout pipeline_layout_;
         
-		VkDescriptorPool descriptor_pool_;
+		/*VkDescriptorPool descriptor_pool_;
 		VkDescriptorSetLayout descriptor_set_layout_;
-        std::vector<VkDescriptorSet> descriptor_sets_;
+        std::vector<VkDescriptorSet> descriptor_sets_;*/
 
-		std::vector<char> vertex_shader_code_;
-		std::vector<char> fragment_shader_code_;
-        
-		std::vector<VkCommandBuffer> command_buffers_;
-		std::vector<VkBuffer> uniform_buffers_;
-		std::vector<VkDeviceMemory> uniform_buffers_memory_;
+		
+		/*std::vector<VkBuffer> uniform_buffers_;
+		std::vector<VkDeviceMemory> uniform_buffers_memory_;*/
 
         VulkanBufferManager buffer_manager_;
         
         // TODO: get rid of these
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
+
+        VkDescriptorSetLayout dst_;
         
 		std::unique_ptr<VulkanModel> model_;
         
 		void LoadModel();
 
     public:
-        VulkanRenderer(const VulkanDevice& device, Swapchain& swapchain_, std::shared_ptr<Camera> camera, VkImageView texture_view, VkSampler texture_sampler);
+        VulkanRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, std::shared_ptr<Camera> camera, VkImageView texture_view, VkSampler texture_sampler, VkDescriptorSetLayout dst);
         ~VulkanRenderer() override;
 
         void Render() override;
+        void Render(VkCommandBuffer& command_buffer);
+        auto GetLayout() const -> VkPipelineLayout { return pipeline_layout_; }
         
-        void CreateCommandBuffers();
-        void UpdateUniformBuffer(uint32_t image_index);
-        
-        auto GetCommandBuffer(uint32_t index) -> VkCommandBuffer { return command_buffers_[index]; }
+        //void UpdateUniformBuffer(uint32_t image_index);
 
     private:
 		void SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor);
 		void CreatePipelineLayout();
-
-        void CreateDescriptorPool();
-        void CreateDescriptorSetLayout();
-        void CreateDescriptorSets();
-
-        void CreateUniformBuffers();
     };
 }
 

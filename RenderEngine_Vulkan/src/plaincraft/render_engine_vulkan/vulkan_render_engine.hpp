@@ -51,13 +51,17 @@ namespace plaincraft_render_engine_vulkan {
 		VulkanInstance instance_;
 		VkSurfaceKHR surface_;
 		VulkanDevice device_;
-		Swapchain swapchain_;
 
-        std::unique_ptr<VulkanPipeline> pipeline_;
-		VkPipelineLayout pipeline_layout_;
-		
 		VulkanBufferManager buffer_manager_;
 		VulkanImageManager image_manager_;
+		
+		std::unique_ptr<Swapchain> swapchain_;
+
+		std::vector<VkCommandBuffer> command_buffers_;
+
+		VkDescriptorPool descriptor_pool_;
+		VkDescriptorSetLayout descriptor_set_layout_;
+        std::vector<VkDescriptorSet> descriptor_sets_;
 
 		VkBuffer vertex_buffer_;
 		VkBuffer index_buffer_;
@@ -70,13 +74,16 @@ namespace plaincraft_render_engine_vulkan {
 		VkSampler texture_sampler_;
 		VkDeviceMemory texture_image_memory_;
 
+		std::vector<VkBuffer> uniform_buffers_;
+		std::vector<VkDeviceMemory> uniform_buffers_memory_;
+
 		std::vector<VkSemaphore> image_available_semaphores_;
 		std::vector<VkSemaphore> render_finished_semaphores_;
 		std::vector<VkFence> in_flight_fences_;
 		std::vector<VkFence> images_in_flight_;
+		size_t current_frame_ = 0;
 
 		bool enable_debug_ = false;
-		size_t current_frame_ = 0;
 
 	public:
 		VulkanRenderEngine(std::shared_ptr<VulkanWindow> window);
@@ -90,19 +97,29 @@ namespace plaincraft_render_engine_vulkan {
 
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 
-		//auto GetVulkanRenderer() -> std::unique_ptr<VulkanRenderer> { return std::static_pointer_cast<VulkanRenderer>(renderer_); }
+		auto GetVulkanRenderer() -> VulkanRenderer* { return dynamic_cast<VulkanRenderer*>(renderer_.get()); }
+        
+        auto GetCommandBuffer(uint32_t index) -> VkCommandBuffer { return command_buffers_[index]; }
 
 		bool CheckValidationLayerSupport();
 		std::vector<const char*> GetRequiredExtensions();
 		
+		void RecreateSwapChain();
+		
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
 
+		void CreateDescriptorSetLayout();
+		
+		void CreateDescriptorPool();
+		void CreateDescriptorSets();
+		
 		void CreateSyncObjects();
-
-		void RecreateSwapChain();
 
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();
+		void CreateUniformBuffers();
+
+		void CreateCommandBuffers();
 	};
 }
 
