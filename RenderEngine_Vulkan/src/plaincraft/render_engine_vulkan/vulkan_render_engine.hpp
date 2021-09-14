@@ -63,12 +63,6 @@ namespace plaincraft_render_engine_vulkan {
 		VkDescriptorSetLayout descriptor_set_layout_;
         std::vector<VkDescriptorSet> descriptor_sets_;
 
-		VkBuffer vertex_buffer_;
-		VkBuffer index_buffer_;
-
-		VkDeviceMemory vertex_buffer_memory_;
-		VkDeviceMemory index_buffer_memory_;
-
 		VkImage texture_image_;
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
@@ -115,8 +109,6 @@ namespace plaincraft_render_engine_vulkan {
 		
 		void CreateSyncObjects();
 
-		void CreateVertexBuffer();
-		void CreateIndexBuffer();
 		void CreateUniformBuffers();
 
 		void CreateCommandBuffers();

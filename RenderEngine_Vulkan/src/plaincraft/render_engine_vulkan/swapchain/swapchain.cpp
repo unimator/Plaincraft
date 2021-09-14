@@ -31,11 +31,14 @@ namespace plaincraft_render_engine_vulkan
     Swapchain::Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface)
 		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device))
     {
-        CreateSwapchain();
-		CreateImageViews();
-		CreateRenderPass();
-		CreateDepthResources();
-		CreateFrameBuffers();
+		Initialize();
+    }
+
+	Swapchain::Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface, std::unique_ptr<Swapchain> old_swapchain)
+		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device)), old_swapchain_(std::move(old_swapchain))
+    {
+		Initialize();
+		old_swapchain_ = nullptr;
     }
 
 	Swapchain::Swapchain(Swapchain&& other) 
@@ -68,16 +71,19 @@ namespace plaincraft_render_engine_vulkan
 
 		for (auto image_view : swapchain_images_views_)
 		{
-			vkDestroyImageView(device_.GetDevice(), image_view, nullptr);
+			vkDestroyImageView(device, image_view, nullptr);
 		}
 
-		for (auto i = 0; i < swapchain_images_.size(); ++i) 
-		{
-			vkDestroyImageView(device, swapchain_images_views_[i], nullptr);
-			vkDestroyImage(device, swapchain_images_[i], nullptr);
-		}
+		vkDestroySwapchainKHR(device, swapchain_, nullptr);
+	}
 
-		vkDestroySwapchainKHR(device_.GetDevice(), swapchain_, nullptr);
+	void Swapchain::Initialize() 
+	{
+        CreateSwapchain();
+		CreateImageViews();
+		CreateRenderPass();
+		CreateDepthResources();
+		CreateFrameBuffers();
 	}
 
 	void Swapchain::CreateSwapchain()
@@ -123,7 +129,7 @@ namespace plaincraft_render_engine_vulkan
 		create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		create_info.presentMode = present_mode;
 		create_info.clipped = VK_TRUE;
-		create_info.oldSwapchain = VK_NULL_HANDLE;
+		create_info.oldSwapchain = old_swapchain_ == nullptr ? VK_NULL_HANDLE : old_swapchain_->swapchain_;
 
 		if (vkCreateSwapchainKHR(device_.GetDevice(), &create_info, nullptr, &swapchain_) != VK_SUCCESS)
 		{

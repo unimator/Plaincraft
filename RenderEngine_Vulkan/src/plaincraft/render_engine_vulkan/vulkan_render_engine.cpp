@@ -37,21 +37,6 @@ SOFTWARE.
 #include "swapchain/swapchain.hpp"
 #include "renderer/vulkan_renderer.hpp"
 
-const std::vector<plaincraft_render_engine::Vertex> vertices = {
-	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
-
-const std::vector<uint16_t> indices = {
-	0, 1, 2, 2, 3, 0,
-	4, 5, 6, 6, 7, 4};
-
 namespace plaincraft_render_engine_vulkan
 {
 	VulkanRenderEngine::VulkanRenderEngine(std::shared_ptr<VulkanWindow> window) : VulkanRenderEngine::VulkanRenderEngine(std::move(window), false) {}
@@ -73,8 +58,6 @@ namespace plaincraft_render_engine_vulkan
 		CreateDescriptorSetLayout();
 		RecreateSwapChain();
 
-		CreateVertexBuffer();
-		CreateIndexBuffer();
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();
@@ -90,12 +73,6 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyImageView(device_.GetDevice(), texture_image_view_, nullptr);
 		vkDestroyImage(device_.GetDevice(), texture_image_, nullptr);
 		vkFreeMemory(device_.GetDevice(), texture_image_memory_, nullptr);
-
-		vkDestroyBuffer(device_.GetDevice(), vertex_buffer_, nullptr);
-		vkFreeMemory(device_.GetDevice(), vertex_buffer_memory_, nullptr);
-
-		vkDestroyBuffer(device_.GetDevice(), index_buffer_, nullptr);
-		vkFreeMemory(device_.GetDevice(), index_buffer_memory_, nullptr);
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 		{
@@ -189,50 +166,16 @@ namespace plaincraft_render_engine_vulkan
 
 		vkDeviceWaitIdle(device_.GetDevice());
 
-		swapchain_ = std::make_unique<Swapchain>(GetVulkanWindow(), device_, surface_);
+		if(swapchain_ == nullptr)
+		{
+			swapchain_ = std::make_unique<Swapchain>(GetVulkanWindow(), device_, surface_);
+		}
+		else 
+		{
+			swapchain_ = std::make_unique<Swapchain>(GetVulkanWindow(), device_, surface_, std::move(swapchain_));
+		}
 
 		renderer_ = std::make_unique<VulkanRenderer>(device_, swapchain_->GetRenderPass(), swapchain_->GetSwapchainExtent(), camera_, texture_image_view_, texture_sampler_, descriptor_set_layout_);
-	}
-
-	void VulkanRenderEngine::CreateVertexBuffer()
-	{
-		VkDeviceSize buffer_size = sizeof(Vertex) * vertices.size();
-
-		VkBuffer staging_buffer;
-		VkDeviceMemory staging_buffer_memory;
-		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
-
-		void *data;
-		vkMapMemory(device_.GetDevice(), staging_buffer_memory, 0, buffer_size, 0, &data);
-		memcpy(data, vertices.data(), buffer_size);
-		vkUnmapMemory(device_.GetDevice(), staging_buffer_memory);
-
-		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertex_buffer_, vertex_buffer_memory_);
-
-		buffer_manager_.CopyBuffer(staging_buffer, vertex_buffer_, buffer_size);
-
-		vkDestroyBuffer(device_.GetDevice(), staging_buffer, nullptr);
-		vkFreeMemory(device_.GetDevice(), staging_buffer_memory, nullptr);
-	}
-
-	void VulkanRenderEngine::CreateIndexBuffer()
-	{
-		VkDeviceSize buffer_size = sizeof(uint16_t) * indices.size();
-
-		VkBuffer staging_buffer;
-		VkDeviceMemory staging_buffer_memory;
-		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
-
-		void *data;
-		vkMapMemory(device_.GetDevice(), staging_buffer_memory, 0, buffer_size, 0, &data);
-		memcpy(data, indices.data(), buffer_size);
-		vkUnmapMemory(device_.GetDevice(), staging_buffer_memory);
-
-		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, index_buffer_, index_buffer_memory_);
-		buffer_manager_.CopyBuffer(staging_buffer, index_buffer_, buffer_size);
-
-		vkDestroyBuffer(device_.GetDevice(), staging_buffer, nullptr);
-		vkFreeMemory(device_.GetDevice(), staging_buffer_memory, nullptr);
 	}
 
 	void VulkanRenderEngine::CreateDescriptorPool()
