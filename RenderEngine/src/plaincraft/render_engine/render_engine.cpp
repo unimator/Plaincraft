@@ -82,16 +82,6 @@ namespace plaincraft_render_engine
 		glfwGetCursorPos(window_->GetInstance(), cursor_position_x, cursor_position_y);
 	}
 
-	void RenderEngine::RenderFrame()
-	{
-		for (auto drawable : drawables_list_)
-		{
-			renderer_->Batch(drawable);
-			renderer_->Render();
-		}
-		renderer_->HasRendered();
-	}
-
 	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable)
 	{
 		drawables_list_.push_back(drawable);

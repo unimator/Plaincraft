@@ -27,69 +27,39 @@ SOFTWARE.
 #include "vulkan_model.hpp"
 #include <cstring>
 
-namespace plaincraft_render_engine_vulkan {
-    VulkanModel::VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon) 
-        : device_(device), buffer_manager_(VulkanBufferManager(device)) {
-        CreateVertexBuffer(polygon->GetVertices());
-        CreateIndexBuffer(polygon->GetIndices());
+namespace plaincraft_render_engine_vulkan
+{
+    VulkanModel::VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon)
+        : device_(device),
+          vertex_buffer_(VulkanBuffer::CreateFromVector(
+              device,
+              polygon->GetVertices(),
+              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)),
+          index_buffer_(VulkanBuffer::CreateFromVector(
+              device,
+              polygon->GetIndices(),
+              VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
+    {
+
     }
 
-    VulkanModel::~VulkanModel() {
-        vkDestroyBuffer(device_.GetDevice(), vertex_buffer_, nullptr);
-        vkFreeMemory(device_.GetDevice(), vertex_buffer_memory_, nullptr);
+    VulkanModel::~VulkanModel()
+    {
     }
 
     void VulkanModel::Bind(VkCommandBuffer command_buffer)
     {
-        VkBuffer buffers[] = {vertex_buffer_};
+        VkBuffer buffers[] = {vertex_buffer_.GetBuffer()};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
-        vkCmdBindIndexBuffer(command_buffer, index_buffer_, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(command_buffer, index_buffer_.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 
     void VulkanModel::Draw(VkCommandBuffer command_buffer)
     {
-        //vkCmdDraw(command_buffer, vertex_count_, 1, 0, 0);
-        vkCmdDrawIndexed(command_buffer, index_count_, 1, 0, 0, 0);
-    }
-
-    void VulkanModel::CreateVertexBuffer(const std::vector<Vertex>& vertices)
-    {
-        vertex_count_ = static_cast<uint32_t>(vertices.size());
-
-        VkDeviceSize buffer_size = sizeof(vertices[0]) * vertex_count_;
-
-        buffer_manager_.CreateBuffer(
-            buffer_size, 
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            vertex_buffer_,
-            vertex_buffer_memory_
-        );
-
-        void* data;
-        vkMapMemory(device_.GetDevice(), vertex_buffer_memory_, 0, buffer_size, 0, &data);
-        memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
-        vkUnmapMemory(device_.GetDevice(), vertex_buffer_memory_);
-    }
-
-    void VulkanModel::CreateIndexBuffer(const std::vector<uint32_t>& indices)
-    {
-        index_count_ = static_cast<uint32_t>(indices.size());
-
-        VkDeviceSize buffer_size = sizeof(indices[0]) * index_count_;
-
-        buffer_manager_.CreateBuffer(
-            buffer_size, 
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            index_buffer_,
-            index_buffer_memory_
-        );
-
-        void* data;
-        vkMapMemory(device_.GetDevice(), index_buffer_memory_, 0, buffer_size, 0, &data);
-        memcpy(data, indices.data(), static_cast<size_t>(buffer_size));
-        vkUnmapMemory(device_.GetDevice(), index_buffer_memory_);    
+        //vkCmdDraw(command_buffer, vertex_buffer_.GetInstanceCount(), 1, 0, 0);
+        vkCmdDrawIndexed(command_buffer, index_buffer_.GetInstanceCount(), 1, 0, 0, 0);
     }
 }

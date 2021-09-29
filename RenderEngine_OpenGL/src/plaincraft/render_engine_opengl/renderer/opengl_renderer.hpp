@@ -42,7 +42,7 @@ namespace plaincraft_render_engine_opengl {
 	public:
 		OpenGLRenderer(std::shared_ptr<Camera> camera);
 
-		virtual void Render() override;
+		void Render();
 
 	private:
 		OpenGLShader CreateDefaultShader();

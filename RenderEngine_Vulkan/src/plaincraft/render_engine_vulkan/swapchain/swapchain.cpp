@@ -29,20 +29,20 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan 
 {
     Swapchain::Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface)
-		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device))
+		: window_(window), device_(device), surface_(surface)
     {
 		Initialize();
     }
 
 	Swapchain::Swapchain(std::shared_ptr<VulkanWindow> window, const VulkanDevice& device, const VkSurfaceKHR& surface, std::unique_ptr<Swapchain> old_swapchain)
-		: window_(window), device_(device), surface_(surface), image_manager_(VulkanImageManager(device)), old_swapchain_(std::move(old_swapchain))
+		: window_(window), device_(device), surface_(surface), old_swapchain_(std::move(old_swapchain))
     {
 		Initialize();
 		old_swapchain_ = nullptr;
     }
 
 	Swapchain::Swapchain(Swapchain&& other) 
-		: swapchain_(other.swapchain_), window_(other.window_), device_(other.device_), surface_(other.surface_), image_manager_(other.image_manager_)
+		: swapchain_(other.swapchain_), window_(other.window_), device_(other.device_), surface_(other.surface_)
 	{
 		other.swapchain_ = VK_NULL_HANDLE;
 
@@ -55,12 +55,6 @@ namespace plaincraft_render_engine_vulkan
 	Swapchain::~Swapchain()
 	{
 		auto device = device_.GetDevice();
-		for(auto i = 0; i < depth_images_.size(); ++i)
-		{
-			vkDestroyImageView(device, depth_images_views_[i], nullptr);
-			vkDestroyImage(device, depth_images_[i], nullptr);
-			vkFreeMemory(device, depth_images_memories_[i], nullptr);
-		}
 
 		for (auto framebuffer : swapchain_frame_buffers_)
 		{
@@ -68,11 +62,6 @@ namespace plaincraft_render_engine_vulkan
 		}
 
 		vkDestroyRenderPass(device, render_pass_, nullptr);
-
-		for (auto image_view : swapchain_images_views_)
-		{
-			vkDestroyImageView(device, image_view, nullptr);
-		}
 
 		vkDestroySwapchainKHR(device, swapchain_, nullptr);
 	}
@@ -200,7 +189,7 @@ namespace plaincraft_render_engine_vulkan
 
 		for (size_t i = 0; i < swapchain_images_.size(); ++i)
 		{
-			image_manager_.CreateImageView(swapchain_images_[i], swapchain_image_format_, VK_IMAGE_ASPECT_COLOR_BIT, swapchain_images_views_[i]);
+			swapchain_images_views_[i] = std::make_unique<VulkanImageView>(device_, swapchain_images_[i], swapchain_image_format_, VK_IMAGE_ASPECT_COLOR_BIT);
 		}
 	}
 
@@ -272,8 +261,8 @@ namespace plaincraft_render_engine_vulkan
 		for (size_t i = 0; i < swapchain_images_views_.size(); ++i)
 		{
 			std::array<VkImageView, 2> attachments = {
-				swapchain_images_views_[i],
-				depth_images_views_[i]
+				swapchain_images_views_[i]->GetImageView(),
+				depth_images_views_[i]->GetImageView()
 			};
 
 			VkFramebufferCreateInfo framebuffer_info{};
@@ -308,13 +297,11 @@ namespace plaincraft_render_engine_vulkan
 
 		depth_images_.resize(images_count);
 		depth_images_views_.resize(images_count);
-		depth_images_memories_.resize(images_count);
 
 		for(size_t i = 0; i < images_count; ++i)
 		{
-			image_manager_.CreateImage(swapchain_extent_.width, swapchain_extent_.height, depth_format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depth_images_[i], depth_images_memories_[i]);
-			image_manager_.CreateImageView(depth_images_[i], depth_format, VK_IMAGE_ASPECT_DEPTH_BIT, depth_images_views_[i]);
-			//image_manager_.TransitionImageLayout(depth_images_[i], depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+			depth_images_[i] = std::make_unique<VulkanImage>(device_, swapchain_extent_.width, swapchain_extent_.height, depth_format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			depth_images_views_[i] = std::make_unique<VulkanImageView>(device_, depth_images_[i]->GetImage(), depth_format, VK_IMAGE_ASPECT_DEPTH_BIT);
 		}
 	}
 

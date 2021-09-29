@@ -39,4 +39,8 @@ namespace plaincraft_render_engine {
 	void Drawable::SetPosition(Vector3d position) {
 		position_ = position;
 	}
+
+	void Drawable::SetColor(Vector3d color) {
+		color_ = color;
+	}
 }

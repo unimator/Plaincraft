@@ -34,8 +34,9 @@ SOFTWARE.
 #include "window/vulkan_window.hpp"
 #include "pipeline/vulkan_pipeline.hpp"
 #include "pipeline/vulkan_pipeline_config.hpp"
-#include "memory/vulkan_image_manager.hpp"
-#include "memory/vulkan_buffer_manager.hpp"
+#include "memory/vulkan_buffer.hpp"
+#include "memory/vulkan_texture.hpp"
+#include "memory/vulkan_image.hpp"
 #include "model/vulkan_model.hpp"
 #include "renderer/vulkan_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
@@ -51,25 +52,19 @@ namespace plaincraft_render_engine_vulkan {
 		VulkanInstance instance_;
 		VkSurfaceKHR surface_;
 		VulkanDevice device_;
-
-		VulkanBufferManager buffer_manager_;
-		VulkanImageManager image_manager_;
 		
 		std::unique_ptr<Swapchain> swapchain_;
 
 		std::vector<VkCommandBuffer> command_buffers_;
 
+		std::vector<std::unique_ptr<VulkanBuffer>> uniform_buffers_;
+
 		VkDescriptorPool descriptor_pool_;
 		VkDescriptorSetLayout descriptor_set_layout_;
         std::vector<VkDescriptorSet> descriptor_sets_;
 
-		VkImage texture_image_;
-		VkImageView texture_image_view_;
-		VkSampler texture_sampler_;
-		VkDeviceMemory texture_image_memory_;
-
-		std::vector<VkBuffer> uniform_buffers_;
-		std::vector<VkDeviceMemory> uniform_buffers_memory_;
+		std::unique_ptr<VulkanTexture> texture_image_;
+		std::unique_ptr<VulkanImageView> texture_image_view_;
 
 		std::vector<VkSemaphore> image_available_semaphores_;
 		std::vector<VkSemaphore> render_finished_semaphores_;
@@ -103,7 +98,6 @@ namespace plaincraft_render_engine_vulkan {
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
 
 		void CreateDescriptorSetLayout();
-		
 		void CreateDescriptorPool();
 		void CreateDescriptorSets();
 		

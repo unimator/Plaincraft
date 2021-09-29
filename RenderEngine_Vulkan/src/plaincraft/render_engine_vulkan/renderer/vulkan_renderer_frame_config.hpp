@@ -1,9 +1,9 @@
-/*
+/* 
 MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,38 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#include "../common.hpp"
-#include "model.hpp"
+#ifndef VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG
+#define VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG
 
-namespace plaincraft_render_engine
-{
-	class Drawable
-	{
-	private:
-		std::shared_ptr<Model> model_;
-		Vector3d position_;
-		Vector3d color_;
-		Quaternion rotation_;
-		float scale_ = 1.0f;
+#include <vulkan/vulkan.h>
 
-	public:
-		void SetModel(std::shared_ptr<Model> model);
-		std::shared_ptr<Model> GetModel() const;
+namespace plaincraft_render_engine_vulkan {
+    struct VulkanRendererFrameConfig {
+        VkCommandBuffer& command_buffer;
+        VkDescriptorSet descriptor_set;
+        size_t d;
+    };
+};
 
-		auto SetScale(float scale) -> void { scale_ = scale; }
-		auto GetScale() const -> const float { return scale_; }
-
-		auto GetRotation() -> Quaternion { return rotation_; }
-
-		void SetPosition(Vector3d position);
-		auto GetPosition() -> Vector3d { return position_; }
-
-		void SetColor(Vector3d color);
-		auto GetColor() -> Vector3d { return color_; }
-	};
-}
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#endif // VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG

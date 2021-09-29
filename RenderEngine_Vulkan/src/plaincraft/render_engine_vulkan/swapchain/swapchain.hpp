@@ -30,7 +30,8 @@ SOFTWARE.
 #include "../device/vulkan_device.hpp"
 #include "../utils/queue_family.hpp"
 #include "../window/vulkan_window.hpp"
-#include "../memory/vulkan_image_manager.hpp"
+#include "../memory/vulkan_image.hpp"
+#include "../memory/vulkan_image_view.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -51,16 +52,13 @@ namespace plaincraft_render_engine_vulkan
 		VkExtent2D swapchain_extent_;
 
         std::vector<VkImage> swapchain_images_;
-		std::vector<VkImageView> swapchain_images_views_;
+		std::vector<std::unique_ptr<VulkanImageView>> swapchain_images_views_;
 		std::vector<VkFramebuffer> swapchain_frame_buffers_;
 
-        std::vector<VkImage> depth_images_;
-        std::vector<VkImageView> depth_images_views_; 
-        std::vector<VkDeviceMemory> depth_images_memories_;
+        std::vector<std::unique_ptr<VulkanImage>> depth_images_;
+        std::vector<std::unique_ptr<VulkanImageView>> depth_images_views_;
 
         VkRenderPass render_pass_;
-
-        VulkanImageManager image_manager_;
 
         std::unique_ptr<Swapchain> old_swapchain_;
 
@@ -80,7 +78,7 @@ namespace plaincraft_render_engine_vulkan
         auto GetSwapchainExtent() const -> VkExtent2D { return swapchain_extent_; }
 
         auto GetSwapchainImages() -> std::vector<VkImage>& { return swapchain_images_; }
-        auto GetSwapchainImagesViews() -> std::vector<VkImageView>& { return swapchain_images_views_; }
+        auto GetSwapchainImagesViews() -> std::vector<std::unique_ptr<VulkanImageView>>& { return swapchain_images_views_; }
         auto GetSwapchainFrameBuffers() -> std::vector<VkFramebuffer>& { return swapchain_frame_buffers_; }
 
         auto GetRenderPass() const -> VkRenderPass {return render_pass_;}

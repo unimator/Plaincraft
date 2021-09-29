@@ -1,4 +1,4 @@
-/*
+/* 
 MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
@@ -24,28 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_CONFIG
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_CONFIG
 
-#include "../device/vulkan_device.hpp"
 #include <vulkan/vulkan.h>
 
 namespace plaincraft_render_engine_vulkan {
-    class VulkanBufferManager final {
-        friend class VulkanImageManager;
-    private:
-        const VulkanDevice& device_;
-
-    public:
-        VulkanBufferManager(const VulkanDevice& device);
-
-        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memory_properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
-        void CopyBuffer(VkBuffer source_buffer, VkBuffer destination_buffer, VkDeviceSize size);
-
-    private:
-        VkCommandBuffer BeginSingleTimeCommands();
-		void EndSingleTimeCommands(VkCommandBuffer command_buffer);
+    struct VulkanRendererConfig {
+        VkPipelineLayout pipeline_layout;
+        VkExtent2D extent;
+        uint32_t images_count;
     };
 }
 
-#endif //PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_BUFFER_MANAGER 
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_CONFIG

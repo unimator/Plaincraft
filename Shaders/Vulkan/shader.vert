@@ -7,20 +7,19 @@ layout(location = 2) in vec2 textMapping;
 
 layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTextCoord;
-/*
-/*layout(binding = 0) uniform ModelViewProjectionMatrix {
+
+layout(binding = 0) uniform ModelViewProjectionMatrix {
     mat4 model;
     mat4 view;
     mat4 projection;
+    vec3 color;
 } mvp;
-*/
-layout(push_constant) uniform Push {
-  mat4 transform;
-} push;
+
+
 
 void main() {
-    //gl_Position = mvp.projection * mvp.view * mvp.model * vec4(inPosition, 1.0);
-    gl_Position = push.transform * vec4(inPosition, 1.0);
-    fragColor = inColor;
+    gl_Position = mvp.projection * mvp.view * mvp.model * vec4(inPosition, 1.0);
+    //gl_Position = vec4(inPosition, 1.0);
+    fragColor = mvp.color;
     fragTextCoord = textMapping;
 }

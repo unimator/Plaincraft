@@ -52,6 +52,9 @@ namespace plaincraft_core {
 
 		void SetBody(std::shared_ptr<Body> body);
 		std::shared_ptr<Body> GetBody() const;
+
+		void SetColor(Vector3d color);
+		Vector3d GetColor();
 	};
 }
 

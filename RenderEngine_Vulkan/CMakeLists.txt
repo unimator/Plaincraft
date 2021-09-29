@@ -3,23 +3,30 @@ add_library("RenderEngine_Vulkan" "")
 target_sources("RenderEngine_Vulkan"
 PRIVATE
     include/plaincraft_render_engine_vulkan.hpp
-    src/plaincraft/render_engine_vulkan/memory/vulkan_buffer_manager.cpp
-    src/plaincraft/render_engine_vulkan/memory/vulkan_buffer_manager.hpp
-    src/plaincraft/render_engine_vulkan/memory/vulkan_image_manager.cpp
-    src/plaincraft/render_engine_vulkan/memory/vulkan_image_manager.hpp
-    src/plaincraft/render_engine_vulkan/model/vulkan_model.cpp
-    src/plaincraft/render_engine_vulkan/model/vulkan_model.hpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.cpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.cpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance.cpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_buffer.cpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_buffer.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_image_view.cpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_image_view.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_image.cpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_image.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_texture.cpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_texture.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_uniform_buffer.hpp
+    src/plaincraft/render_engine_vulkan/memory/vulkan_uniform_buffer.cpp
+    src/plaincraft/render_engine_vulkan/model/vulkan_model.cpp
+    src/plaincraft/render_engine_vulkan/model/vulkan_model.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline_config.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp
     src/plaincraft/render_engine_vulkan/renderer/vertex_utils.cpp
     src/plaincraft/render_engine_vulkan/renderer/vertex_utils.hpp
+    src/plaincraft/render_engine_vulkan/renderer/vulkan_renderer_config.hpp
     src/plaincraft/render_engine_vulkan/renderer/vulkan_renderer.cpp
     src/plaincraft/render_engine_vulkan/renderer/vulkan_renderer.hpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.cpp

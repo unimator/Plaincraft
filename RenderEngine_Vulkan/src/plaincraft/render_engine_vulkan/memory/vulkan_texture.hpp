@@ -24,34 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_TEXTURE
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_TEXTURE
 
-#include "vulkan_buffer_manager.hpp"
+#include "vulkan_image.hpp"
+#include "../device/vulkan_device.hpp"
+#include "vulkan_buffer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine_vulkan {
+namespace plaincraft_render_engine_vulkan
+{
     using namespace plaincraft_render_engine;
 
-    class VulkanImageManager {
+    class VulkanTexture : public VulkanImage
+    { 
     private:
-        const VulkanDevice& device_;
-        VulkanBufferManager buffer_manager_;
+        VkSampler texture_sampler_;
 
     public:
-        VulkanImageManager(const VulkanDevice& device);
+        VulkanTexture(const VulkanDevice& device, const Image& image);
 
-		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling image_tiling, VkImageUsageFlags image_usage_flags, VkMemoryPropertyFlags memory_property_flags, VkImage& image, VkDeviceMemory& image_memory);
-        void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags, VkImageView& image_view);
-        void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-        
-		void CreateTextureImage(const Image& image, VkImage& texture_image, VkDeviceMemory& texture_image_memory);
-		void CreateTextureImageView(VkImage texture_image, VkImageView& texture_image_view);
-		void CreateTextureSampler(VkSampler& texture_sampler);
+        VulkanTexture(const VulkanTexture& other) = delete;
+        VulkanTexture& operator=(const VulkanTexture& other) = delete;
 
-        void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout);
+        virtual ~VulkanTexture() override;
+
+        auto GetSampler() -> VkSampler { return texture_sampler_; }
+
+    private:
+        void TransitionImageLayout(VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout);
+
+        void CreateTexture(void* image_data);
+        void CreateSampler();
     };
 }
 
-#endif //PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_MANAGER
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_TEXTURE

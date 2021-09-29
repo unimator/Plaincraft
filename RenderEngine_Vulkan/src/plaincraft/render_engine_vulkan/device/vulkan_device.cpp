@@ -222,4 +222,41 @@ namespace plaincraft_render_engine_vulkan {
 	{
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
+	
+    VkCommandBuffer VulkanDevice::BeginSingleTimeCommands() const
+	{
+		VkCommandBufferAllocateInfo allocate_info{};
+		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocate_info.commandPool = command_pool_;
+		allocate_info.commandBufferCount = 1;
+
+		VkCommandBuffer command_buffer;
+		vkAllocateCommandBuffers(device_, &allocate_info, &command_buffer);
+
+		VkCommandBufferBeginInfo begin_info{};
+		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		vkBeginCommandBuffer(command_buffer, &begin_info);
+
+		return command_buffer;
+	}
+
+	void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer command_buffer) const
+	{
+		vkEndCommandBuffer(command_buffer);
+
+		VkSubmitInfo submit_info{};
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &command_buffer;
+
+		auto graphics_queue = graphics_queue_;
+
+		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+		vkQueueWaitIdle(graphics_queue);
+
+		vkFreeCommandBuffers(device_, command_pool_, 1, &command_buffer);
+	}
 }

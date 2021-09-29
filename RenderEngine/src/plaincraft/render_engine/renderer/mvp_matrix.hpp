@@ -31,9 +31,10 @@ SOFTWARE.
 
 namespace plaincraft_render_engine {
 	struct ModelViewProjectionMatrix {
-		alignas(16) glm::mat4 model;
+		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 projection;
+		glm::vec3 color;
 	};
 }
 #endif // PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX

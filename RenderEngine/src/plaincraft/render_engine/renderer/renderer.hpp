@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ namespace plaincraft_render_engine {
 	class Renderer
 	{
 	protected:
-		std::list<std::shared_ptr<Drawable>> drawables_list_;
+		std::vector<std::shared_ptr<Drawable>> drawables_list_;
 		std::shared_ptr<Camera> camera_;
 
 		Renderer(std::shared_ptr<Camera> camera);
@@ -45,7 +45,6 @@ namespace plaincraft_render_engine {
 		virtual ~Renderer();
 
 		void Batch(std::shared_ptr<Drawable> drawable);
-		virtual void Render() = 0;
 		void HasRendered();
 	};
 }

@@ -30,8 +30,9 @@ SOFTWARE.
 #include "../device/vulkan_device.hpp"
 #include "../swapchain/swapchain.hpp"
 #include "../pipeline/vulkan_pipeline.hpp"
-#include "../memory/vulkan_buffer_manager.hpp"
+#include "../memory/vulkan_buffer.hpp"
 #include "../model/vulkan_model.hpp"
+#include "vulkan_renderer_frame_config.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -56,32 +57,21 @@ namespace plaincraft_render_engine_vulkan {
         std::unique_ptr<VulkanPipeline> pipeline_;
 		VkPipelineLayout pipeline_layout_;
         
-		/*VkDescriptorPool descriptor_pool_;
 		VkDescriptorSetLayout descriptor_set_layout_;
-        std::vector<VkDescriptorSet> descriptor_sets_;*/
-
-		
-		/*std::vector<VkBuffer> uniform_buffers_;
-		std::vector<VkDeviceMemory> uniform_buffers_memory_;*/
-
-        VulkanBufferManager buffer_manager_;
-        
+		        
         // TODO: get rid of these
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
-
-        VkDescriptorSetLayout dst_;
         
 		std::unique_ptr<VulkanModel> model_;
         
 		void LoadModel();
 
     public:
-        VulkanRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, std::shared_ptr<Camera> camera, VkImageView texture_view, VkSampler texture_sampler, VkDescriptorSetLayout dst);
+        VulkanRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera);
         ~VulkanRenderer() override;
 
-        void Render() override;
-        void Render(VkCommandBuffer& command_buffer);
+        void Render(VulkanRendererFrameConfig& frame_config);
         auto GetLayout() const -> VkPipelineLayout { return pipeline_layout_; }
         
         //void UpdateUniformBuffer(uint32_t image_index);
@@ -89,6 +79,8 @@ namespace plaincraft_render_engine_vulkan {
     private:
 		void SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor);
 		void CreatePipelineLayout();
+
+        void CreateDescriptorPool();
     };
 }
 

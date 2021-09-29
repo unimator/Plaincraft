@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,38 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#include "../common.hpp"
-#include "model.hpp"
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_VIEW
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_VIEW
 
-namespace plaincraft_render_engine
-{
-	class Drawable
-	{
-	private:
-		std::shared_ptr<Model> model_;
-		Vector3d position_;
-		Vector3d color_;
-		Quaternion rotation_;
-		float scale_ = 1.0f;
+#include "../device/vulkan_device.hpp"
+#include <vulkan/vulkan.hpp>
+#include <functional>
 
-	public:
-		void SetModel(std::shared_ptr<Model> model);
-		std::shared_ptr<Model> GetModel() const;
+namespace plaincraft_render_engine_vulkan {
+    class VulkanImageView {
+    private:
+        std::reference_wrapper<const VulkanDevice> device_;
 
-		auto SetScale(float scale) -> void { scale_ = scale; }
-		auto GetScale() const -> const float { return scale_; }
+        VkImageView image_view_;
+        VkFormat format_;
+        VkImageAspectFlags aspect_flags_;
 
-		auto GetRotation() -> Quaternion { return rotation_; }
+    public:
+        VulkanImageView(const VulkanDevice& device, VkImage image, VkFormat format, VkImageAspectFlags aspect_flags);
 
-		void SetPosition(Vector3d position);
-		auto GetPosition() -> Vector3d { return position_; }
+        VulkanImageView(const VulkanImageView& other) = delete;
+        VulkanImageView& operator=(const VulkanImageView& other) = delete;
 
-		void SetColor(Vector3d color);
-		auto GetColor() -> Vector3d { return color_; }
-	};
+        VulkanImageView(VulkanImageView&& other) noexcept;
+        VulkanImageView& operator=(VulkanImageView&& other) noexcept;
+
+        ~VulkanImageView();
+
+        auto GetImageView() -> VkImageView { return image_view_; }
+
+    private:
+        void CreateImageView(VkImage image);
+    };
 }
 
-
-#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IMAGE_VIEW

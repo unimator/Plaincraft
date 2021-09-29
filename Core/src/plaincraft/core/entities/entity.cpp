@@ -56,4 +56,12 @@ namespace plaincraft_core {
 	std::shared_ptr<Body> Entity::GetBody() const {
 		return body_;
 	}
+
+	void Entity::SetColor(Vector3d color) {
+		drawable_->SetColor(color);
+	}
+
+	Vector3d Entity::GetColor() {
+		return drawable_->GetColor();
+	}
 }

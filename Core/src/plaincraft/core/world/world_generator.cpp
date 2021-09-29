@@ -28,10 +28,14 @@ SOFTWARE.
 #include <plaincraft_render_engine.hpp>
 #include <plaincraft_render_engine_opengl.hpp>
 
-namespace plaincraft_core {
-	void WorldGenerator::GenerateWorld(Scene& scene, std::unique_ptr<RenderEngine>& render_engine) {
-		for (int i = -10; i < 10; ++i) {
-			for (int j = -10; j < 10; ++j) {
+namespace plaincraft_core
+{
+	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine)
+	{
+		for (int i = -10; i < 10; ++i)
+		{
+			for (int j = -10; j < 10; ++j)
+			{
 				auto entity = std::shared_ptr<Entity>(new Entity());
 				auto polygon = std::shared_ptr<Polygon>(new Cube());
 				const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
@@ -45,6 +49,11 @@ namespace plaincraft_core {
 				//body->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
 				entity->SetBody(body);
 				entity->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
+				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				auto color = glm::vec3(r, g, b);
+				entity->SetColor(color);
 				scene.AddEntity(entity, render_engine);
 			}
 		}

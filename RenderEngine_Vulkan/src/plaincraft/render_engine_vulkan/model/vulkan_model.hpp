@@ -28,7 +28,7 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
 
 #include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer_manager.hpp"
+#include "../memory/vulkan_buffer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -39,15 +39,8 @@ namespace plaincraft_render_engine_vulkan {
     private:
         const VulkanDevice& device_;
 
-        VkBuffer vertex_buffer_;
-        VkDeviceMemory vertex_buffer_memory_;
-        uint32_t vertex_count_;
-
-        VkBuffer index_buffer_;
-        VkDeviceMemory index_buffer_memory_;
-        uint32_t index_count_;
-
-        VulkanBufferManager& buffer_manager_;
+        VulkanBuffer vertex_buffer_;
+        VulkanBuffer index_buffer_;
     
     public:
         VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon);
@@ -58,10 +51,6 @@ namespace plaincraft_render_engine_vulkan {
 
         void Bind(VkCommandBuffer command_buffer);
         void Draw(VkCommandBuffer command_buffer);
-
-    private:
-        void CreateVertexBuffer(const std::vector<Vertex>& vertices);
-        void CreateIndexBuffer(const std::vector<uint32_t>& indices);
     };
 }
 

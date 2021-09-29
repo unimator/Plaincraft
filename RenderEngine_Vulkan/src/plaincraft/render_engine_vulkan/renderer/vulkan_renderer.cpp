@@ -30,15 +30,12 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-	VulkanRenderer::VulkanRenderer(const VulkanDevice &device, VkRenderPass render_pass, VkExtent2D extent, std::shared_ptr<Camera> camera, VkImageView texture_view, VkSampler texture_sampler, VkDescriptorSetLayout dst)
+	VulkanRenderer::VulkanRenderer(const VulkanDevice &device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera)
 		: Renderer(camera),
 		  device_(device),
 		  render_pass_(render_pass),
 		  extent_(extent),
-		  buffer_manager_(VulkanBufferManager(device)),
-		  texture_image_view_(texture_view),
-		  texture_sampler_(texture_sampler),
-		  dst_(dst)
+		  descriptor_set_layout_(descriptor_set_layout)
 	{
 		vertex_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
 		fragment_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
@@ -65,32 +62,20 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyPipelineLayout(device_.GetDevice(), pipeline_layout_, nullptr);
 	}
 
-	void VulkanRenderer::Render()
+	void VulkanRenderer::Render(VulkanRendererFrameConfig& frame_config)
 	{
-		/*pipeline_->Bind(command_buffer_);
-		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
-		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
-
-		auto projection_view = camera_->
-
-		for(auto drawable : drawables_list_)
-		{
-
-		}
-		model_->Bind(command_buffer_);*/
-	}
-
-	void VulkanRenderer::Render(VkCommandBuffer &command_buffer)
-	{
+		auto command_buffer = frame_config.command_buffer;
+		auto descriptor_set = frame_config.descriptor_set;
 		pipeline_->Bind(command_buffer);
 		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
 		projection[1][1] *= -1;
 		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
 
-		for (auto drawable : drawables_list_)
+		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
+			auto drawable = drawables_list_[i];
 			/*auto model_object = drawable->GetModel();
-			auto polygon = modelObject->GetPolygon();*/
+			auto polygon = modelObject->GetPolygon();
 			const auto scale = drawable->GetScale();
 			const auto position = drawable->GetPosition();
 			const auto rotation = drawable->GetRotation();
@@ -104,7 +89,10 @@ namespace plaincraft_render_engine_vulkan
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0,
 				sizeof(SimplePushConstants),
-				&push);
+				&push);*/
+				
+			uint32_t dynamic_offset = i * frame_config.d;
+			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
 			model_->Bind(command_buffer);
 			model_->Draw(command_buffer);
 		}
@@ -120,7 +108,7 @@ namespace plaincraft_render_engine_vulkan
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipeline_layout_create_info.setLayoutCount = 1;
-		pipeline_layout_create_info.pSetLayouts = &dst_;
+		pipeline_layout_create_info.pSetLayouts = &descriptor_set_layout_;
 		pipeline_layout_create_info.pushConstantRangeCount = 1;
 		pipeline_layout_create_info.pPushConstantRanges = &push_constant_range;
 		pipeline_layout_create_info.pNext = VK_NULL_HANDLE;
@@ -133,7 +121,7 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderer::SetupPipelineConfig(VulkanPipelineConfig &pipeline_config, VkViewport &viewport, VkRect2D &scissor)
 	{
-		//pipeline_config.descriptor_set_layout = descriptor_set_layout_;
+		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
 		pipeline_config.pipeline_layout = pipeline_layout_;
 		pipeline_config.render_pass = render_pass_;
 
