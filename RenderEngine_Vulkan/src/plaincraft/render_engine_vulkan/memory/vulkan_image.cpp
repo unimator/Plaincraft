@@ -86,7 +86,7 @@ namespace plaincraft_render_engine_vulkan
 
     VulkanImage::~VulkanImage()
     {
-        auto device = device_.get();
+        auto& device = device_.get();
         vkDestroyImage(device.GetDevice(), image_, nullptr);
         vkFreeMemory(device.GetDevice(), image_memory_, nullptr);
     }

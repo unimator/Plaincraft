@@ -19,7 +19,7 @@ layout(binding = 0) uniform ModelViewProjectionMatrix {
 
 void main() {
     gl_Position = mvp.projection * mvp.view * mvp.model * vec4(inPosition, 1.0);
-    //gl_Position = vec4(inPosition, 1.0);
     fragColor = mvp.color;
+    //fragColor = inColor;
     fragTextCoord = textMapping;
 }

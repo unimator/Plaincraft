@@ -27,14 +27,15 @@ SOFTWARE.
 #include "world_generator.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <plaincraft_render_engine_opengl.hpp>
+#include <cmath>
 
 namespace plaincraft_core
 {
 	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine)
 	{
-		for (int i = -10; i < 10; ++i)
+		for (int i = -20; i < 20; ++i)
 		{
-			for (int j = -10; j < 10; ++j)
+			for (int j = -20; j < 20; ++j)
 			{
 				auto entity = std::shared_ptr<Entity>(new Entity());
 				auto polygon = std::shared_ptr<Polygon>(new Cube());
@@ -48,7 +49,7 @@ namespace plaincraft_core
 				body->SetCollider(std::shared_ptr<Collider>(new BoxCollider(Quaternion(1.0f, 0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f)));
 				//body->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
 				entity->SetBody(body);
-				entity->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
+				entity->SetPosition(Vector3d(i * 1.0f, 0.0f, j * 1.0f));
 				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

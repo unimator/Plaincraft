@@ -30,10 +30,6 @@ SOFTWARE.
 #include "events/types/loop_event.hpp"
 #include "physics/collider/box_collider.hpp"
 #include "world/world_generator.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <plaincraft_render_engine_vulkan.hpp>
-#include <plaincraft_render_engine_opengl.hpp>
-#include <plaincraft_render_engine.hpp>
 #include <iostream>
 #include <ctime>
 
@@ -105,6 +101,8 @@ namespace plaincraft_core {
 		do {
 			current_time = glfwGetTime();
 			delta_time = static_cast<float>(current_time - last_time);
+			delta_time = glm::clamp(delta_time, 0.0f, 1.0f);
+
 			last_time = current_time;
 
 			events_manager_->Trigger(LoopEvent(delta_time));

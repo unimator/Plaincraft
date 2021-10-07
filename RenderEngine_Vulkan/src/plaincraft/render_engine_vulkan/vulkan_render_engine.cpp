@@ -255,7 +255,7 @@ namespace plaincraft_render_engine_vulkan
 		auto swapchain_images = swapchain_->GetSwapchainImages();
 		uniform_buffers_.resize(swapchain_images.size());
 
-		VkDeviceSize instance_count = (20 * 20 + 1);
+		VkDeviceSize instance_count = (40 * 40 + 1);
 
 		for (size_t i = 0; i < swapchain_images.size(); ++i)
 		{
