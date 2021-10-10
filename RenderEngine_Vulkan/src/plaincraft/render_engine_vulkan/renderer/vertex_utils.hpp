@@ -37,7 +37,7 @@ namespace plaincraft_render_engine_vulkan {
 	public:
 		static VkVertexInputBindingDescription GetBindingDescription();
 
-		static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescription();
+		static std::array<VkVertexInputAttributeDescription, 4> GetAttributeDescription();
 	};
 }
 #endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VERTEX_UTILS

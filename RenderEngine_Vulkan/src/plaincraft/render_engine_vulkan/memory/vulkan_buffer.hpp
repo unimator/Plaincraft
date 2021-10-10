@@ -68,7 +68,7 @@ namespace plaincraft_render_engine_vulkan
 
         auto GetBuffer() -> VkBuffer { return buffer_; }
         auto GetMemory() -> VkDeviceMemory { return memory_; }
-        auto GetBufferSize() -> VkDeviceSize { return buffer_size_; }
+        auto GetBufferSize() const -> VkDeviceSize { return buffer_size_; }
         auto GetInstanceCount() -> uint32_t { return instance_count_; }
         auto GetInstanceSize() -> VkDeviceSize { return instance_size_; }
         auto GetAlignmentSize() -> VkDeviceSize { return alignment_size_; }
@@ -76,8 +76,12 @@ namespace plaincraft_render_engine_vulkan
         auto GetMemoryPropertyFlags() -> VkMemoryPropertyFlags { return memory_property_flags_; }
         auto GetMappedData() -> void* { return mapped_data_; }
 
+        void CopyFromBuffer(const VulkanBuffer& other);
+
         template<typename T>
         static VulkanBuffer CreateFromVector(const VulkanDevice& device, std::vector<T> data, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties);
+
+        static VulkanBuffer MoveBuffer(const VulkanDevice& device, VulkanBuffer&& buffer, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties);
 
     private:
         void CreateBuffer();

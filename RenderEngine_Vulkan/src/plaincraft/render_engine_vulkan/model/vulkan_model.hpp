@@ -51,7 +51,10 @@ namespace plaincraft_render_engine_vulkan {
 
         void Bind(VkCommandBuffer command_buffer);
         void Draw(VkCommandBuffer command_buffer);
+
+    private:
     };
+
 }
 
 #endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL

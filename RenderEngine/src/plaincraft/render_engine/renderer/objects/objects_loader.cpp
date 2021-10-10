@@ -24,11 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "no_draw.hpp"
+#include "objects_loader.hpp"
 
 namespace plaincraft_render_engine {
-	NoDraw::NoDraw() {
-		vertices_ = std::vector<Vertex>();
-		indices_ = std::vector<uint32_t>();
-	}
+    Polygon ObjectsLoader::LoadWavefrontObject(const std::string model);
 }

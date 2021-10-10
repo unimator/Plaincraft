@@ -35,9 +35,9 @@ namespace plaincraft_render_engine {
 	{
 		glm::vec3 position;
 		glm::vec3 color;
-		glm::vec2 textCoordinates;
+		glm::vec3 normal;
+		glm::vec2 text_coordinates;
 	};
 }
-
 
 #endif // PLAINCRAFT_RENDER_ENGINE_VERTEX

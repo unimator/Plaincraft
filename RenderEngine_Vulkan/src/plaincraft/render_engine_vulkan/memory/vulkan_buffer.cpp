@@ -133,6 +133,29 @@ namespace plaincraft_render_engine_vulkan
         }
     }
 
+    void VulkanBuffer::CopyFromBuffer(const VulkanBuffer& other)
+    {
+        auto& device = device_.get();
+        auto command_buffer = device.BeginSingleTimeCommands();
+
+        VkBufferCopy copy_region{};
+        copy_region.srcOffset = 0;
+        copy_region.dstOffset = 0;
+        copy_region.size = other.GetBufferSize();
+        vkCmdCopyBuffer(command_buffer, other.buffer_, buffer_, 1, &copy_region);
+
+        device.EndSingleTimeCommands(command_buffer);
+    }
+
+    VulkanBuffer VulkanBuffer::MoveBuffer(const VulkanDevice& device, VulkanBuffer&& buffer, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties)
+    {
+        VulkanBuffer result(device, buffer.GetInstanceSize(), buffer.GetInstanceCount(), buffer_usage_flags, memory_properties);
+
+        result.CopyFromBuffer(buffer);
+
+        return result;
+    }
+
     VkResult VulkanBuffer::Flush(VkDeviceSize size, VkDeviceSize offset)
     {
         VkMappedMemoryRange mapped_memory_range{};

@@ -47,9 +47,9 @@ namespace plaincraft_core
 				auto body = std::shared_ptr<Body>(new Body());
 
 				body->SetCollider(std::shared_ptr<Collider>(new BoxCollider(Quaternion(1.0f, 0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f)));
-				//body->SetPosition(Vector3d(i * 1.0f, sin(i) * cos(j), j * 1.0f));
+				//body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
 				entity->SetBody(body);
-				entity->SetPosition(Vector3d(i * 1.0f, 0.0f, j * 1.0f));
+				entity->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
 				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

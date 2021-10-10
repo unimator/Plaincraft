@@ -29,20 +29,27 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-    VulkanModel::VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon)
+    VulkanModel::VulkanModel(const VulkanDevice &device, std::shared_ptr<Polygon const> polygon)
         : device_(device),
-          vertex_buffer_(VulkanBuffer::CreateFromVector(
-              device,
-              polygon->GetVertices(),
-              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)),
-          index_buffer_(VulkanBuffer::CreateFromVector(
-              device,
-              polygon->GetIndices(),
-              VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
+          vertex_buffer_(
+              VulkanBuffer::MoveBuffer(device,
+                                       VulkanBuffer::CreateFromVector(
+                                           device,
+                                           polygon->GetVertices(),
+                                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+                                       VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)),
+          index_buffer_(
+              VulkanBuffer::MoveBuffer(device,
+                                       VulkanBuffer::CreateFromVector(
+                                           device,
+                                           polygon->GetIndices(),
+                                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+                                       VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
-
     }
 
     VulkanModel::~VulkanModel()
