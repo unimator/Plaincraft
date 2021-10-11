@@ -31,6 +31,7 @@ SOFTWARE.
 #include "./input/input_manager.hpp"
 #include "./events/events_manager.hpp"
 #include "scene.hpp"
+#include "camera_operators/camera_operator.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
@@ -41,6 +42,7 @@ namespace plaincraft_core {
 		std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::shared_ptr<EventsManager> events_manager_;
 		std::shared_ptr<PhysicsEngine> physics_engine_;
+		std::unique_ptr<CameraOperator> camera_operator_;
 		Scene scene_;
 		InputManager input_manager_;
 

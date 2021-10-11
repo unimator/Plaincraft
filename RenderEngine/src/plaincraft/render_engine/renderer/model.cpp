@@ -29,5 +29,5 @@ SOFTWARE.
 namespace plaincraft_render_engine {
 	Model::Model() {}
 
-	Model::Model(std::shared_ptr<Polygon const> polygon, std::shared_ptr<Texture const> texture) : polygon_(polygon), texture_(texture) {}
+	Model::Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) : mesh_(mesh), texture_(texture) {}
 }

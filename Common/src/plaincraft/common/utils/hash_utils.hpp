@@ -24,8 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "objects_loader.hpp"
+#ifndef PLAINCRAFT_COMMON_HASH_UTILS
+#define PLAINCRAFT_COMMON_HASH_UTILS
 
-namespace plaincraft_render_engine {
-    Polygon ObjectsLoader::LoadWavefrontObject(const std::string model);
+#include <functional>
+
+namespace plaincraft_common
+{
+    // from: https://stackoverflow.com/a/57595105
+    template <typename T, typename... Rest>
+    void hash_combine(std::size_t &seed, const T &v, const Rest &...rest)
+    {
+        seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        (hash_combine(seed, rest), ...);
+    };
 }
+
+#endif // PLAINCRAFT_COMMON_HASH_UTILS

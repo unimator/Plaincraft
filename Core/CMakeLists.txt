@@ -12,6 +12,12 @@ target_sources(${TARGET_NAME}
 PRIVATE
     include/plaincraft_core.hpp
     src/plaincraft/core/common.hpp
+    src/plaincraft/core/camera_operators/eyes/camera_operator_eyes.cpp
+    src/plaincraft/core/camera_operators/eyes/camera_operator_eyes.hpp
+    src/plaincraft/core/camera_operators/follow/camera_operator_follow.cpp
+    src/plaincraft/core/camera_operators/follow/camera_operator_follow.hpp
+    src/plaincraft/core/camera_operators/camera_operator.cpp
+    src/plaincraft/core/camera_operators/camera_operator.hpp
     src/plaincraft/core/entities/entity.cpp
     src/plaincraft/core/entities/entity.hpp
     src/plaincraft/core/entities/player.cpp

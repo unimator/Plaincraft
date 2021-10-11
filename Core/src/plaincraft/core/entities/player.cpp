@@ -30,7 +30,7 @@ SOFTWARE.
 #include <plaincraft_render_engine_opengl.hpp>
 
 namespace plaincraft_core {
-	Player::Player(std::shared_ptr<Camera> camera) : camera_(camera), velocity_vector_(Vector3d(0, 0, 0)){
+	Player::Player(std::shared_ptr<Camera> camera) : camera_(camera), velocity_vector_(Vector3d(0, 0, 0)) {
 		this->SetDrawable(nullptr);
 	}
 
@@ -81,6 +81,10 @@ namespace plaincraft_core {
 				{
 					right_ = acceleration_flag_;
 				}
+				if (key_code == GLFW_KEY_SPACE) 
+				{
+					jump_ = acceleration_flag_;
+				}
 			}
 			break;
 		}
@@ -105,6 +109,13 @@ namespace plaincraft_core {
 			
 			if (right_) {
 				acceleration_vector = horizontal_movement_vector * acceleration_ * normalize(cross(camera_->direction, camera_->up)) * delta_time;
+			}
+
+			if(jump_) {
+				if(GetBody()->GetVelocity().y <= 0.0001f)
+				{
+					acceleration_vector += vertical_movement_vector * jump_power_ * delta_time;
+				}
 			}
 
 			/*const auto player_position = GetPosition();

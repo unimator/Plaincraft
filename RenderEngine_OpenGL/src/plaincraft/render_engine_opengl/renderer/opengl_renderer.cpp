@@ -38,7 +38,7 @@ namespace plaincraft_render_engine_opengl {
 	void OpenGLRenderer::Render() {
 		auto drawable = drawables_list_.front();
 		auto modelObject = drawable->GetModel();
-		auto polygon = modelObject->GetPolygon();
+		auto polygon = modelObject->GetMesh();
 		const auto scale = drawable->GetScale();
 		const auto position = drawable->GetPosition();
 		const auto rotation = drawable->GetRotation();

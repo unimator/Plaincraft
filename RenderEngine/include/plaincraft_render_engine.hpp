@@ -44,7 +44,7 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/renderer/drawable.hpp"
 #include "../src/plaincraft/render_engine/renderer/objects/cube.hpp"
 #include "../src/plaincraft/render_engine/renderer/objects/no_draw.hpp"
-#include "../src/plaincraft/render_engine/renderer/objects/polygon.hpp"
+#include "../src/plaincraft/render_engine/renderer/objects/mesh.hpp"
 
 #include "../src/plaincraft/render_engine/window/window.hpp"
 

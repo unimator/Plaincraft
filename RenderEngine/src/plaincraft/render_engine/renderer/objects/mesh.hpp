@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,19 +27,30 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_POLYGON
 #define PLAINCRAFT_RENDER_ENGINE_POLYGON
 
-#include <cstdint>
+#include <lib/tiny_obj_loader.h>
+
 #include "../../common.hpp"
 #include "../vertex.hpp"
 
+#include <cstdint>
+#include <string>
+
 namespace plaincraft_render_engine {
-	class Polygon {
+	class Mesh {
 	protected:
+		Mesh() {}
 		std::vector<Vertex> vertices_;
 		std::vector<uint32_t> indices_;
 
-		~Polygon() {};
-
 	public:
+		Mesh(const Mesh& other) = delete;
+		Mesh& operator=(const Mesh& other) = delete;
+
+		Mesh(Mesh&& other);
+		Mesh& operator=(Mesh&& other);
+
+		virtual ~Mesh() {};
+
 		const std::vector<Vertex>& GetVertices() const {
 			return vertices_;
 		}
@@ -47,6 +58,8 @@ namespace plaincraft_render_engine {
 		const std::vector<uint32_t>& GetIndices() const {
 			return indices_;
 		}
+
+		static std::unique_ptr<Mesh> LoadWavefront(const char* data);
 	};
 }
 

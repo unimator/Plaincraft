@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,9 +40,10 @@ namespace plaincraft_core {
 	private:
 		const float acceleration_ = 2.0f;
 		const float max_speed_ = 10.0f;
+		const float jump_power_ = 50.0f;
 		float velocity_ = 0.0f;
 		bool acceleration_flag_ = false;
-		bool forward_ = false, back_ = false, left_ = false, right_ = false;
+		bool forward_ = false, back_ = false, left_ = false, right_ = false, jump_ = false;
 		Vector3d velocity_vector_;
 		std::shared_ptr<Camera> camera_;
 

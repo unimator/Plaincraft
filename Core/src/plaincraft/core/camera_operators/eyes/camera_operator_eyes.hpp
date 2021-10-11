@@ -24,22 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_CAMERA
-#define PLAINCRAFT_RENDER_ENGINE_CAMERA
+#ifndef PLAINCRAFT_CORE_CAMERA_OPERATOR_EYES
+#define PLAINCRAFT_CORE_CAMERA_OPERATOR_EYES
 
-#include "../common.hpp"
+#include "../../entities/entity.hpp"
+#include "../camera_operator.hpp"
 
-namespace plaincraft_render_engine {
-	struct Camera
-	{
-		Vector3d position;
-		Vector3d up;
-		Vector3d direction;
+namespace plaincraft_core
+{
+    using namespace plaincraft_render_engine;
 
-		float fov;
+    class CameraOperatorEyes : public CameraOperator
+    {
+    private:
+        std::shared_ptr<Entity> follow_target_;
 
-		double pitch, yaw;
-	};
+    public:
+        CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target);
+
+        void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
+    };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_CAMERA
+#endif // PLAINCRAFT_CORE_CAMERA_OPERATOR_EYES

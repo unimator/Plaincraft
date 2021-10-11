@@ -27,23 +27,23 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_MODEL
 #define PLAINCRAFT_RENDER_ENGINE_MODEL
 
-#include "objects/polygon.hpp"
+#include "objects/mesh.hpp"
 #include "../texture/texture.hpp"
 
 namespace plaincraft_render_engine {
 	class Model
 	{
 	private:
-		std::shared_ptr<Polygon const> polygon_;
+		std::shared_ptr<Mesh const> mesh_;
 		std::shared_ptr<Texture const> texture_;
 
 	public:
 		Model();
-		Model(std::shared_ptr<Polygon const> polygon, std::shared_ptr<Texture const> texture);
+		Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture);
 
 		~Model() { }
 
-		auto GetPolygon() -> std::shared_ptr<Polygon const> { return polygon_; }
+		auto GetMesh() -> std::shared_ptr<Mesh const> { return mesh_; }
 		auto GetTexture() -> std::shared_ptr<Texture const> { return texture_; }
 	};
 }

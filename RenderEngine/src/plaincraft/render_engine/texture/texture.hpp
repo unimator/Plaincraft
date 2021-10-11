@@ -38,10 +38,6 @@ namespace plaincraft_render_engine {
 
 		~Texture() {}
 	};
-
-	using TextureRef = std::shared_ptr<Texture>;
 }
-
-
 
 #endif // PLAINCRAFT_RENDER_ENGINE_TEXTURE

@@ -43,7 +43,7 @@ namespace plaincraft_render_engine_vulkan {
         VulkanBuffer index_buffer_;
     
     public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Polygon const> polygon);
+        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
         ~VulkanModel();
 
         VulkanModel(const VulkanModel& other) = delete;

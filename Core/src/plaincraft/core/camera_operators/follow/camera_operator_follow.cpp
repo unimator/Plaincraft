@@ -23,18 +23,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#ifndef PLAINCRAT_RENDER_ENGINE_OBJECTS_LOADER
-#define PLAINCRAT_RENDER_ENGINE_OBJECTS_LOADER
-
-#include "polygon.hpp"
-#include <string>
-
-namespace plaincraft_render_engine {
-    class ObjectsLoader final {
-        public:
-            Polygon LoadWavefrontObject(const std::string model);
-    };  
-}
-
-#endif // PLAINCRAT_RENDER_ENGINE_OBJECTS_LOADER

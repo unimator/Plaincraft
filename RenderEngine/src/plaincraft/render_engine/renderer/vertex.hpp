@@ -37,6 +37,8 @@ namespace plaincraft_render_engine {
 		glm::vec3 color;
 		glm::vec3 normal;
 		glm::vec2 text_coordinates;
+
+		bool operator==(const Vertex& other) const;
 	};
 }
 

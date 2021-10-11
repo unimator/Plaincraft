@@ -14,11 +14,11 @@ PRIVATE
     src/plaincraft/render_engine/renderer/objects/cube.hpp
     src/plaincraft/render_engine/renderer/objects/no_draw.cpp
     src/plaincraft/render_engine/renderer/objects/no_draw.hpp
-    src/plaincraft/render_engine/renderer/objects/objects_loader.cpp
-    src/plaincraft/render_engine/renderer/objects/objects_loader.hpp
-    src/plaincraft/render_engine/renderer/objects/polygon.hpp
+    src/plaincraft/render_engine/renderer/objects/mesh.cpp
+    src/plaincraft/render_engine/renderer/objects/mesh.hpp
     src/plaincraft/render_engine/renderer/renderer.cpp
     src/plaincraft/render_engine/renderer/renderer.hpp
+    src/plaincraft/render_engine/renderer/vertex.cpp
     src/plaincraft/render_engine/renderer/vertex.hpp
     src/plaincraft/render_engine/texture/texture.hpp
     src/plaincraft/render_engine/texture/textures_factory.hpp

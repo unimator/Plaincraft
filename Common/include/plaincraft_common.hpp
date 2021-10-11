@@ -31,6 +31,7 @@ SOFTWARE.
 #include "../src/plaincraft/common/system_types.hpp"
 
 #include "../src/plaincraft/common/utils/file_utils.hpp"
+#include "../src/plaincraft/common/utils/hash_utils.hpp"
 
 #include "../src/plaincraft/common/exceptions/not_implemented_exception.hpp"
 #endif // PLAINCRAFT_COMMON_PLAINCRAFT_COMMON

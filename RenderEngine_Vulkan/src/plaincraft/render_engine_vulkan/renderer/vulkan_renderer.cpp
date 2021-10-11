@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include "vulkan_renderer.hpp"
 #include <chrono>
+#include <fstream>
 #include <glm\gtx\quaternion.hpp>
 
 namespace plaincraft_render_engine_vulkan
@@ -53,8 +54,10 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanRenderer::LoadModel()
 	{
-		auto polygon = std::make_shared<const Cube>(Cube());
-		model_ = std::make_unique<VulkanModel>(device_, polygon);
+		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
+		auto mesh = Mesh::LoadWavefront(cube_model.data());
+
+		model_ = std::make_unique<VulkanModel>(device_, std::move(mesh));
 	}
 
 	VulkanRenderer::~VulkanRenderer()
@@ -75,7 +78,7 @@ namespace plaincraft_render_engine_vulkan
 		{
 			auto drawable = drawables_list_[i];
 			/*auto model_object = drawable->GetModel();
-			auto polygon = modelObject->GetPolygon();
+			auto polygon = modelObject->GetMesh();
 			const auto scale = drawable->GetScale();
 			const auto position = drawable->GetPosition();
 			const auto rotation = drawable->GetRotation();

@@ -11,6 +11,7 @@ endif()
 target_sources(${TARGET_NAME}
 PRIVATE
     include/lib/stb_image.h
+    include/lib/tiny_obj_loader.h
     include/plaincraft_common.hpp
     src/plaincraft/common/common.hpp
     src/plaincraft/common/exceptions/not_implemented_exception.hpp

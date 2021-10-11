@@ -43,7 +43,7 @@ namespace plaincraft_core {
 	}
 
 	void InputManager::ProcessInput(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		auto event = InputEvent(key, action);
+		auto event = InputEvent(static_cast<char>(key), action);
 		events_manager_->Trigger(event);
 	}
 

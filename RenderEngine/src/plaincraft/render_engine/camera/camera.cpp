@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,27 +27,4 @@ SOFTWARE.
 #include "camera.hpp"
 
 namespace plaincraft_render_engine {
-    void Camera::HandleCameraMovement(double delta_x, double delta_y, double delta_time) {
-        const float camera_movement_speed = 0.05f;
-        const float camera_sensitivity = 0.1f;
-
-        delta_x *= camera_sensitivity;
-        delta_y *= camera_sensitivity;
-
-        yaw += delta_x;
-        pitch += delta_y;
-
-        if (pitch > 89.0f) {
-            pitch = 89.0f;
-        }
-
-        if (pitch < -89.0f) {
-            pitch = -89.0f;
-        }
-
-        direction.x = static_cast<float>(cos(glm::radians(yaw)) * cos(glm::radians(pitch)));
-        direction.y = static_cast<float>(sin(glm::radians(pitch)));
-        direction.z = static_cast<float>(sin(glm::radians(yaw)) * cos(glm::radians(pitch)));
-        direction = glm::normalize(direction);
-    }
 }

@@ -30,6 +30,7 @@ SOFTWARE.
 #include "events/types/loop_event.hpp"
 #include "physics/collider/box_collider.hpp"
 #include "world/world_generator.hpp"
+#include "camera_operators/eyes/camera_operator_eyes.hpp"
 #include <iostream>
 #include <ctime>
 
@@ -60,13 +61,16 @@ namespace plaincraft_core {
 		std::shared_ptr<Player> player;
 		player = std::make_shared<Player>(camera);
 
-		auto polygon = std::make_shared<Cube>();
+		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/sphere.obj");
+		auto mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model.data())));
+
 		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\player.png");
 		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
 
 		auto drawable = std::make_shared<Drawable>();
-		drawable->SetModel(std::make_shared<Model>(polygon, player_texture));
+		drawable->SetModel(std::make_shared<Model>(mesh, player_texture));
 		drawable->SetScale(0.5f);
+		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);		
 
 		auto body = std::shared_ptr<Body>(new Body());
@@ -80,6 +84,8 @@ namespace plaincraft_core {
 
 		events_manager_->Subscribe(EventTypes::INPUT_EVENT, player);
 		events_manager_->Subscribe(EventTypes::LOOP_EVENT, player);
+
+		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
 		MainLoop();
 	}
@@ -108,7 +114,7 @@ namespace plaincraft_core {
 			events_manager_->Trigger(LoopEvent(delta_time));
 
 			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
-			camera->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
+			camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
 
 			//scene_->Render();
 

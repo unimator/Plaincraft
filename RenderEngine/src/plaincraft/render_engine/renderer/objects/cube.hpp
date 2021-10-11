@@ -26,11 +26,11 @@ SOFTWARE.
 
 #ifndef PLAINCRAFT_RENDER_ENGINE_CUBE
 #define PLAINCRAFT_RENDER_ENGINE_CUBE
-#include "polygon.hpp"
+#include "mesh.hpp"
 
 namespace plaincraft_render_engine
 {
-	class Cube : public Polygon
+	class Cube : public Mesh
 	{
 	public:
 		Cube();

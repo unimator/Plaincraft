@@ -27,10 +27,10 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_NO_DRAW
 #define PLAINCRAFT_RENDER_ENGINE_NO_DRAW
 
-#include "./polygon.hpp"
+#include "./mesh.hpp"
 
 namespace plaincraft_render_engine {
-	class NoDraw : public Polygon
+	class NoDraw : public Mesh
 	{
 	public:
 		NoDraw();
