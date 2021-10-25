@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "plane.hpp"
+#ifndef PLAINCRAFT_CORE_CONVERSIONS
+#define PLAINCRAFT_CORE_CONVERSIONS
+
+#include <reactphysics3d/reactphysics3d.h>
+#include "../common.hpp"
 
 namespace plaincraft_core {
-	Plane::Plane(float a, float b, float c, float d) : a_(a), b_(b), c_(c), d_(d) {}
+    rp3d::Vector3 FromGlm(const Vector3d& vector);
+
+    Vector3d FromRP3D(const rp3d::Vector3& vector);
 }
+
+#endif // PLAINCRAFT_CORE_CONVERSIONS

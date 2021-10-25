@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,53 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "body.hpp"
+#ifndef PLAINCRAFT_CORE_COMPONENT
+#define PLAINCRAFT_CORE_COMPONENT
 
 namespace plaincraft_core {
-	const float Body::minimum_velocity_ = 0.0001f;
+    class Component {
 
-	Body::Body() {
-		velocity_ = Vector3d(0.0f, 0.0f, 0.0f);
-	}
-
-	void Body::SetCollider(std::shared_ptr<Collider> collider) {
-		collider_ = std::move(collider);
-	}
-
-	std::shared_ptr<Collider> Body::GetCollider() const {
-		return collider_;
-	}
-
-	void Body::SetPosition(Vector3d position) {
-		position_ = std::move(position);
-	}
-
-
-	Vector3d Body::GetPosition() const {
-		return position_;
-	}
-
-	void Body::SetVelocity(Vector3d velocity) {
-		velocity_ = std::move(velocity);
-		if (glm::length(velocity_) < minimum_velocity_) {
-			velocity_ = Vector3d(0.0f, 0.0f, 0.0f);
-		}
-	}
-	
-	Vector3d Body::GetVelocity() const {
-		return velocity_;
-	}
-
-	const float Body::GetFriction() const {
-		return friction_factor_;
-	}
-
-	const bool Body::IsActive() const {
-		return glm::length(velocity_) > minimum_velocity_;
-	}
-
-	void Body::AddForce(Vector3d force)
-	{
-		velocity_ += force / mass_;
-	}
+    };
 }
+
+#endif // PLAINCRAFT_CORE_COMPONENT

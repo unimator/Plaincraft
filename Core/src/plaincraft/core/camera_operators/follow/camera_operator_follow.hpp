@@ -27,11 +27,18 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
 #define PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
 
+#include "../../entities/entity.hpp"
 #include "../camera_operator.hpp"
 
 namespace plaincraft_core {
     class CameraOperatorFollow : public CameraOperator {
+    private:
+        std::shared_ptr<Entity> follow_target_;
+        float distance_to_target_;
+
     public:
+        CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target, float distance_to_target = 4.0f);
+
         void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
     };
 }

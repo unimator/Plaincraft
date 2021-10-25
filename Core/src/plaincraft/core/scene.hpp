@@ -29,7 +29,6 @@ SOFTWARE.
 #include "common.hpp"
 #include "entities/entity.hpp"
 #include "events/events_manager.hpp"
-#include "physics/physics_engine.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core
@@ -41,13 +40,13 @@ namespace plaincraft_core
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
 		std::shared_ptr<EventsManager> events_manager_;
-		std::shared_ptr<PhysicsEngine> physics_engine_;
-		
 
 	public:
-		Scene(std::shared_ptr<EventsManager> events_manager, std::shared_ptr<PhysicsEngine> physics_engine);
+		Scene(std::shared_ptr<EventsManager> events_manager);
 
 		void AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine);
+
+		void UpdateFrame();
 	};
 }
 

@@ -23,3 +23,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+#include "camera_operator_follow.hpp"
+#include "glm/glm.hpp"
+
+namespace plaincraft_core {
+    CameraOperatorFollow::CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target, float distance_to_target)
+    : CameraOperator(camera), follow_target_(follow_target), distance_to_target_(distance_to_target) {}
+
+    void CameraOperatorFollow::HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time)
+    {
+        const float camera_movement_speed = 0.05f;
+        const float camera_sensitivity = 0.25f;
+
+        delta_horiz *= camera_sensitivity * delta_time;
+        delta_vert *= camera_sensitivity * delta_time;
+
+        camera_->yaw += delta_horiz;
+        camera_->pitch -= delta_vert;
+
+        if (camera_->pitch > (glm::half_pi<float>() - 0.05f)) {
+            camera_->pitch = glm::half_pi<float>() - 0.05f;
+        }
+
+        if (camera_->pitch < -(glm::half_pi<float>() - 0.05f)) {
+            camera_->pitch = -(glm::half_pi<float>() - 0.05f);
+        }
+
+        auto target_position = follow_target_->GetPosition();
+        camera_->position = Vector3d(
+            target_position.x + distance_to_target_ * glm::cos(camera_->pitch) * glm::cos(camera_->yaw),
+            target_position.y + distance_to_target_ * glm::sin(camera_->pitch),
+            target_position.z + distance_to_target_ * glm::cos(camera_->pitch) * glm::sin(camera_->yaw)
+        );
+
+        camera_->direction = follow_target_->GetPosition() - camera_->position;
+
+        // camera_->direction.x = static_cast<float>(cos(glm::radians(camera_->yaw)) * cos(glm::radians(camera_->pitch)));
+        // camera_->direction.y = static_cast<float>(sin(glm::radians(camera_->pitch)));
+        // camera_->direction.z = static_cast<float>(sin(glm::radians(camera_->yaw)) * cos(glm::radians(camera_->pitch)));
+        // camera_->direction = glm::normalize(camera_->direction);
+
+        // camera_->position = follow_target_->GetPosition();
+    }
+}

@@ -25,8 +25,9 @@ SOFTWARE.
 */
 
 #include "player.hpp"
-#include <iostream>
 #include "../events/types/loop_event.hpp"
+#include "../utils/conversions.hpp"
+#include <iostream>
 #include <plaincraft_render_engine_opengl.hpp>
 
 namespace plaincraft_core {
@@ -112,7 +113,7 @@ namespace plaincraft_core {
 			}
 
 			if(jump_) {
-				if(GetBody()->GetVelocity().y <= 0.0001f)
+				if(GetRigidBody()->getLinearVelocity().y <= 0.0001f)
 				{
 					acceleration_vector += vertical_movement_vector * jump_power_ * delta_time;
 				}
@@ -124,13 +125,10 @@ namespace plaincraft_core {
 			camera_->position.z = player_position.z;
 			break;*/
 
-			camera_->position = GetBody()->GetPosition();
+			camera_->position = GetPosition();
 			camera_->position.y = camera_->position.y + 1.5f;
 
-			acceleration_vector.y -= 1.0f * delta_time;
-			GetBody()->AddForce(acceleration_vector);
-
-			GetDrawable()->SetPosition(GetBody()->GetPosition());
+			GetRigidBody()->applyForceToCenterOfMass(FromGlm(acceleration_vector));
 
 			break;
 		}

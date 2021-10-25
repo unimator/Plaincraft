@@ -64,6 +64,7 @@ namespace plaincraft_render_engine_vulkan {
 		VkSampler texture_sampler_;
         
 		std::unique_ptr<VulkanModel> model_;
+        std::unique_ptr<VulkanModel> plane_;
         
 		void LoadModel();
 

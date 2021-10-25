@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_COLLIDER
-#define PLAINCRAFT_CORE_COLLIDER
-
-#include "../../common.hpp"
+#include "conversions.hpp"
 
 namespace plaincraft_core {
-	class Collider {
+    rp3d::Vector3 FromGlm(const Vector3d& vector) {
+        return rp3d::Vector3(vector.x, vector.y, vector.z);
+    }
 
-	protected:
-		Quaternion rotation_;
-
-	public:
-		Collider() : rotation_(Quaternion(1.0f, 0.0f, 0.0f, 0.0f)) {};
-
-		virtual ~Collider() {};
-
-		virtual float GetSphericalRadius() const = 0;
-
-		Quaternion GetRotation() { return rotation_; }
-		
-		void SetRotation(Quaternion rotation) {
-			rotation_ = std::move(rotation);
-		}
-	};
+    Vector3d FromRP3D(const rp3d::Vector3& vector) {
+        return Vector3d(vector.x, vector.y, vector.z);
+    }
 }
-#endif // PLAINCRAFT_CORE_COLLIDER

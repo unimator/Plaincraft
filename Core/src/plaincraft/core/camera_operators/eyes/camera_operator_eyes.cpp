@@ -38,8 +38,8 @@ namespace plaincraft_core {
         const float camera_movement_speed = 0.05f;
         const float camera_sensitivity = 0.1f;
 
-        delta_horiz *= camera_sensitivity;
-        delta_vert *= camera_sensitivity;
+        delta_horiz *= camera_sensitivity * delta_time;
+        delta_vert *= camera_sensitivity * delta_time;
 
         camera_->yaw += delta_horiz;
         camera_->pitch += delta_vert;

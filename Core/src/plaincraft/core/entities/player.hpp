@@ -40,7 +40,7 @@ namespace plaincraft_core {
 	private:
 		const float acceleration_ = 2.0f;
 		const float max_speed_ = 10.0f;
-		const float jump_power_ = 50.0f;
+		const float jump_power_ = 500.0f;
 		float velocity_ = 0.0f;
 		bool acceleration_flag_ = false;
 		bool forward_ = false, back_ = false, left_ = false, right_ = false, jump_ = false;

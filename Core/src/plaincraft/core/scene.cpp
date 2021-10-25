@@ -26,9 +26,6 @@ SOFTWARE.
 
 #include "scene.hpp"
 #include "entities/player.hpp"
-#include "physics/collider/box_collider.hpp"
-#include "physics/physics_engine.hpp"
-#include "physics/collisions/collisions_detector.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <plaincraft_render_engine_opengl.hpp>
 
@@ -37,9 +34,8 @@ namespace plaincraft_core
 	using namespace plaincraft_render_engine;
 	using namespace plaincraft_render_engine_opengl;
 
-	Scene::Scene(std::shared_ptr<EventsManager> events_manager, std::shared_ptr<PhysicsEngine> physics_engine)
-		: events_manager_(std::move(events_manager)),
-		physics_engine_(std::move(physics_engine))
+	Scene::Scene(std::shared_ptr<EventsManager> events_manager)
+		: events_manager_(std::move(events_manager))
 	{
 	}
 
@@ -47,6 +43,18 @@ namespace plaincraft_core
 	{
 		entities_list_.push_back(entity);
 		render_engine->AddDrawable(entity->GetDrawable());
-		physics_engine_->AddBody(entity->GetBody());
+	}
+
+	void Scene::UpdateFrame()
+	{
+		for(auto entity : entities_list_)
+		{
+			const auto rb = entity->GetRigidBody();
+			auto transform = rb->getTransform();
+			auto position = transform.getPosition();
+			auto rotation = transform.getOrientation();
+			entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+		}
 	}
 }

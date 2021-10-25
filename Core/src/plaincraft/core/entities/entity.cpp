@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 #include "entity.hpp"
-#include "../physics/collider/void_collider.hpp"
+#include "../utils/conversions.hpp"
 
 namespace plaincraft_core {
 	Entity::Entity() : drawable_(nullptr)  {
@@ -33,12 +33,29 @@ namespace plaincraft_core {
 	}
 
 	void Entity::SetPosition(Vector3d position) {
-		body_->SetPosition(position);
-		drawable_->SetPosition(position);
+		if(rigid_body_) 
+		{
+			auto transform = rigid_body_->getTransform();
+			transform.setPosition(FromGlm(position));
+			rigid_body_->setTransform(transform);
+		}
+
+		if(drawable_)
+		{
+			drawable_->SetPosition(position);
+		}
+
+		position_ = position;
 	}
 
-	Vector3d Entity::GetPosition() {
-		return body_->GetPosition();
+	Vector3d Entity::GetPosition() const {
+		//return position_;
+		if(rigid_body_) 
+		{
+			return FromRP3D(rigid_body_->getTransform().getPosition());
+		}
+		
+		return position_;
 	}
 
 	void Entity::SetDrawable(std::shared_ptr<plaincraft_render_engine::Drawable> drawable) {
@@ -49,19 +66,19 @@ namespace plaincraft_core {
 		return drawable_;
 	}
 
-	void Entity::SetBody(std::shared_ptr<Body> body) {
-		body_ = std::move(body);
-	}
-
-	std::shared_ptr<Body> Entity::GetBody() const {
-		return body_;
-	}
-
 	void Entity::SetColor(Vector3d color) {
 		drawable_->SetColor(color);
 	}
 
 	Vector3d Entity::GetColor() {
 		return drawable_->GetColor();
+	}
+
+	void Entity::SetRigidBody(rp3d::RigidBody* rigid_body) {
+		rigid_body_ = rigid_body;
+	}
+
+	rp3d::RigidBody* Entity::GetRigidBody() const {
+		return rigid_body_;
 	}
 }

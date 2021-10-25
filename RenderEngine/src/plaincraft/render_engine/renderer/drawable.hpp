@@ -47,6 +47,7 @@ namespace plaincraft_render_engine
 		auto SetScale(float scale) -> void { scale_ = scale; }
 		auto GetScale() const -> const float { return scale_; }
 
+		void SetRotation(Quaternion rotation) { rotation_ = rotation; }
 		auto GetRotation() -> Quaternion { return rotation_; }
 
 		void SetPosition(Vector3d position);

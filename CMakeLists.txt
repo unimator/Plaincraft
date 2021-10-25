@@ -10,15 +10,17 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(Vulkan)
 
 include_directories(
-    "Dependencies/glm"
-    "Dependencies/GLEW/include"
-    "Dependencies/GLFW/include"
-    ${Vulkan_INCLUDE_DIRS}
+    SYSTEM "Dependencies/glm"
+    SYSTEM "Dependencies/GLEW/include"
+    SYSTEM "Dependencies/GLFW/include"
+    SYSTEM "Dependencies/ReactPhysics3D/include"
+    SYSTEM ${Vulkan_INCLUDE_DIRS}
     )
 
 add_subdirectory("Dependencies/glm")
 add_subdirectory("Dependencies/GLEW")
 add_subdirectory("Dependencies/GLFW")
+add_subdirectory("Dependencies/ReactPhysics3D")
 
 # Include sub-projects.
 add_subdirectory("Common")

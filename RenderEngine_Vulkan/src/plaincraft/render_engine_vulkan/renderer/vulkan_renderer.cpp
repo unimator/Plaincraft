@@ -58,6 +58,11 @@ namespace plaincraft_render_engine_vulkan
 		auto mesh = Mesh::LoadWavefront(cube_model.data());
 
 		model_ = std::make_unique<VulkanModel>(device_, std::move(mesh));
+
+		auto plane_model = read_file_raw("F:/Projekty/Plaincraft/Models/plane.obj");
+		mesh = Mesh::LoadWavefront(plane_model.data());
+
+		plane_ = std::make_unique<VulkanModel>(device_, std::move(mesh));
 	}
 
 	VulkanRenderer::~VulkanRenderer()
@@ -77,6 +82,10 @@ namespace plaincraft_render_engine_vulkan
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto drawable = drawables_list_[i];
+			uint32_t dynamic_offset = i * frame_config.d;
+			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
+			model_->Bind(command_buffer);
+			model_->Draw(command_buffer);
 			/*auto model_object = drawable->GetModel();
 			auto polygon = modelObject->GetMesh();
 			const auto scale = drawable->GetScale();
@@ -93,11 +102,6 @@ namespace plaincraft_render_engine_vulkan
 				0,
 				sizeof(SimplePushConstants),
 				&push);*/
-				
-			uint32_t dynamic_offset = i * frame_config.d;
-			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
-			model_->Bind(command_buffer);
-			model_->Draw(command_buffer);
 		}
 	}
 

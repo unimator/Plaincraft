@@ -41,10 +41,12 @@ namespace plaincraft_core {
 	private:
 		std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::shared_ptr<EventsManager> events_manager_;
-		std::shared_ptr<PhysicsEngine> physics_engine_;
 		std::unique_ptr<CameraOperator> camera_operator_;
 		Scene scene_;
 		InputManager input_manager_;
+
+		rp3d::PhysicsCommon physics_common_;
+		rp3d::PhysicsWorld* physics_world_;
 
 	public:
 		Game(std::unique_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
