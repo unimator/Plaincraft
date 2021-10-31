@@ -24,23 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "drawable.hpp"
+#include "model.hpp"
 
 namespace plaincraft_render_engine {
-	void Drawable::SetModel(std::shared_ptr<Model> model)
-	{
-		model_ = std::move(model);
-	}
+	Model::Model() {}
 
-	std::shared_ptr<Model> Drawable::GetModel() const {
-		return model_;
-	}
+	Model::Model(std::shared_ptr<Mesh const> mesh) : mesh_(mesh) {}
 
-	void Drawable::SetPosition(Vector3d position) {
-		position_ = position;
-	}
-
-	void Drawable::SetColor(Vector3d color) {
-		color_ = color;
-	}
+	Model::Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) : mesh_(mesh), texture_(texture) {}
 }

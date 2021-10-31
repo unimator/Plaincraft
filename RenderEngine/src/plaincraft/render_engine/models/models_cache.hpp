@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Gorka
+Copyright (c) 2020 Marcin Górka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "drawable.hpp"
 
-namespace plaincraft_render_engine {
-	void Drawable::SetModel(std::shared_ptr<Model> model)
-	{
-		model_ = std::move(model);
-	}
+#ifndef PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE
+#define PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE
 
-	std::shared_ptr<Model> Drawable::GetModel() const {
-		return model_;
-	}
+#include "model.hpp"
+#include <map>
+#include <memory>
 
-	void Drawable::SetPosition(Vector3d position) {
-		position_ = position;
-	}
+namespace plaincraft_render_engine { 
+    class ModelsCache {
+    private:
+        std::map<std::string, std::shared_ptr<Model>> models_;
 
-	void Drawable::SetColor(Vector3d color) {
-		color_ = color;
-	}
+    public:
+        ModelsCache() {}
+
+        ModelsCache(const ModelsCache& other) = delete;
+        ModelsCache& operator=(const ModelsCache& other) = delete;
+
+        void Store(std::string name, std::shared_ptr<Model> model);
+        std::shared_ptr<Model> Fetch(std::string name);
+        void Remove(std::string name);
+    };
 }
+
+#endif // PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE

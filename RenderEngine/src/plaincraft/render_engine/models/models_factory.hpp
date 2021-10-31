@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Gorka
+Copyright (c) 2020 Marcin Górka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_MODELS_FACTORY
+#define PLAINCRAFT_RENDER_ENGINE_MODELS_FACTORY
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+#include "model.hpp"
+#include <memory>
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : Model {
-    private:
-        const VulkanDevice& device_;
-
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
-    public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        ~VulkanModel();
-
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
-
-        void Bind(VkCommandBuffer command_buffer);
-        void Draw(VkCommandBuffer command_buffer);
-
-    private:
+namespace plaincraft_render_engine {
+    class ModelsFactory {
+        public:
+            virtual std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh) = 0;
+            virtual std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) = 0;
     };
-
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_MODELS_FACTORY

@@ -56,20 +56,23 @@ namespace plaincraft_core {
 
 	void Game::Run() {
 		
+		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
+		auto mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model.data())));
+		auto model = render_engine_->GetModelsFactory()->CreateModel(mesh);
+		render_engine_->GetModelsCache().Store("cube_half", std::move(model));
+
 		WorldGenerator world_generator(physics_common_, physics_world_);
 		world_generator.GenerateWorld(scene_, render_engine_);
 
 		auto camera = render_engine_->GetCamera();
 		player = std::make_shared<Player>(camera);
 
-		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
-		auto mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model.data())));
-
 		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\player.png");
 		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
 
+		auto player_model = render_engine_->GetModelsCache().Fetch("cube_half");
 		auto drawable = std::make_shared<Drawable>();
-		drawable->SetModel(std::make_shared<Model>(mesh, player_texture));
+		drawable->SetModel(player_model);
 		drawable->SetScale(0.5f);
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Gorka
+Copyright (c) 2020 Marcin Górka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "drawable.hpp"
-
-namespace plaincraft_render_engine {
-	void Drawable::SetModel(std::shared_ptr<Model> model)
-	{
-		model_ = std::move(model);
-	}
-
-	std::shared_ptr<Model> Drawable::GetModel() const {
-		return model_;
-	}
-
-	void Drawable::SetPosition(Vector3d position) {
-		position_ = position;
-	}
-
-	void Drawable::SetColor(Vector3d color) {
-		color_ = color;
-	}
-}
+#include "models_factory.hpp"

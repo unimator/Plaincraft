@@ -24,23 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "drawable.hpp"
+#include <plaincraft_render_engine.hpp>
+#include "../device/vulkan_device.hpp"
 
-namespace plaincraft_render_engine {
-	void Drawable::SetModel(std::shared_ptr<Model> model)
-	{
-		model_ = std::move(model);
-	}
+namespace plaincraft_render_engine_vulkan {
+    using namespace plaincraft_render_engine;
 
-	std::shared_ptr<Model> Drawable::GetModel() const {
-		return model_;
-	}
+    class VulkanModelsFactory : public ModelsFactory {
+    private:
+        const VulkanDevice& device_;
 
-	void Drawable::SetPosition(Vector3d position) {
-		position_ = position;
-	}
+    public:
+        VulkanModelsFactory(const VulkanDevice& device);
 
-	void Drawable::SetColor(Vector3d color) {
-		color_ = color;
-	}
+        std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh) override;
+        std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) override;
+    };
 }

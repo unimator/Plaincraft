@@ -24,30 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
 
-#include "objects/mesh.hpp"
-#include "../texture/texture.hpp"
+#include "../device/vulkan_device.hpp"
+#include "../memory/vulkan_buffer.hpp"
+#include <plaincraft_render_engine.hpp>
+#include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine {
-	class Model
-	{
-	private:
-		std::shared_ptr<Mesh const> mesh_;
-		std::shared_ptr<Texture const> texture_;
+namespace plaincraft_render_engine_vulkan {
+    using namespace plaincraft_render_engine;
+    
+    class VulkanModel : public Model {
+    private:
+        const VulkanDevice& device_;
 
-	public:
-		Model();
-		Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture);
+        VulkanBuffer vertex_buffer_;
+        VulkanBuffer index_buffer_;
+    
+    public:
+        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
+        virtual ~VulkanModel();
 
-		~Model() { }
+        VulkanModel(const VulkanModel& other) = delete;
+        VulkanModel& operator=(const VulkanModel& other) = delete;
 
-		auto GetMesh() -> std::shared_ptr<Mesh const> { return mesh_; }
-		auto GetTexture() -> std::shared_ptr<Texture const> { return texture_; }
-	};
+        VulkanModel(VulkanModel&& other);
+        VulkanModel& operator=(VulkanModel&& other);
+
+        void Bind(VkCommandBuffer command_buffer);
+        void Draw(VkCommandBuffer command_buffer);
+
+    private:
+    };
+
 }
 
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL

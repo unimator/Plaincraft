@@ -19,8 +19,10 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/memory/vulkan_texture.hpp
     src/plaincraft/render_engine_vulkan/memory/vulkan_uniform_buffer.hpp
     src/plaincraft/render_engine_vulkan/memory/vulkan_uniform_buffer.cpp
-    src/plaincraft/render_engine_vulkan/model/vulkan_model.cpp
-    src/plaincraft/render_engine_vulkan/model/vulkan_model.hpp
+    src/plaincraft/render_engine_vulkan/models/vulkan_model.cpp
+    src/plaincraft/render_engine_vulkan/models/vulkan_model.hpp
+    src/plaincraft/render_engine_vulkan/models/vulkan_models_factory.cpp
+    src/plaincraft/render_engine_vulkan/models/vulkan_models_factory.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline_config.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp

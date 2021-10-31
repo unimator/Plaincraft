@@ -28,12 +28,14 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_RENDER_ENGINE
 
 #include "common.hpp"
-#include <GLFW\glfw3.h>
-#include "renderer\drawable.hpp"
-#include "renderer\renderer.hpp"
-#include "texture\textures_factory.hpp"
-#include "texture\textures_repository.hpp"
-#include "window\window.hpp"
+#include <GLFW/glfw3.h>
+#include "renderer/drawable.hpp"
+#include "renderer/renderer.hpp"
+#include "texture/textures_factory.hpp"
+#include "texture/textures_repository.hpp"
+#include "window/window.hpp"
+#include "models/models_factory.hpp"
+#include "models/models_cache.hpp"
 
 namespace plaincraft_render_engine {
 	class RenderEngine {
@@ -48,6 +50,9 @@ namespace plaincraft_render_engine {
 		std::shared_ptr<TexturesRepository> textures_repository_;
 		std::shared_ptr<TexturesFactory> textures_factory_;
 
+		std::unique_ptr<ModelsFactory> models_factory_;
+		ModelsCache models_cache_;
+
 	public:
 		virtual ~RenderEngine();
 		
@@ -61,6 +66,10 @@ namespace plaincraft_render_engine {
 		auto GetTexturesRepository() const -> std::shared_ptr<TexturesRepository> { return textures_repository_; }
 
 		virtual void RenderFrame() = 0;
+
+		auto GetModelsFactory() -> std::unique_ptr<ModelsFactory>& { return models_factory_; }
+		auto GetModelsCache() -> ModelsCache& { return models_cache_; }
+		
 	protected:
 		RenderEngine(std::shared_ptr<Window> window);
 

@@ -27,8 +27,6 @@ SOFTWARE.
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "vulkan_render_engine.hpp"
-#include <stdexcept>
-#include <iostream>
 #include "texture/vulkan_textures_factory.hpp"
 #include "shader/vulkan_shader.hpp"
 #include "renderer/vertex_utils.hpp"
@@ -37,6 +35,9 @@ SOFTWARE.
 #include "swapchain/swapchain.hpp"
 #include "renderer/vulkan_renderer.hpp"
 #include "renderer/vulkan_renderer_frame_config.hpp"
+#include "models/vulkan_models_factory.hpp"
+#include <stdexcept>
+#include <iostream>
 #include <glm/gtx/quaternion.hpp>
 
 namespace plaincraft_render_engine_vulkan
@@ -53,6 +54,8 @@ namespace plaincraft_render_engine_vulkan
 		auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
 		texture_image_ = std::make_unique<VulkanTexture>(device_, image);
 		texture_image_view_ = std::make_unique<VulkanImageView>(device_, texture_image_->GetImage(), VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+
+		models_factory_ = std::make_unique<VulkanModelsFactory>(VulkanModelsFactory(device_));
 
 		CreateDescriptorSetLayout();
 		RecreateSwapChain();

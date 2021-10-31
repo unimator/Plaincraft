@@ -47,22 +47,7 @@ namespace plaincraft_render_engine_vulkan
 		VkRect2D scissor{};
 		SetupPipelineConfig(pipeline_config, viewport, scissor);
 
-		LoadModel();
-
 		pipeline_ = std::make_unique<VulkanPipeline>(device_, vertex_shader_code_, fragment_shader_code_, pipeline_config);
-	}
-
-	void VulkanRenderer::LoadModel()
-	{
-		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
-		auto mesh = Mesh::LoadWavefront(cube_model.data());
-
-		model_ = std::make_unique<VulkanModel>(device_, std::move(mesh));
-
-		auto plane_model = read_file_raw("F:/Projekty/Plaincraft/Models/plane.obj");
-		mesh = Mesh::LoadWavefront(plane_model.data());
-
-		plane_ = std::make_unique<VulkanModel>(device_, std::move(mesh));
 	}
 
 	VulkanRenderer::~VulkanRenderer()
@@ -84,8 +69,9 @@ namespace plaincraft_render_engine_vulkan
 			auto drawable = drawables_list_[i];
 			uint32_t dynamic_offset = i * frame_config.d;
 			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
-			model_->Bind(command_buffer);
-			model_->Draw(command_buffer);
+			auto model = std::dynamic_pointer_cast<VulkanModel>(drawable->GetModel());
+			model->Bind(command_buffer);
+			model->Draw(command_buffer);
 			/*auto model_object = drawable->GetModel();
 			auto polygon = modelObject->GetMesh();
 			const auto scale = drawable->GetScale();

@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Górka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "model.hpp"
+
+#include "models_cache.hpp"
 
 namespace plaincraft_render_engine {
-	Model::Model() {}
+    void ModelsCache::Store(std::string name, std::shared_ptr<Model> model)
+    {
+        models_[name] = std::move(model);
+    }
 
-	Model::Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) : mesh_(mesh), texture_(texture) {}
+    std::shared_ptr<Model> ModelsCache::Fetch(std::string name)
+    {
+        return models_[name];
+    }
+
+    void ModelsCache::Remove(std::string name)
+    {
+        models_.erase(name);
+    }
 }

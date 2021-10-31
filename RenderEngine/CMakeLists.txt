@@ -5,17 +5,21 @@ PRIVATE
     include/plaincraft_render_engine.hpp
     src/plaincraft/render_engine/camera/camera.cpp
     src/plaincraft/render_engine/camera/camera.hpp
-    src/plaincraft/render_engine/renderer/drawable.cpp
-    src/plaincraft/render_engine/renderer/drawable.hpp
-    src/plaincraft/render_engine/renderer/model.cpp
-    src/plaincraft/render_engine/renderer/model.hpp
-    src/plaincraft/render_engine/renderer/mvp_matrix.hpp
+    src/plaincraft/render_engine/models/model.cpp
+    src/plaincraft/render_engine/models/model.hpp
+    src/plaincraft/render_engine/models/models_cache.cpp
+    src/plaincraft/render_engine/models/models_cache.hpp
+    src/plaincraft/render_engine/models/models_factory.cpp
+    src/plaincraft/render_engine/models/models_factory.hpp
     src/plaincraft/render_engine/renderer/objects/cube.cpp
     src/plaincraft/render_engine/renderer/objects/cube.hpp
-    src/plaincraft/render_engine/renderer/objects/no_draw.cpp
-    src/plaincraft/render_engine/renderer/objects/no_draw.hpp
     src/plaincraft/render_engine/renderer/objects/mesh.cpp
     src/plaincraft/render_engine/renderer/objects/mesh.hpp
+    src/plaincraft/render_engine/renderer/objects/no_draw.cpp
+    src/plaincraft/render_engine/renderer/objects/no_draw.hpp
+    src/plaincraft/render_engine/renderer/drawable.cpp
+    src/plaincraft/render_engine/renderer/drawable.hpp
+    src/plaincraft/render_engine/renderer/mvp_matrix.hpp
     src/plaincraft/render_engine/renderer/renderer.cpp
     src/plaincraft/render_engine/renderer/renderer.hpp
     src/plaincraft/render_engine/renderer/vertex.cpp

@@ -37,7 +37,6 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/camera/camera.hpp"
 
 #include "../src/plaincraft/render_engine/renderer/renderer.hpp"
-#include "../src/plaincraft/render_engine/renderer/model.hpp"
 #include "../src/plaincraft/render_engine/renderer/vertex.hpp"
 #include "../src/plaincraft/render_engine/renderer/mvp_matrix.hpp"
 
@@ -47,5 +46,8 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/renderer/objects/mesh.hpp"
 
 #include "../src/plaincraft/render_engine/window/window.hpp"
+
+#include "../src/plaincraft/render_engine/models/model.hpp"
+#include "../src/plaincraft/render_engine/models/models_factory.hpp"
 
 #endif // PLAINCRAFT_RENDER_ENGINE_PLAINCRAFT_RENDER_ENGINE

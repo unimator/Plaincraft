@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
 #define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
 #include "../common.hpp"
-#include "model.hpp"
+#include "../models/model.hpp"
 
 namespace plaincraft_render_engine
 {

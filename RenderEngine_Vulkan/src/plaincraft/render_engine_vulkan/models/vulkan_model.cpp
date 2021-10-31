@@ -30,7 +30,8 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan
 {
     VulkanModel::VulkanModel(const VulkanDevice &device, std::shared_ptr<Mesh const> mesh)
-        : device_(device),
+        : Model(mesh),
+          device_(device),
           vertex_buffer_(
               VulkanBuffer::MoveBuffer(device,
                                        VulkanBuffer::CreateFromVector(
@@ -50,6 +51,28 @@ namespace plaincraft_render_engine_vulkan
                                        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
+    }
+
+    
+    VulkanModel::VulkanModel(VulkanModel&& other)
+    :
+        device_(other.device_),
+        vertex_buffer_(std::move(other.vertex_buffer_)),
+        index_buffer_(std::move(other.index_buffer_))
+    {
+    }
+
+    VulkanModel& VulkanModel::operator=(VulkanModel&& other)
+    {
+        if(&other == this)
+        {
+            return *this;
+        }
+
+        this->index_buffer_ = std::move(other.index_buffer_);
+        this->vertex_buffer_ = std::move(other.vertex_buffer_);
+
+        return *this;
     }
 
     VulkanModel::~VulkanModel()

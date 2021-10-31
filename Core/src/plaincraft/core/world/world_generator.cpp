@@ -36,14 +36,10 @@ namespace plaincraft_core
 	WorldGenerator::WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world) 
 		: physics_common_(physics_common), physics_world_(physics_world)
 	{}
-
-	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine)
+ 
+	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine>& render_engine)
 	{
-		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
-		auto mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model.data())));
-
-		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
-		std::shared_ptr<Texture> texture = render_engine->GetTexturesFactory()->LoadFromImage(image);
+		const auto model = render_engine->GetModelsCache().Fetch("cube_half");
 
 		for (int i = -10; i < 10; ++i)
 		{
@@ -51,7 +47,7 @@ namespace plaincraft_core
 			{
 				auto entity = std::make_shared<Entity>(Entity());
 				auto drawable = std::make_shared<Drawable>(Drawable());
-				drawable->SetModel(std::make_shared<Model>(Model(mesh, texture)));
+				drawable->SetModel(model);
 				entity->SetDrawable(drawable);
 				
 				auto position = Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f);

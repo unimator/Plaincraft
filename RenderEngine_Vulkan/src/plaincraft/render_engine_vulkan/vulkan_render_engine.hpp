@@ -37,7 +37,7 @@ SOFTWARE.
 #include "memory/vulkan_buffer.hpp"
 #include "memory/vulkan_texture.hpp"
 #include "memory/vulkan_image.hpp"
-#include "model/vulkan_model.hpp"
+#include "models/vulkan_model.hpp"
 #include "renderer/vulkan_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>

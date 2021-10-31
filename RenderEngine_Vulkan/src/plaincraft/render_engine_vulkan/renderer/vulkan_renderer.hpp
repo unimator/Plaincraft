@@ -31,7 +31,7 @@ SOFTWARE.
 #include "../swapchain/swapchain.hpp"
 #include "../pipeline/vulkan_pipeline.hpp"
 #include "../memory/vulkan_buffer.hpp"
-#include "../model/vulkan_model.hpp"
+#include "../models/vulkan_model.hpp"
 #include "vulkan_renderer_frame_config.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vector>
@@ -62,11 +62,6 @@ namespace plaincraft_render_engine_vulkan {
         // TODO: get rid of these
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
-        
-		std::unique_ptr<VulkanModel> model_;
-        std::unique_ptr<VulkanModel> plane_;
-        
-		void LoadModel();
 
     public:
         VulkanRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera);
