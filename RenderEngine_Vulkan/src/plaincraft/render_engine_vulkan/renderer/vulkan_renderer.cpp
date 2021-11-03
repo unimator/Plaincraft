@@ -69,9 +69,14 @@ namespace plaincraft_render_engine_vulkan
 			auto drawable = drawables_list_[i];
 			uint32_t dynamic_offset = i * frame_config.d;
 			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
-			auto model = std::dynamic_pointer_cast<VulkanModel>(drawable->GetModel());
-			model->Bind(command_buffer);
-			model->Draw(command_buffer);
+			auto model = drawable->GetModel();
+			if(model.expired()) {
+				continue;
+			}
+			auto vulkan_model = std::dynamic_pointer_cast<VulkanModel>(model.lock());
+			vulkan_model->Bind(command_buffer);
+			vulkan_model->Draw(command_buffer);
+			vulkan_model.reset();
 			/*auto model_object = drawable->GetModel();
 			auto polygon = modelObject->GetMesh();
 			const auto scale = drawable->GetScale();

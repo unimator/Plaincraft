@@ -37,9 +37,9 @@ namespace plaincraft_core
 		: physics_common_(physics_common), physics_world_(physics_world)
 	{}
  
-	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine>& render_engine)
+	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine>& render_engine, ModelsCache& models_cache)
 	{
-		const auto model = render_engine->GetModelsCache().Fetch("cube_half");
+		const auto model = models_cache.Fetch("cube_half");
 
 		for (int i = -10; i < 10; ++i)
 		{
@@ -55,13 +55,14 @@ namespace plaincraft_core
 				rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 				auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 				auto rigid_body = physics_world_->createRigidBody(transform);
-				rigid_body->addCollider(cube_shape, transform);
+				auto collider = rigid_body->addCollider(cube_shape, transform);
+				collider->getMaterial().setBounciness(0);
 				rigid_body->setType(rp3d::BodyType::KINEMATIC);
 				rigid_body->enableGravity(false);
+				rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
 				entity->SetRigidBody(rigid_body);
 				
 				//body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
-				entity->SetPosition(position);
 				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 				float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

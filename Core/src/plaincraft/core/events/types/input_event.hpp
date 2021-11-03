@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,15 +44,11 @@ namespace plaincraft_core {
 		InputEvent& operator=(InputEvent&& other) noexcept;
 
 		inline EventType GetType() const override {
-			return EventTypes::INPUT_EVENT;
+			return EventType::INPUT_EVENT;
 		}
 
-		const char Test() const {
-			return 1;
-		};
-
-		auto GetKeyCode() const -> const char { return key_code_; }
-		auto GetAction() const -> const int { return action_; }
+		char GetKeyCode() const;
+		int GetAction() const;
 	};
 }
 #endif // PLAINCRAFT_CORE_INPUT_EVENT

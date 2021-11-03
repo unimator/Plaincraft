@@ -29,25 +29,24 @@ SOFTWARE.
 
 #include "../common.hpp"
 #include <plaincraft_render_engine.hpp>
-#include <reactphysics3d/reactphysics3d.h>
+
 
 namespace plaincraft_core {
 	using namespace plaincraft_render_engine;
-
+	
 	class Entity
 	{
 	private:
 		std::shared_ptr<Drawable> drawable_;
 		rp3d::RigidBody* rigid_body_ = nullptr;
 		rp3d::Collider* collider_;
+		std::string name_;
 
-		Vector3d position_;
+		static uint32_t next_id_;
+		uint32_t unique_id_;
 
 	public:
 		Entity();
-
-		void SetPosition(Vector3d position);
-		Vector3d GetPosition() const;
 
 		void SetDrawable(std::shared_ptr<Drawable> drawable);
 		std::shared_ptr<Drawable> GetDrawable() const;
@@ -60,8 +59,12 @@ namespace plaincraft_core {
 
 		void SetCollider(rp3d::Collider* collider);
 		rp3d::Collider* GetCollider();
+
+		void SetName(std::string name);
+		std::string GetName() const;
+
+		uint32_t GetUniqueId() const;
 	};
 }
-
 
 #endif // PLAINCRAFT_CORE_ENTITY

@@ -35,7 +35,6 @@ SOFTWARE.
 #include "texture/textures_repository.hpp"
 #include "window/window.hpp"
 #include "models/models_factory.hpp"
-#include "models/models_cache.hpp"
 
 namespace plaincraft_render_engine {
 	class RenderEngine {
@@ -51,7 +50,6 @@ namespace plaincraft_render_engine {
 		std::shared_ptr<TexturesFactory> textures_factory_;
 
 		std::unique_ptr<ModelsFactory> models_factory_;
-		ModelsCache models_cache_;
 
 	public:
 		virtual ~RenderEngine();
@@ -68,7 +66,6 @@ namespace plaincraft_render_engine {
 		virtual void RenderFrame() = 0;
 
 		auto GetModelsFactory() -> std::unique_ptr<ModelsFactory>& { return models_factory_; }
-		auto GetModelsCache() -> ModelsCache& { return models_cache_; }
 		
 	protected:
 		RenderEngine(std::shared_ptr<Window> window);

@@ -38,7 +38,7 @@ namespace plaincraft_core {
 		LoopEvent(float delta_time);
 
 		inline EventType GetType() const override {
-			return EventTypes::LOOP_EVENT;
+			return EventType::LOOP_EVENT;
 		}
 
 		auto GetDeltaTime() const -> const float { return delta_time_; }

@@ -30,7 +30,6 @@ SOFTWARE.
 #include "events/types/loop_event.hpp"
 #include "world/world_generator.hpp"
 #include "utils/conversions.hpp"
-#include <reactphysics3d/reactphysics3d.h>
 //#include "camera_operators/eyes/camera_operator_eyes.hpp"
 #include "camera_operators/follow/camera_operator_follow.hpp"
 #include <iostream>
@@ -48,21 +47,37 @@ namespace plaincraft_core {
 		auto window = render_engine_->GetWindow();
 
 		glfwSetWindowUserPointer(window->GetInstance(), this);
+
+		Initialize();
 	}
 
 	Game::~Game() {
 	}
-	std::shared_ptr<Player> player;
 
-	void Game::Run() {
+	std::shared_ptr<Camera> Game::GetCamera() {
+		return render_engine_->GetCamera();
+	}
+
+	void Game::Initialize() {
+		std::shared_ptr<Player> player;
 		
-		auto cube_model = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
-		auto mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model.data())));
-		auto model = render_engine_->GetModelsFactory()->CreateModel(mesh);
-		render_engine_->GetModelsCache().Store("cube_half", std::move(model));
+		auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
+		auto cube_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model_obj.data())));
+		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
+		models_cache_.Store("cube_half", std::move(cube_model));
+
+		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/sphere_half.obj");
+		auto sphere_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(sphere_model_obj.data())));
+		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
+		models_cache_.Store("sphere_half", std::move(sphere_model));
+
+		auto capsule_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/capsule_half.obj");
+		auto capsule_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(capsule_model_obj.data())));
+		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
+		models_cache_.Store("capsule_half", std::move(capsule_model));
 
 		WorldGenerator world_generator(physics_common_, physics_world_);
-		world_generator.GenerateWorld(scene_, render_engine_);
+		world_generator.GenerateWorld(scene_, render_engine_, models_cache_);
 
 		auto camera = render_engine_->GetCamera();
 		player = std::make_shared<Player>(camera);
@@ -70,36 +85,41 @@ namespace plaincraft_core {
 		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\player.png");
 		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
 
-		auto player_model = render_engine_->GetModelsCache().Fetch("cube_half");
+		auto player_model = models_cache_.Fetch("capsule_half");
 		auto drawable = std::make_shared<Drawable>();
 		drawable->SetModel(player_model);
 		drawable->SetScale(0.5f);
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.5f, 2.0f, 0.0f);
+		auto player_position = Vector3d(0.2f, 2.25f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 		auto rigid_body = physics_world_->createRigidBody(transform);
-		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
-		rigid_body->addCollider(cube_shape, transform);
-		//rigid_body->setTransform(transform);
+		auto capsule_shape = physics_common_.createCapsuleShape(0.25, 0.5);
+		//auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
+		auto collider = rigid_body->addCollider(capsule_shape, transform);
+		collider->getMaterial().setBounciness(0);
+		collider->getMaterial().setFrictionCoefficient(2.0);
+
+		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
 		player->SetRigidBody(rigid_body);
 		
-		player->SetPosition(player_position);
-
 		scene_.AddEntity(player, render_engine_);
 
-		events_manager_->Subscribe(EventTypes::INPUT_EVENT, player);
-		events_manager_->Subscribe(EventTypes::LOOP_EVENT, player);
+		events_manager_->Subscribe(EventType::INPUT_EVENT, player);
+		events_manager_->Subscribe(EventType::LOOP_EVENT, player);
 
 		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+	}
 
+	void Game::Run() {
 		MainLoop();
 	}
 
 	void Game::MainLoop() {
+		static float accumulator = 0.0f;
 		double cursor_position_x, cursor_position_y;
 		double last_cursor_position_x_ = 1024 / 2, last_cursor_position_y_ = 768 / 2;
 		auto window_instance = render_engine_->GetWindow()->GetInstance();
@@ -117,13 +137,14 @@ namespace plaincraft_core {
 			current_time = glfwGetTime();
 			delta_time = static_cast<float>(current_time - last_time);
 			delta_time = glm::clamp(delta_time, 0.0f, 1.0f);
+			accumulator += delta_time;
 
 			last_time = current_time;
 
-			physics_world_->update(delta_time);
-			
-			//player->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			//player->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			while(accumulator >= physics_time_step_) {
+				physics_world_->update(physics_time_step_);
+				accumulator -= physics_time_step_;
+			}
 
 			scene_.UpdateFrame();
 

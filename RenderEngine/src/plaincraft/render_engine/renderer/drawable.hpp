@@ -34,7 +34,7 @@ namespace plaincraft_render_engine
 	class Drawable
 	{
 	private:
-		std::shared_ptr<Model> model_;
+		std::weak_ptr<Model> model_;
 		Vector3d position_;
 		Vector3d color_;
 		Quaternion rotation_;
@@ -42,7 +42,7 @@ namespace plaincraft_render_engine
 
 	public:
 		void SetModel(std::shared_ptr<Model> model);
-		std::shared_ptr<Model> GetModel() const;
+		std::weak_ptr<Model> GetModel() const;
 
 		auto SetScale(float scale) -> void { scale_ = scale; }
 		auto GetScale() const -> const float { return scale_; }

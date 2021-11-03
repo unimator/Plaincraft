@@ -45,7 +45,6 @@ namespace plaincraft_core {
 		static void ProcessInputWrapper(GLFWwindow* window, int key, int scancode, int action, int mods);
 		void ProcessInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 	};
-
 }
 
 

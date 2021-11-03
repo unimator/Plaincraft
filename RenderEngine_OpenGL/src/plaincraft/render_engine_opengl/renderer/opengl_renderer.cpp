@@ -37,8 +37,8 @@ namespace plaincraft_render_engine_opengl {
 
 	void OpenGLRenderer::Render() {
 		auto drawable = drawables_list_.front();
-		auto modelObject = drawable->GetModel();
-		auto polygon = modelObject->GetMesh();
+		auto model_object = drawable->GetModel().lock();
+		auto polygon = model_object->GetMesh();
 		const auto scale = drawable->GetScale();
 		const auto position = drawable->GetPosition();
 		const auto rotation = drawable->GetRotation();
@@ -55,7 +55,7 @@ namespace plaincraft_render_engine_opengl {
 
 		glBindVertexArray(vao_);
 
-		modelObject->GetTexture()->UseTexture();
+		model_object->GetTexture()->UseTexture();
 
 		auto t = polygon->GetVertices().data();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
@@ -74,6 +74,7 @@ namespace plaincraft_render_engine_opengl {
 		glDrawElements(GL_TRIANGLES, static_cast<uint32_t>(polygon->GetIndices().size()), GL_UNSIGNED_INT, nullptr);
 
 		drawables_list_.clear();
+		model_object.reset();
 	}
 
 	OpenGLShader OpenGLRenderer::CreateDefaultShader() 

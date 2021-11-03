@@ -80,7 +80,7 @@ namespace plaincraft_render_engine_vulkan
 
 		vkDestroySurfaceKHR(instance_.GetInstance(), surface_, nullptr);
 
-		//vkDestroyDescriptorSetLayout(device_.GetDevice(), descriptor_set_layout_, nullptr);
+		renderer_.reset(); // because it relies on device which would be deleted before renderer
 	}
 
 

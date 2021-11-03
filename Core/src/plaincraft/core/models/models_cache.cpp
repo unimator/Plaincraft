@@ -24,25 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
 
-#include "../common.hpp"
-#include "../scene.hpp"
-#include "../models/models_cache.hpp"
+#include "models_cache.hpp"
 
-namespace plaincraft_core
-{
-	class WorldGenerator
-	{
-	private:
-		rp3d::PhysicsCommon& physics_common_;
-		rp3d::PhysicsWorld* physics_world_;
+namespace plaincraft_core {
+    void ModelsCache::Store(std::string name, std::shared_ptr<Model> model)
+    {
+        models_[name] = std::move(model);
+    }
 
-	public:
-		WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world);
+    std::shared_ptr<Model> ModelsCache::Fetch(std::string name)
+    {
+        return models_[name];
+    }
 
-		void GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine, ModelsCache& models_cache);
-	};
+    void ModelsCache::Remove(std::string name)
+    {
+        models_.erase(name);
+    }
 }
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR

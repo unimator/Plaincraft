@@ -7,8 +7,6 @@ PRIVATE
     src/plaincraft/render_engine/camera/camera.hpp
     src/plaincraft/render_engine/models/model.cpp
     src/plaincraft/render_engine/models/model.hpp
-    src/plaincraft/render_engine/models/models_cache.cpp
-    src/plaincraft/render_engine/models/models_cache.hpp
     src/plaincraft/render_engine/models/models_factory.cpp
     src/plaincraft/render_engine/models/models_factory.hpp
     src/plaincraft/render_engine/renderer/objects/cube.cpp

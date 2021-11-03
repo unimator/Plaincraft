@@ -27,7 +27,6 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_CONVERSIONS
 #define PLAINCRAFT_CORE_CONVERSIONS
 
-#include <reactphysics3d/reactphysics3d.h>
 #include "../common.hpp"
 
 namespace plaincraft_core {

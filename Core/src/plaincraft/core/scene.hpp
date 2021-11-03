@@ -30,6 +30,16 @@ SOFTWARE.
 #include "entities/entity.hpp"
 #include "events/events_manager.hpp"
 #include <plaincraft_render_engine.hpp>
+#include <memory>
+
+namespace std 
+{
+	template<>
+	struct less<std::reference_wrapper<plaincraft_core::Entity>> {
+		bool operator()(std::reference_wrapper<plaincraft_core::Entity> first_entity, 
+			std::reference_wrapper<plaincraft_core::Entity> second_entity) const;
+	};
+}
 
 namespace plaincraft_core
 {
@@ -39,14 +49,16 @@ namespace plaincraft_core
 	{
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
+		std::map<std::reference_wrapper<Entity>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<EventsManager> events_manager_;
 
 	public:
 		Scene(std::shared_ptr<EventsManager> events_manager);
 
 		void AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine);
+		std::shared_ptr<Entity> FindEntityByName(const std::string& name) const;
 
-		void UpdateFrame();
+		void UpdateFrame(float interpolation_factor = 0.0f);
 	};
 }
 

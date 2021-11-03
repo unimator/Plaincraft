@@ -28,34 +28,10 @@ SOFTWARE.
 #include "../utils/conversions.hpp"
 
 namespace plaincraft_core {
+	uint32_t Entity::next_id_ = 0;
+
 	Entity::Entity() : drawable_(nullptr)  {
-
-	}
-
-	void Entity::SetPosition(Vector3d position) {
-		if(rigid_body_) 
-		{
-			auto transform = rigid_body_->getTransform();
-			transform.setPosition(FromGlm(position));
-			rigid_body_->setTransform(transform);
-		}
-
-		if(drawable_)
-		{
-			drawable_->SetPosition(position);
-		}
-
-		position_ = position;
-	}
-
-	Vector3d Entity::GetPosition() const {
-		//return position_;
-		if(rigid_body_) 
-		{
-			return FromRP3D(rigid_body_->getTransform().getPosition());
-		}
-		
-		return position_;
+		unique_id_ = next_id_++;
 	}
 
 	void Entity::SetDrawable(std::shared_ptr<plaincraft_render_engine::Drawable> drawable) {
@@ -80,5 +56,17 @@ namespace plaincraft_core {
 
 	rp3d::RigidBody* Entity::GetRigidBody() const {
 		return rigid_body_;
+	}
+
+	void Entity::SetName(std::string name) {
+		name_ = name;
+	}
+
+	std::string Entity::GetName() const {
+		return name_;
+	}
+
+	uint32_t Entity::GetUniqueId() const {
+		return unique_id_;
 	}
 }

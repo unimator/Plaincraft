@@ -32,6 +32,7 @@ SOFTWARE.
 #include "./events/events_manager.hpp"
 #include "scene.hpp"
 #include "camera_operators/camera_operator.hpp"
+#include "models/models_cache.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
@@ -44,9 +45,11 @@ namespace plaincraft_core {
 		std::unique_ptr<CameraOperator> camera_operator_;
 		Scene scene_;
 		InputManager input_manager_;
+		ModelsCache models_cache_;
 
 		rp3d::PhysicsCommon physics_common_;
 		rp3d::PhysicsWorld* physics_world_;
+		float physics_time_step_ = 1.0f / 60.0f;
 
 	public:
 		Game(std::unique_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
@@ -54,8 +57,13 @@ namespace plaincraft_core {
 
 		void Run();
 
+		auto GetScene() -> Scene& {return scene_;}
+		auto GetEventsManager() -> std::shared_ptr<EventsManager> { return events_manager_; }
+		std::shared_ptr<Camera> GetCamera();
+
 	private:
 		void MainLoop();
+		void Initialize();
 	};
 }
 #endif // PLAINCRAFT_CORE_GAME

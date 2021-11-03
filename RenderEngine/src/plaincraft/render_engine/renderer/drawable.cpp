@@ -32,7 +32,7 @@ namespace plaincraft_render_engine {
 		model_ = std::move(model);
 	}
 
-	std::shared_ptr<Model> Drawable::GetModel() const {
+	std::weak_ptr<Model> Drawable::GetModel() const {
 		return model_;
 	}
 

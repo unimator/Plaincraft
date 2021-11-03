@@ -27,6 +27,12 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_PLAINCRAFT_CORE
 #define PLAINCRAFT_CORE_PLAINCRAFT_CORE
 
+#include "../src/plaincraft/core/events/types/input_event.hpp"
+#include "../src/plaincraft/core/events/types/loop_event.hpp"
+#include "../src/plaincraft/core/events/event.hpp"
+
+#include "../src/plaincraft/core/utils/conversions.hpp"
+
 #include "../src/plaincraft/core/scene.hpp"
 #include "../src/plaincraft/core/game.hpp"
 

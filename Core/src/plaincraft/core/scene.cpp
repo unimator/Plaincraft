@@ -28,6 +28,16 @@ SOFTWARE.
 #include "entities/player.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <plaincraft_render_engine_opengl.hpp>
+#include <algorithm>
+
+namespace std
+{
+	bool less<std::reference_wrapper<plaincraft_core::Entity>>::operator()(std::reference_wrapper<plaincraft_core::Entity> first_entity,
+																		   std::reference_wrapper<plaincraft_core::Entity> second_entity) const
+	{
+		return first_entity.get().GetUniqueId() < second_entity.get().GetUniqueId();
+	}
+}
 
 namespace plaincraft_core
 {
@@ -39,22 +49,44 @@ namespace plaincraft_core
 	{
 	}
 
-	void Scene::AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine)
+	void Scene::AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine> &render_engine)
 	{
 		entities_list_.push_back(entity);
+		auto &entity_reference = *(entity.get());
+		const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
+		previous_transforms_.insert({entity_reference, transform});
 		render_engine->AddDrawable(entity->GetDrawable());
 	}
 
-	void Scene::UpdateFrame()
+	std::shared_ptr<Entity> Scene::FindEntityByName(const std::string &name) const
 	{
-		for(auto entity : entities_list_)
+
+		auto predicate = [&](const std::shared_ptr<const Entity> entity)
+		{ return entity->GetName() == name; };
+		auto result = std::find_if(begin(entities_list_), end(entities_list_), predicate);
+		if (result != end(entities_list_))
+		{
+			return *result;
+		}
+		return nullptr;
+	}
+
+	void Scene::UpdateFrame(float interpolation_factor)
+	{
+		for (auto entity : entities_list_)
 		{
 			const auto rb = entity->GetRigidBody();
 			auto transform = rb->getTransform();
-			auto position = transform.getPosition();
-			auto rotation = transform.getOrientation();
+			auto& entity_reference = *(entity.get());
+			auto previous_transform = previous_transforms_[entity_reference];
+			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
+
+			auto position = interpolated_transform.getPosition();
+			auto rotation = interpolated_transform.getOrientation();
 			entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
 			entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+
+			previous_transforms_[entity_reference] = transform;
 		}
 	}
 }

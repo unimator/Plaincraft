@@ -44,9 +44,8 @@ namespace plaincraft_render_engine_vulkan {
 
     VulkanDevice::~VulkanDevice()
     {
-		vkDestroyDevice(device_, nullptr);
-		
 		vkDestroyCommandPool(device_, command_pool_, nullptr);
+		vkDestroyDevice(device_, nullptr);
     }
 
     void VulkanDevice::PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface)

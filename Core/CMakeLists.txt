@@ -35,6 +35,8 @@ PRIVATE
     src/plaincraft/core/events/types/input_event.hpp
     src/plaincraft/core/events/types/loop_event.cpp
     src/plaincraft/core/events/types/loop_event.hpp
+    src/plaincraft/core/models/models_cache.cpp
+    src/plaincraft/core/models/models_cache.hpp
     src/plaincraft/core/input/input_manager.cpp
     src/plaincraft/core/input/input_manager.hpp
     src/plaincraft/core/utils/conversions.cpp

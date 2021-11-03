@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,16 @@ SOFTWARE.
 */
 
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE
-#define PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE
+#ifndef PLAINCRAFT_CORE_MODELS_CACHE
+#define PLAINCRAFT_CORE_MODELS_CACHE
 
-#include "model.hpp"
+#include <plaincraft_render_engine.hpp>
 #include <map>
 #include <memory>
 
-namespace plaincraft_render_engine { 
+namespace plaincraft_core {
+    using namespace plaincraft_render_engine;
+
     class ModelsCache {
     private:
         std::map<std::string, std::shared_ptr<Model>> models_;
@@ -49,4 +51,4 @@ namespace plaincraft_render_engine {
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_MODELS_CACHE
+#endif // PLAINCRAFT_CORE_MODELS_CACHE

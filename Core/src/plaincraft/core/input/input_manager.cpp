@@ -46,5 +46,4 @@ namespace plaincraft_core {
 		auto event = InputEvent(static_cast<char>(key), action);
 		events_manager_->Trigger(event);
 	}
-
 }

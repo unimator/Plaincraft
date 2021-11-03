@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,14 @@ SOFTWARE.
 
 namespace plaincraft_core {
 	class Event {
-	public:
+	private:
+		bool mutable stop_propagation_ = false;
 
+	public:
 		virtual EventType GetType() const = 0;
+
+		inline auto IsPropagationStopped() const -> const bool { return stop_propagation_; }
+		inline void StopPropagation(bool stop_propagation) const { stop_propagation_ = stop_propagation; }
 	};
 }
 #endif // PLAINCRAFT_CORE_EVENT

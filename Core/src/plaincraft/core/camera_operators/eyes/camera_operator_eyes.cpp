@@ -57,6 +57,6 @@ namespace plaincraft_core {
         camera_->direction.z = static_cast<float>(sin(glm::radians(camera_->yaw)) * cos(glm::radians(camera_->pitch)));
         camera_->direction = glm::normalize(camera_->direction);
 
-        camera_->position = follow_target_->GetPosition();
+        camera_->position = follow_target_->GetDrawable()->GetPosition();
     }
 }

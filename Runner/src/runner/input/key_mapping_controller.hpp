@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#define PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
 
-#include "models_cache.hpp"
+#include <plaincraft_core.hpp>
+#include <memory>
 
-namespace plaincraft_render_engine {
-    void ModelsCache::Store(std::string name, std::shared_ptr<Model> model)
+using namespace plaincraft_core;
+
+namespace plaincraft_runner
+{
+    class KeyMappingController : public EventObserver, public std::enable_shared_from_this<KeyMappingController>
     {
-        models_[name] = std::move(model);
-    }
+    private:
+        std::shared_ptr<Entity> player_;
+        std::shared_ptr<Camera> camera_;
 
-    std::shared_ptr<Model> ModelsCache::Fetch(std::string name)
-    {
-        return models_[name];
-    }
+        float movement_speed_ = 3.0f;
+        float maximum_speed_ = 3.0f;
 
-    void ModelsCache::Remove(std::string name)
-    {
-        models_.erase(name);
-    }
+    public:
+        static std::shared_ptr<KeyMappingController> CreateInstance();
+
+        void Setup(Game &game_instance);
+
+        void OnEventTriggered(const Event &event) override;
+
+    private:
+        KeyMappingController() = default;
+    };
 }
+
+#endif // PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
