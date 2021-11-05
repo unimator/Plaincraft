@@ -42,8 +42,6 @@ namespace plaincraft_core {
 		scene_(Scene(events_manager_)),
 		input_manager_(InputManager(events_manager_, render_engine_->GetWindow()->GetInstance()))
 	{
-		physics_world_ = physics_common_.createPhysicsWorld();
-
 		auto window = render_engine_->GetWindow();
 
 		glfwSetWindowUserPointer(window->GetInstance(), this);
@@ -76,7 +74,7 @@ namespace plaincraft_core {
 		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
 		models_cache_.Store("capsule_half", std::move(capsule_model));
 
-		WorldGenerator world_generator(physics_common_, physics_world_);
+		WorldGenerator world_generator;
 		world_generator.GenerateWorld(scene_, render_engine_, models_cache_);
 
 		auto camera = render_engine_->GetCamera();
@@ -94,17 +92,17 @@ namespace plaincraft_core {
 
 		auto player_position = Vector3d(0.2f, 2.25f, 0.25f);
 
-		auto orientation = rp3d::Quaternion::identity();
-		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-		auto rigid_body = physics_world_->createRigidBody(transform);
-		auto capsule_shape = physics_common_.createCapsuleShape(0.25, 0.5);
+		// auto orientation = rp3d::Quaternion::identity();
+		// rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
+		// auto rigid_body = physics_world_->createRigidBody(transform);
+		// auto capsule_shape = physics_common_.createCapsuleShape(0.25, 0.5);
 		//auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
-		auto collider = rigid_body->addCollider(capsule_shape, transform);
-		collider->getMaterial().setBounciness(0);
-		collider->getMaterial().setFrictionCoefficient(2.0);
+		// auto collider = rigid_body->addCollider(capsule_shape, transform);
+		// collider->getMaterial().setBounciness(0);
+		// collider->getMaterial().setFrictionCoefficient(2.0);
 
-		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
-		player->SetRigidBody(rigid_body);
+		// rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
+		// player->SetRigidBody(rigid_body);
 		
 		scene_.AddEntity(player, render_engine_);
 
@@ -142,7 +140,6 @@ namespace plaincraft_core {
 			last_time = current_time;
 
 			while(accumulator >= physics_time_step_) {
-				physics_world_->update(physics_time_step_);
 				accumulator -= physics_time_step_;
 			}
 

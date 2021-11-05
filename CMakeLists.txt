@@ -13,7 +13,6 @@ include_directories(
     SYSTEM "Dependencies/glm"
     SYSTEM "Dependencies/GLEW/include"
     SYSTEM "Dependencies/GLFW/include"
-    SYSTEM "Dependencies/ReactPhysics3D/include"
     SYSTEM ${Vulkan_INCLUDE_DIRS}
     )
 

@@ -49,7 +49,7 @@ namespace plaincraft_core
 	{
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
-		std::map<std::reference_wrapper<Entity>, rp3d::Transform> previous_transforms_;
+		// std::map<std::reference_wrapper<Entity>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<EventsManager> events_manager_;
 
 	public:

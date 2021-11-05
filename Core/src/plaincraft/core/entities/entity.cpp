@@ -50,14 +50,6 @@ namespace plaincraft_core {
 		return drawable_->GetColor();
 	}
 
-	void Entity::SetRigidBody(rp3d::RigidBody* rigid_body) {
-		rigid_body_ = rigid_body;
-	}
-
-	rp3d::RigidBody* Entity::GetRigidBody() const {
-		return rigid_body_;
-	}
-
 	void Entity::SetName(std::string name) {
 		name_ = name;
 	}

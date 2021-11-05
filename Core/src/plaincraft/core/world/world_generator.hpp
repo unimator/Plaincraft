@@ -36,11 +36,8 @@ namespace plaincraft_core
 	class WorldGenerator
 	{
 	private:
-		rp3d::PhysicsCommon& physics_common_;
-		rp3d::PhysicsWorld* physics_world_;
-
 	public:
-		WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world);
+		WorldGenerator();
 
 		void GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine, ModelsCache& models_cache);
 	};

@@ -45,7 +45,7 @@ namespace plaincraft_runner {
     }
 
     void KeyMappingController::OnEventTriggered(const Event& event) {
-        static rp3d::Vector3 target;
+        // static rp3d::Vector3 target;
         static bool forward = false, backward = false, left = false, right = false; 
 
         switch(event.GetType()) {
@@ -75,10 +75,10 @@ namespace plaincraft_runner {
                     }
                     if (action == GLFW_PRESS && key_code == GLFW_KEY_SPACE)
                     {
-                        if(abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.00001)
-                        { 
-                            player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 250.0, 0.0));
-                        }
+                        // if(abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.00001)
+                        // { 
+                        //     player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 250.0, 0.0));
+                        // }
                     }
                 }
 
@@ -92,29 +92,29 @@ namespace plaincraft_runner {
                     auto loop_event = static_cast<const LoopEvent&>(event);
                     
                     const auto direction = camera_->direction;
-                    target = rp3d::Vector3::zero();
+                    // target = rp3d::Vector3::zero();
                     
                     if(forward)
                     {
-                        target += rp3d::Vector3(direction.x, 0, direction.z);
+                        // target += rp3d::Vector3(direction.x, 0, direction.z);
                     }
                     if(backward)
                     {
-                        target -= rp3d::Vector3(direction.x, 0, direction.z);
+                        // target -= rp3d::Vector3(direction.x, 0, direction.z);
                     }
                     if(right)
                     {
-                        target += rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
+                        // target += rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
                     }
                     if(left)
                     {
-                        target -= rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
+                        // target -= rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
                     }
 
-                    target.normalize();
-                    target *= movement_speed_;
+                    // target.normalize();
+                    // target *= movement_speed_;
 
-                    auto current_velocity = player_->GetRigidBody()->getLinearVelocity();
+                    // auto current_velocity = player_->GetRigidBody()->getLinearVelocity();
                     
                     /*if(abs(target.x + current_velocity.x) < maximum_speed_) {
                         target.x += current_velocity.x;
@@ -136,9 +136,9 @@ namespace plaincraft_runner {
                         target.y = current_velocity.y;
                     }*/
 
-                    target.y = current_velocity.y;
+                    // target.y = current_velocity.y;
                     
-                    player_->GetRigidBody()->setLinearVelocity(target);
+                    // player_->GetRigidBody()->setLinearVelocity(target);
                 }
 
                 break;

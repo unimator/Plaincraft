@@ -33,8 +33,7 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	WorldGenerator::WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world) 
-		: physics_common_(physics_common), physics_world_(physics_world)
+	WorldGenerator::WorldGenerator() 
 	{}
  
 	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine>& render_engine, ModelsCache& models_cache)
@@ -51,16 +50,16 @@ namespace plaincraft_core
 				entity->SetDrawable(drawable);
 				
 				auto position = Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f);
-				auto orientation = rp3d::Quaternion::identity();
-				rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-				auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
-				auto rigid_body = physics_world_->createRigidBody(transform);
-				auto collider = rigid_body->addCollider(cube_shape, transform);
-				collider->getMaterial().setBounciness(0);
-				rigid_body->setType(rp3d::BodyType::KINEMATIC);
-				rigid_body->enableGravity(false);
-				rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
-				entity->SetRigidBody(rigid_body);
+				// auto orientation = rp3d::Quaternion::identity();
+				// rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
+				// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+				// auto rigid_body = physics_world_->createRigidBody(transform);
+				// auto collider = rigid_body->addCollider(cube_shape, transform);
+				// collider->getMaterial().setBounciness(0);
+				// rigid_body->setType(rp3d::BodyType::KINEMATIC);
+				// rigid_body->enableGravity(false);
+				// rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
+				// entity->SetRigidBody(rigid_body);
 				
 				//body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
 				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

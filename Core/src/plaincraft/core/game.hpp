@@ -47,8 +47,6 @@ namespace plaincraft_core {
 		InputManager input_manager_;
 		ModelsCache models_cache_;
 
-		rp3d::PhysicsCommon physics_common_;
-		rp3d::PhysicsWorld* physics_world_;
 		float physics_time_step_ = 1.0f / 60.0f;
 
 	public:

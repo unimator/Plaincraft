@@ -53,8 +53,8 @@ namespace plaincraft_core
 	{
 		entities_list_.push_back(entity);
 		auto &entity_reference = *(entity.get());
-		const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
-		previous_transforms_.insert({entity_reference, transform});
+		// const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
+		// previous_transforms_.insert({entity_reference, transform});
 		render_engine->AddDrawable(entity->GetDrawable());
 	}
 
@@ -75,18 +75,18 @@ namespace plaincraft_core
 	{
 		for (auto entity : entities_list_)
 		{
-			const auto rb = entity->GetRigidBody();
-			auto transform = rb->getTransform();
-			auto& entity_reference = *(entity.get());
-			auto previous_transform = previous_transforms_[entity_reference];
-			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
+			// const auto rb = entity->GetRigidBody();
+			// auto transform = rb->getTransform();
+			// auto& entity_reference = *(entity.get());
+			// auto previous_transform = previous_transforms_[entity_reference];
+			// auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
 
-			auto position = interpolated_transform.getPosition();
-			auto rotation = interpolated_transform.getOrientation();
-			entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			// auto position = interpolated_transform.getPosition();
+			// auto rotation = interpolated_transform.getOrientation();
+			// entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			// entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
 
-			previous_transforms_[entity_reference] = transform;
+			// previous_transforms_[entity_reference] = transform;
 		}
 	}
 }
