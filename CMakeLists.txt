@@ -13,12 +13,14 @@ include_directories(
     SYSTEM "Dependencies/glm"
     SYSTEM "Dependencies/GLEW/include"
     SYSTEM "Dependencies/GLFW/include"
+    SYSTEM "Dependencies/ReactPhysics3D"
     SYSTEM ${Vulkan_INCLUDE_DIRS}
     )
 
 add_subdirectory("Dependencies/glm")
 add_subdirectory("Dependencies/GLEW")
 add_subdirectory("Dependencies/GLFW")
+add_subdirectory("Dependencies/ReactPhysics3D")
 
 # Include sub-projects.
 add_subdirectory("Common")

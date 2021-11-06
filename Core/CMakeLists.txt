@@ -54,4 +54,4 @@ target_include_directories(${TARGET_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}
 
 target_link_libraries(${TARGET_NAME} 
                         PUBLIC "Common" "RenderEngine" 
-                        PRIVATE "RenderEngine_OpenGL" "RenderEngine_Vulkan" "newton")
+                        PRIVATE "RenderEngine_OpenGL" "RenderEngine_Vulkan" "reactphysics3d")
