@@ -28,7 +28,7 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_PIPELINE
 
 #include "../device/vulkan_device.hpp"
-#include "../swapchain/swapchain.hpp"
+#include "../swapchain/vulkan_swapchain.hpp"
 #include "vulkan_pipeline_config.hpp"
 #include <vulkan/vulkan.h>
 #include <vector>

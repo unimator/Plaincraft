@@ -28,25 +28,23 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_GAME
 
 #include "common.hpp"
-#include "./input/input_manager.hpp"
-#include "./events/events_manager.hpp"
 #include "scene.hpp"
 #include "camera_operators/camera_operator.hpp"
 #include "models/models_cache.hpp"
+#include "events/loop_events_handler.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
 	class Game {
-		friend class InputManager;
-
 	private:
 		std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
-		std::shared_ptr<EventsManager> events_manager_;
 		std::unique_ptr<CameraOperator> camera_operator_;
 		Scene scene_;
-		InputManager input_manager_;
 		ModelsCache models_cache_;
+		LoopEventsHandler loop_events_handler_;
 
+		rp3d::PhysicsCommon physics_common_;
+		rp3d::PhysicsWorld* physics_world_;
 		float physics_time_step_ = 1.0f / 60.0f;
 
 	public:
@@ -56,7 +54,8 @@ namespace plaincraft_core {
 		void Run();
 
 		auto GetScene() -> Scene& {return scene_;}
-		auto GetEventsManager() -> std::shared_ptr<EventsManager> { return events_manager_; }
+		WindowEventsHandler& GetWindowEventsHandler();
+		LoopEventsHandler& GetLoopEventsHandler();
 		std::shared_ptr<Camera> GetCamera();
 
 	private:

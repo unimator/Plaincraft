@@ -3,8 +3,8 @@ add_library("RenderEngine_OpenGL" "")
 target_sources("RenderEngine_OpenGL"
 PRIVATE
     include/plaincraft_render_engine_opengl.hpp
-    src/plaincraft/render_engine_opengl/renderer/opengl_renderer.cpp
-    src/plaincraft/render_engine_opengl/renderer/opengl_renderer.hpp
+    src/plaincraft/render_engine_opengl/scene_rendering/opengl_scene_renderer.cpp
+    src/plaincraft/render_engine_opengl/scene_rendering/opengl_scene_renderer.hpp
     src/plaincraft/render_engine_opengl/shader/opengl_shader.cpp
     src/plaincraft/render_engine_opengl/shader/opengl_shader.hpp
     src/plaincraft/render_engine_opengl/texture/opengl_texture.cpp

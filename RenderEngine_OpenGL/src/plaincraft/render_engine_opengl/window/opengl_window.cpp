@@ -65,5 +65,7 @@ namespace plaincraft_render_engine_opengl
 		}
 
 		glEnable(GL_DEPTH_TEST);
+
+		window_events_handler_ = std::make_shared<WindowEventsHandler>(instance_);
 	}
 }

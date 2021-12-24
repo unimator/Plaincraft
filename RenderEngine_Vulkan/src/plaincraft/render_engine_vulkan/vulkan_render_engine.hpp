@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include "common.hpp"
 #include "instance/vulkan_instance.hpp"
-#include "swapchain/swapchain.hpp"
+#include "swapchain/vulkan_swapchain.hpp"
 #include "device/vulkan_device.hpp"
 #include "window/vulkan_window.hpp"
 #include "pipeline/vulkan_pipeline.hpp"
@@ -38,7 +38,11 @@ SOFTWARE.
 #include "memory/vulkan_texture.hpp"
 #include "memory/vulkan_image.hpp"
 #include "models/vulkan_model.hpp"
-#include "renderer/vulkan_renderer.hpp"
+#include "scene_rendering/vulkan_scene_renderer.hpp"
+#include "descriptors/vulkan_descriptor_set_layout.hpp"
+#include "descriptors/vulkan_descriptor_pool.hpp"
+#include "descriptors/vulkan_descriptor_writer.hpp"
+#include "gui/vulkan_gui_context.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -59,9 +63,9 @@ namespace plaincraft_render_engine_vulkan {
 
 		std::vector<std::unique_ptr<VulkanBuffer>> uniform_buffers_;
 
-		VkDescriptorPool descriptor_pool_;
-		VkDescriptorSetLayout descriptor_set_layout_;
-        std::vector<VkDescriptorSet> descriptor_sets_;
+		std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
+		std::unique_ptr<VulkanDescriptorSetLayout> descriptor_set_layout_;
+		std::vector<VkDescriptorSet> descriptor_sets_;
 
 		std::unique_ptr<VulkanTexture> texture_image_;
 		std::unique_ptr<VulkanImageView> texture_image_view_;
@@ -71,6 +75,8 @@ namespace plaincraft_render_engine_vulkan {
 		std::vector<VkFence> in_flight_fences_;
 		std::vector<VkFence> images_in_flight_;
 		size_t current_frame_ = 0;
+		
+		std::unique_ptr<VulkanGuiContext> gui_context_;
 
 		bool enable_debug_ = false;
 
@@ -86,7 +92,7 @@ namespace plaincraft_render_engine_vulkan {
 
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 
-		auto GetVulkanRenderer() -> VulkanRenderer* { return dynamic_cast<VulkanRenderer*>(renderer_.get()); }
+		auto GetVulkanRenderer() -> VulkanSceneRenderer* { return dynamic_cast<VulkanSceneRenderer*>(scene_renderer_.get()); }
         
         auto GetCommandBuffer(uint32_t index) -> VkCommandBuffer { return command_buffers_[index]; }
 
@@ -97,9 +103,7 @@ namespace plaincraft_render_engine_vulkan {
 		
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
 
-		void CreateDescriptorSetLayout();
-		void CreateDescriptorPool();
-		void CreateDescriptorSets();
+		void CreateDescriptors();
 		
 		void CreateSyncObjects();
 

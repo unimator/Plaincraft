@@ -30,6 +30,9 @@ SOFTWARE.
 #include "../common.hpp"
 
 namespace plaincraft_core {
+    rp3d::Vector3 FromGlm(const Vector3d& vector);
+
+    Vector3d FromRP3D(const rp3d::Vector3& vector);
 }
 
 #endif // PLAINCRAFT_CORE_CONVERSIONS

@@ -12,7 +12,7 @@ using namespace plaincraft_runner;
 
 int main()
 {
-	auto window = std::make_shared<VulkanWindow>("Plaincraft", 1024, 768);
+	auto window = std::make_shared<VulkanWindow>("Plaincraft", 1152, 864);
 	auto render_engine = std::make_unique<VulkanRenderEngine>(window);
 
 	// auto window = std::make_shared<OpenGLWindow>("Plaincraft", 1024, 768);

@@ -1,20 +1,15 @@
 /*
 MIT License
-
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
-
 Copyright (c) 2020 Marcin Gorka
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,10 +31,14 @@ namespace plaincraft_core
 	class WorldGenerator
 	{
 	private:
+		rp3d::PhysicsCommon& physics_common_;
+		rp3d::PhysicsWorld* physics_world_;
+
 	public:
-		WorldGenerator();
+		WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world);
 
 		void GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine, ModelsCache& models_cache);
 	};
 }
+
 #endif // PLAINCRAFT_CORE_WORLD_GENERATOR

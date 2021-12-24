@@ -27,7 +27,8 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_WINDOW
 #define PLAINCRAFT_RENDER_ENGINE_WINDOW
 
-#include "..\common.hpp"
+#include "../common.hpp"
+#include "../events/window_events_handler.hpp"
 #include <string>
 
 namespace plaincraft_render_engine
@@ -38,6 +39,7 @@ namespace plaincraft_render_engine
         GLFWwindow *instance_;
         uint32_t width_, height_;
         std::string title_;
+        std::shared_ptr<WindowEventsHandler> window_events_handler_;
 
     public:
         auto GetInstance() const -> GLFWwindow* {return instance_;} 
@@ -49,6 +51,11 @@ namespace plaincraft_render_engine
         Window(Window&& other);
         Window& operator=(const Window& other) = delete;
         Window& operator=(Window&& other);
+        
+        WindowEventsHandler& GetWindowEventsHandler();
+
+        uint32_t GetWidth() const;
+        uint32_t GetHeight() const;
     };
 }
 

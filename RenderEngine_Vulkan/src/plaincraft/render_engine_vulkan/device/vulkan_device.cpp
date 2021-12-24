@@ -27,7 +27,7 @@ SOFTWARE.
 #include "vulkan_device.hpp"
 #include "../utils/queue_family.hpp"
 #include "../utils/validation_layers.hpp"
-#include "../swapchain/swapchain.hpp"
+#include "../swapchain/vulkan_swapchain.hpp"
 #include <vulkan/vulkan.h>
 #include <stdexcept>
 #include <set>

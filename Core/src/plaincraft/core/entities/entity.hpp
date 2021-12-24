@@ -30,6 +30,7 @@ SOFTWARE.
 #include "../common.hpp"
 #include <plaincraft_render_engine.hpp>
 
+
 namespace plaincraft_core {
 	using namespace plaincraft_render_engine;
 	
@@ -37,6 +38,7 @@ namespace plaincraft_core {
 	{
 	private:
 		std::shared_ptr<Drawable> drawable_;
+		rp3d::RigidBody* rigid_body_ = nullptr;
 		std::string name_;
 
 		static uint32_t next_id_;
@@ -44,12 +46,16 @@ namespace plaincraft_core {
 
 	public:
 		Entity();
+		~Entity();
 
 		void SetDrawable(std::shared_ptr<Drawable> drawable);
 		std::shared_ptr<Drawable> GetDrawable() const;
 
 		void SetColor(Vector3d color);
 		Vector3d GetColor();
+
+		void SetRigidBody(rp3d::RigidBody* rigid_body);
+		rp3d::RigidBody* GetRigidBody() const;
 
 		void SetName(std::string name);
 		std::string GetName() const;

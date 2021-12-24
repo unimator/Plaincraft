@@ -36,11 +36,6 @@ namespace plaincraft_render_engine
 
     Window::~Window()
     {
-        if (instance_)
-        {
-            glfwDestroyWindow(instance_);
-            glfwTerminate();
-        }
     }
 
     Window::Window(Window &&other)
@@ -61,5 +56,20 @@ namespace plaincraft_render_engine
         this->instance_ = other.instance_;
         other.instance_ = nullptr;
         return *this;
+    }
+
+    WindowEventsHandler& Window::GetWindowEventsHandler()
+    {
+        return *window_events_handler_;
+    }
+
+    uint32_t Window::GetWidth() const
+    {
+        return width_;
+    }
+
+    uint32_t Window::GetHeight() const
+    {
+        return height_;
     }
 }

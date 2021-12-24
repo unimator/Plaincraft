@@ -34,7 +34,7 @@ using namespace plaincraft_core;
 
 namespace plaincraft_runner
 {
-    class KeyMappingController : public EventObserver, public std::enable_shared_from_this<KeyMappingController>
+    class KeyMappingController : public std::enable_shared_from_this<KeyMappingController>
     {
     private:
         std::shared_ptr<Entity> player_;
@@ -43,15 +43,16 @@ namespace plaincraft_runner
         float movement_speed_ = 3.0f;
         float maximum_speed_ = 3.0f;
 
+        bool forward_ = false, backward_ = false, left_ = false, right_ = false;
+
     public:
         static std::shared_ptr<KeyMappingController> CreateInstance();
 
         void Setup(Game &game_instance);
 
-        void OnEventTriggered(const Event &event) override;
-
     private:
-        KeyMappingController() = default;
+        void OnKeyPressed(int key, int scancode, int action, int mods);
+        void OnLoopTick(float delta_time);
     };
 }
 

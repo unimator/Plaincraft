@@ -29,94 +29,89 @@ SOFTWARE.
 
 using namespace plaincraft_core;
 
-namespace plaincraft_runner {
-    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance() {
+namespace plaincraft_runner
+{
+    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance()
+    {
         return std::shared_ptr<KeyMappingController>(new KeyMappingController());
     }
 
-    void KeyMappingController::Setup(Game& game_instance) {
-        auto events_manager = game_instance.GetEventsManager();
+    void KeyMappingController::Setup(Game &game_instance)
+    {
         auto player = game_instance.GetScene().FindEntityByName("player");
         player_ = player;
         auto camera = game_instance.GetCamera();
         camera_ = camera;
-        events_manager->Subscribe(EventType::INPUT_EVENT, shared_from_this());
-        events_manager->Subscribe(EventType::LOOP_EVENT, shared_from_this());
+        
+        auto& window_events_handler = game_instance.GetWindowEventsHandler();
+        auto& loop_events_handler = game_instance.GetLoopEventsHandler();
+        window_events_handler.key_pressed_event_trigger.AddSubscription(this, &KeyMappingController::OnKeyPressed);
+        loop_events_handler.loop_event_trigger.AddSubscription(this, &KeyMappingController::OnLoopTick);
     }
 
-    void KeyMappingController::OnEventTriggered(const Event& event) {
-        // static rp3d::Vector3 target;
-        static bool forward = false, backward = false, left = false, right = false; 
-
-        switch(event.GetType()) {
-            case EventType::INPUT_EVENT: 
+    void KeyMappingController::OnKeyPressed(int key, int scancode, int action, int mods)
+    {
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        {
+            auto was_pressed = action == GLFW_PRESS;
+            if (key == GLFW_KEY_W)
+            { 
+                forward_ = was_pressed;
+            }
+            if (key == GLFW_KEY_S)
             {
-                const auto& input_event = static_cast<const InputEvent&>(event);
-                const auto key_code = input_event.GetKeyCode();
-                const auto action = input_event.GetAction();
-                if(action == GLFW_PRESS || action == GLFW_RELEASE) 
+                backward_ = was_pressed;
+            }
+            if (key == GLFW_KEY_A)
+            {
+                left_ = was_pressed;
+            }
+            if (key == GLFW_KEY_D)
+            {
+                right_ = was_pressed;
+            }
+            if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
+            {
+                if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.00001)
                 {
-                    auto was_pressed = action == GLFW_PRESS;
-                    if (key_code == GLFW_KEY_W)
-                    {
-                        forward = was_pressed; 
-                    }
-                    if (key_code == GLFW_KEY_S)
-                    {
-                        backward = was_pressed;
-                    }
-                    if (key_code == GLFW_KEY_A)
-                    {
-                        left = was_pressed;
-                    }
-                    if (key_code == GLFW_KEY_D)
-                    {
-                        right = was_pressed;
-                    }
-                    if (action == GLFW_PRESS && key_code == GLFW_KEY_SPACE)
-                    {
-                        // if(abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.00001)
-                        // { 
-                        //     player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 250.0, 0.0));
-                        // }
-                    }
+                    player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
+                }
+            }
+        }
+    }
+
+    void KeyMappingController::OnLoopTick(float delta_time)
+    {
+        static rp3d::Vector3 target;
+
+        if (forward_ || backward_ || left_ || right_)
+            {
+                const auto direction = camera_->direction;
+                target = rp3d::Vector3::zero();
+
+                if (forward_)
+                {
+                    target += rp3d::Vector3(direction.x, 0, direction.z);
+                }
+                if (backward_)
+                {
+                    target -= rp3d::Vector3(direction.x, 0, direction.z);
+                }
+                if (right_)
+                {
+                    target += rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
+                }
+                if (left_)
+                {
+                    target -= rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
                 }
 
-                break;
-            }
-            case EventType::LOOP_EVENT:
-            {
-                
-                if(forward || backward || left || right)
-                {
-                    auto loop_event = static_cast<const LoopEvent&>(event);
-                    
-                    const auto direction = camera_->direction;
-                    // target = rp3d::Vector3::zero();
-                    
-                    if(forward)
-                    {
-                        // target += rp3d::Vector3(direction.x, 0, direction.z);
-                    }
-                    if(backward)
-                    {
-                        // target -= rp3d::Vector3(direction.x, 0, direction.z);
-                    }
-                    if(right)
-                    {
-                        // target += rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
-                    }
-                    if(left)
-                    {
-                        // target -= rp3d::Vector3(direction.x, 0, direction.z).cross(FromGlm(camera_->up));
-                    }
+                target.normalize();
+                target *= movement_speed_;
 
-                    // target.normalize();
-                    // target *= movement_speed_;
+                auto current_velocity = player_->GetRigidBody()->getLinearVelocity();
 
-                    // auto current_velocity = player_->GetRigidBody()->getLinearVelocity();
-                    
-                    /*if(abs(target.x + current_velocity.x) < maximum_speed_) {
+                /*if(abs(target.x + current_velocity.x) < maximum_speed_) {
                         target.x += current_velocity.x;
                     } else if (current_velocity.x < maximum_speed_) {
                         target.x = maximum_speed_;
@@ -136,17 +131,9 @@ namespace plaincraft_runner {
                         target.y = current_velocity.y;
                     }*/
 
-                    // target.y = current_velocity.y;
-                    
-                    // player_->GetRigidBody()->setLinearVelocity(target);
-                }
+                target.y = current_velocity.y;
 
-                break;
+                player_->GetRigidBody()->setLinearVelocity(target);
             }
-        }
-
-
-       
-           
     }
 }

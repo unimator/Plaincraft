@@ -27,6 +27,9 @@ SOFTWARE.
 #ifndef PLAINCRAFT_COMMON_PLAINCRAFT_COMMON
 #define PLAINCRAFT_COMMON_PLAINCRAFT_COMMON
 
+#include "../src/plaincraft/common/events/event_listener.hpp"
+#include "../src/plaincraft/common/events/event_trigger.hpp"
+
 #include "../src/plaincraft/common/system_types_glm.hpp"
 #include "../src/plaincraft/common/system_types.hpp"
 
@@ -34,4 +37,7 @@ SOFTWARE.
 #include "../src/plaincraft/common/utils/hash_utils.hpp"
 
 #include "../src/plaincraft/common/exceptions/not_implemented_exception.hpp"
+
+#include "../src/plaincraft/common/profiling/profiler.hpp"
+
 #endif // PLAINCRAFT_COMMON_PLAINCRAFT_COMMON

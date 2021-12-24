@@ -23,22 +23,10 @@ PRIVATE
     src/plaincraft/core/components/component.hpp
     src/plaincraft/core/entities/entity.cpp
     src/plaincraft/core/entities/entity.hpp
-    src/plaincraft/core/entities/player.cpp
-    src/plaincraft/core/entities/player.hpp
-    src/plaincraft/core/events/event.hpp
-    src/plaincraft/core/events/events_manager.cpp
-    src/plaincraft/core/events/events_manager.hpp
-    src/plaincraft/core/events/event_observer.hpp
-    src/plaincraft/core/events/event_trigger.hpp
-    src/plaincraft/core/events/event_types.hpp
-    src/plaincraft/core/events/types/input_event.cpp
-    src/plaincraft/core/events/types/input_event.hpp
-    src/plaincraft/core/events/types/loop_event.cpp
-    src/plaincraft/core/events/types/loop_event.hpp
+    src/plaincraft/core/events/loop_events_handler.cpp
+    src/plaincraft/core/events/loop_events_handler.hpp
     src/plaincraft/core/models/models_cache.cpp
     src/plaincraft/core/models/models_cache.hpp
-    src/plaincraft/core/input/input_manager.cpp
-    src/plaincraft/core/input/input_manager.hpp
     src/plaincraft/core/utils/conversions.cpp
     src/plaincraft/core/utils/conversions.hpp
     src/plaincraft/core/world/world_generator.cpp

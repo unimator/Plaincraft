@@ -28,7 +28,6 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_SCENE
 #include "common.hpp"
 #include "entities/entity.hpp"
-#include "events/events_manager.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
 
@@ -49,11 +48,11 @@ namespace plaincraft_core
 	{
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
-		// std::map<std::reference_wrapper<Entity>, rp3d::Transform> previous_transforms_;
-		std::shared_ptr<EventsManager> events_manager_;
+		std::map<std::shared_ptr<Entity>, rp3d::Transform> previous_transforms_;
 
 	public:
-		Scene(std::shared_ptr<EventsManager> events_manager);
+		Scene();
+		~Scene();
 
 		void AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine);
 		std::shared_ptr<Entity> FindEntityByName(const std::string& name) const;

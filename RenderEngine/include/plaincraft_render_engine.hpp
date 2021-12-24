@@ -36,14 +36,14 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/utils/image/image.hpp"
 #include "../src/plaincraft/render_engine/camera/camera.hpp"
 
-#include "../src/plaincraft/render_engine/renderer/renderer.hpp"
-#include "../src/plaincraft/render_engine/renderer/vertex.hpp"
-#include "../src/plaincraft/render_engine/renderer/mvp_matrix.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/scene_renderer.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/vertex.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/mvp_matrix.hpp"
 
-#include "../src/plaincraft/render_engine/renderer/drawable.hpp"
-#include "../src/plaincraft/render_engine/renderer/objects/cube.hpp"
-#include "../src/plaincraft/render_engine/renderer/objects/no_draw.hpp"
-#include "../src/plaincraft/render_engine/renderer/objects/mesh.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/drawable.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/objects/cube.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/objects/no_draw.hpp"
+#include "../src/plaincraft/render_engine/scene_rendering/objects/mesh.hpp"
 
 #include "../src/plaincraft/render_engine/window/window.hpp"
 

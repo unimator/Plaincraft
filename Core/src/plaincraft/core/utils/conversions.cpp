@@ -27,4 +27,11 @@ SOFTWARE.
 #include "conversions.hpp"
 
 namespace plaincraft_core {
+    rp3d::Vector3 FromGlm(const Vector3d& vector) {
+        return rp3d::Vector3(vector.x, vector.y, vector.z);
+    }
+
+    Vector3d FromRP3D(const rp3d::Vector3& vector) {
+        return Vector3d(vector.x, vector.y, vector.z);
+    }
 }

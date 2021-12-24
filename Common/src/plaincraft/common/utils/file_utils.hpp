@@ -31,9 +31,9 @@ SOFTWARE.
 #include "../common.hpp"
 
 namespace plaincraft_common {
-	DLLEXPORT_PLAINCRAFT_COMMON std::string read_file(const std::string& path);
+	std::string read_file(const std::string& path);
 
-	DLLEXPORT_PLAINCRAFT_COMMON std::vector<char> read_file_raw(const std::string& path);
+	std::vector<char> read_file_raw(const std::string& path);
 }
 
 #endif // PLAINCRAFT_COMMON_FILE_UTILS

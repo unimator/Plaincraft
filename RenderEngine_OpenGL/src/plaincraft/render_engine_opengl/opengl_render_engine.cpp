@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include "opengl_render_engine.hpp"
 #include "shader\opengl_shader.hpp"
-#include "renderer\opengl_renderer.hpp"
+#include "scene_rendering\opengl_scene_renderer.hpp"
 #include "texture\opengl_textures_factory.hpp"
 #include "window\opengl_window.hpp"
 
@@ -35,7 +35,7 @@ namespace plaincraft_render_engine_opengl
 	OpenGLRenderEngine::OpenGLRenderEngine(std::shared_ptr<OpenGLWindow> window) 
 	: RenderEngine(std::move(window))
 	{
-		renderer_ = std::make_unique<OpenGLRenderer>(OpenGLRenderer(camera_));
+		scene_renderer_ = std::make_unique<OpenGLSceneRenderer>(OpenGLSceneRenderer(camera_));
 		textures_factory_ = std::make_shared<OpenGLTexturesFactory>(OpenGLTexturesFactory());
 	}
 

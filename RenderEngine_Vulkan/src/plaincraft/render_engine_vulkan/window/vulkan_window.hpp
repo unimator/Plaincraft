@@ -50,12 +50,10 @@ namespace plaincraft_render_engine_vulkan
         VkSurfaceKHR CreateSurface(VkInstance instance);
 
         auto WasResized() -> bool const {return was_resized_;}
-        void ResetWasResized() {was_resized_ = false;}  
+        void ResetWasResized() {was_resized_ = false;}
 
     private:
         void Initialize();
-
-        static void FramebufferResizeCallback(GLFWwindow* instance, int width, int height);
     };
 }
 

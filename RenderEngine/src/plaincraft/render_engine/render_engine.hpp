@@ -29,8 +29,8 @@ SOFTWARE.
 
 #include "common.hpp"
 #include <GLFW/glfw3.h>
-#include "renderer/drawable.hpp"
-#include "renderer/renderer.hpp"
+#include "scene_rendering/drawable.hpp"
+#include "scene_rendering/scene_renderer.hpp"
 #include "texture/textures_factory.hpp"
 #include "texture/textures_repository.hpp"
 #include "window/window.hpp"
@@ -43,7 +43,7 @@ namespace plaincraft_render_engine {
 		std::string title_ = "Plaincraft";
 
 		std::shared_ptr<Camera> camera_;
-		std::unique_ptr<Renderer> renderer_;
+		std::unique_ptr<SceneRenderer> scene_renderer_;
 		std::vector<std::shared_ptr<Drawable>> drawables_list_;
 
 		std::shared_ptr<TexturesRepository> textures_repository_;

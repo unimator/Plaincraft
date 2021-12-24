@@ -25,10 +25,9 @@ SOFTWARE.
 */
 
 #include "scene.hpp"
-#include "entities/player.hpp"
 #include <plaincraft_render_engine.hpp>
-#include <plaincraft_render_engine_opengl.hpp>
 #include <algorithm>
+#include <iostream>
 
 namespace std
 {
@@ -42,25 +41,25 @@ namespace std
 namespace plaincraft_core
 {
 	using namespace plaincraft_render_engine;
-	using namespace plaincraft_render_engine_opengl;
 
-	Scene::Scene(std::shared_ptr<EventsManager> events_manager)
-		: events_manager_(std::move(events_manager))
+	Scene::Scene()
+	{
+	}
+
+	Scene::~Scene() 
 	{
 	}
 
 	void Scene::AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine> &render_engine)
 	{
 		entities_list_.push_back(entity);
-		auto &entity_reference = *(entity.get());
-		// const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
-		// previous_transforms_.insert({entity_reference, transform});
+		const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
+		previous_transforms_.insert({entity, transform});
 		render_engine->AddDrawable(entity->GetDrawable());
 	}
 
 	std::shared_ptr<Entity> Scene::FindEntityByName(const std::string &name) const
 	{
-
 		auto predicate = [&](const std::shared_ptr<const Entity> entity)
 		{ return entity->GetName() == name; };
 		auto result = std::find_if(begin(entities_list_), end(entities_list_), predicate);
@@ -75,18 +74,17 @@ namespace plaincraft_core
 	{
 		for (auto entity : entities_list_)
 		{
-			// const auto rb = entity->GetRigidBody();
-			// auto transform = rb->getTransform();
-			// auto& entity_reference = *(entity.get());
-			// auto previous_transform = previous_transforms_[entity_reference];
-			// auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
+			const auto rb = entity->GetRigidBody();
+			auto transform = rb->getTransform();
+			auto previous_transform = previous_transforms_[entity];
+			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
 
-			// auto position = interpolated_transform.getPosition();
-			// auto rotation = interpolated_transform.getOrientation();
-			// entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			// entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			auto position = interpolated_transform.getPosition();
+			auto rotation = interpolated_transform.getOrientation();
+			entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
 
-			// previous_transforms_[entity_reference] = transform;
+			previous_transforms_[entity] = transform;
 		}
 	}
 }

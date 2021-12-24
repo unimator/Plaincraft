@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gï¿½rka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ SOFTWARE.
 
 #include "../src/plaincraft/render_engine_opengl/shader/opengl_shader.hpp"
 #include "../src/plaincraft/render_engine_opengl/opengl_render_engine.hpp"
-#include "../src/plaincraft/render_engine_opengl/renderer/opengl_renderer.hpp"
+#include "../src/plaincraft/render_engine_opengl/scene_rendering/opengl_scene_renderer.hpp"
 #include "../src/plaincraft/render_engine_opengl/texture/opengl_texture.hpp"
+
 #endif // PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL

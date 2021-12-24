@@ -36,12 +36,14 @@ namespace plaincraft_render_engine_vulkan
 
 	VulkanWindow::VulkanWindow(VulkanWindow&& other) 
 		: Window(std::move(other))
-	{ 
+	{
+		//glfwSetWindowUserPointer(instance_, this);
 	}
 
 	VulkanWindow& VulkanWindow::operator=(VulkanWindow&& other)
 	{ 
 		Window::operator=(std::move(other));
+		//glfwSetWindowUserPointer(instance_, this);
 		return *this;
 	}
 
@@ -60,8 +62,8 @@ namespace plaincraft_render_engine_vulkan
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		instance_ = glfwCreateWindow(width_, height_, title_.c_str(), nullptr, nullptr);
-		glfwSetWindowUserPointer(instance_, this);
-		glfwSetInputMode(instance_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		//glfwSetInputMode(instance_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -69,8 +71,8 @@ namespace plaincraft_render_engine_vulkan
 		glfwSetInputMode(instance_, GLFW_STICKY_KEYS, GL_FALSE);
 
 		glEnable(GL_DEPTH_TEST);
-		
-		glfwSetFramebufferSizeCallback(instance_, FramebufferResizeCallback);
+
+		window_events_handler_ = std::make_shared<WindowEventsHandler>(instance_);
     }
 
 	VkSurfaceKHR VulkanWindow::CreateSurface(VkInstance instance)
@@ -82,14 +84,5 @@ namespace plaincraft_render_engine_vulkan
 			throw std::runtime_error("Failed to create window surface");
 		}
 		return surface;
-	}
-
-	
-	void VulkanWindow::FramebufferResizeCallback(GLFWwindow *instance, int width, int height)
-	{
-		auto window = reinterpret_cast<VulkanWindow *>(glfwGetWindowUserPointer(instance));
-		window->width_ = width;
-		window->height_ = height;
-		window->was_resized_ = true;
 	}
 }

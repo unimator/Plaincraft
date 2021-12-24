@@ -29,13 +29,14 @@ SOFTWARE.
 
 #include "../device/vulkan_device.hpp"
 #include "../memory/vulkan_buffer.hpp"
+#include "../scene_rendering/vulkan_drawable.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
 namespace plaincraft_render_engine_vulkan {
     using namespace plaincraft_render_engine;
     
-    class VulkanModel : public Model {
+    class VulkanModel : public Model, VulkanDrawable {
     private:
         const VulkanDevice& device_;
 
@@ -52,8 +53,8 @@ namespace plaincraft_render_engine_vulkan {
         VulkanModel(VulkanModel&& other);
         VulkanModel& operator=(VulkanModel&& other);
 
-        void Bind(VkCommandBuffer command_buffer);
-        void Draw(VkCommandBuffer command_buffer);
+        void Bind(VkCommandBuffer command_buffer) override;
+        void Draw(VkCommandBuffer command_buffer) override;
 
     private:
     };

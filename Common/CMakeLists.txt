@@ -13,12 +13,20 @@ PRIVATE
     include/lib/stb_image.h
     include/lib/tiny_obj_loader.h
     include/plaincraft_common.hpp
-    src/plaincraft/common/common.hpp
+    src/plaincraft/common/events/event_listener.hpp
+    src/plaincraft/common/events/event_publisher.hpp
+    src/plaincraft/common/events/event_subscription_base.hpp
+    src/plaincraft/common/events/event_subscription.hpp
+    src/plaincraft/common/events/event_trigger_base.hpp
+    src/plaincraft/common/events/event_trigger.hpp
     src/plaincraft/common/exceptions/not_implemented_exception.hpp
-    src/plaincraft/common/system_types.hpp
-    src/plaincraft/common/system_types_glm.hpp
+    src/plaincraft/common/profiling/profiler.cpp
+    src/plaincraft/common/profiling/profiler.hpp
     src/plaincraft/common/utils/file_utils.cpp
     src/plaincraft/common/utils/file_utils.hpp
+    src/plaincraft/common/common.hpp
+    src/plaincraft/common/system_types.hpp
+    src/plaincraft/common/system_types_glm.hpp
 )
 
 target_include_directories(${TARGET_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")

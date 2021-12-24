@@ -13,7 +13,8 @@ include_directories(
     SYSTEM "Dependencies/glm"
     SYSTEM "Dependencies/GLEW/include"
     SYSTEM "Dependencies/GLFW/include"
-    SYSTEM "Dependencies/ReactPhysics3D"
+    SYSTEM "Dependencies/ReactPhysics3D/include"
+    SYSTEM "Dependencies/imgui"
     SYSTEM ${Vulkan_INCLUDE_DIRS}
     )
 
@@ -29,5 +30,5 @@ add_subdirectory("RenderEngine")
 add_subdirectory("RenderEngine_OpenGL")
 add_subdirectory("RenderEngine_Vulkan")
 add_subdirectory("Runner")
-
+add_subdirectory("ImGui")
 

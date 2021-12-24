@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 #include "vulkan_pipeline.hpp"
-#include "../renderer/vertex_utils.hpp"
+#include "../scene_rendering/vertex_utils.hpp"
 #include "../device/vulkan_device.hpp"
 #include <stdexcept>
 
