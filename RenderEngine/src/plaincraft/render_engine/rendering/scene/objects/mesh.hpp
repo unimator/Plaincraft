@@ -24,31 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER
-#define PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER
+#ifndef PLAINCRAFT_RENDER_ENGINE_POLYGON
+#define PLAINCRAFT_RENDER_ENGINE_POLYGON
 
-#include "../common.hpp"
-#include "../shader/opengl_shader.hpp"
-#include <plaincraft_render_engine.hpp>
+#include <lib/tiny_obj_loader.h>
 
-namespace plaincraft_render_engine_opengl {
-	using namespace plaincraft_render_engine;
+#include "../../../common.hpp"
+#include "../vertex.hpp"
 
-	class OpenGLSceneRenderer : public SceneRenderer {
-	private:
-		uint32_t vbo_, ebo_, vao_;
-		std::unique_ptr<OpenGLShader> shader_;
+#include <cstdint>
+#include <string>
+
+namespace plaincraft_render_engine {
+	class Mesh {
+	protected:
+		Mesh() {}
+		std::vector<Vertex> vertices_;
+		std::vector<uint32_t> indices_;
 
 	public:
-		OpenGLSceneRenderer(std::shared_ptr<Camera> camera);
+		Mesh(const Mesh& other) = delete;
+		Mesh& operator=(const Mesh& other) = delete;
 
-		void Render();
+		Mesh(Mesh&& other);
+		Mesh& operator=(Mesh&& other);
 
-	private:
-		OpenGLShader CreateDefaultShader();
+		virtual ~Mesh() {};
+
+		const std::vector<Vertex>& GetVertices() const {
+			return vertices_;
+		}
+
+		const std::vector<uint32_t>& GetIndices() const {
+			return indices_;
+		}
+
+		static std::unique_ptr<Mesh> LoadWavefront(const char* data);
 	};
 }
 
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER
+#endif // PLAINCRAFT_RENDER_ENGINE_POLYGON

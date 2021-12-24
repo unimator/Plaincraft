@@ -24,22 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../common.hpp"
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VERTEX
-#define PLAINCRAFT_RENDER_ENGINE_VERTEX
+#include "../../vulkan_gui_widget.hpp"
 
-namespace plaincraft_render_engine {
+namespace plaincraft_render_engine_vulkan
+{
+    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    {
+    public:
+        VulkanDiagnosticWidget();
 
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 color;
-		glm::vec3 normal;
-		glm::vec2 text_coordinates;
-
-		bool operator==(const Vertex& other) const;
-	};
+        void Draw() override;
+    };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VERTEX
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET

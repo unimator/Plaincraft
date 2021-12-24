@@ -28,10 +28,13 @@ SOFTWARE.
 
 #include <string>
 #include <chrono>
+#include <array>
+#include <map>
 
 namespace plaincraft_common
 {
-
+    
+    constexpr uint32_t profiling_history_length = 60 * 10;
     class Profiler final
     {
     private:
@@ -46,23 +49,51 @@ namespace plaincraft_common
 
             std::string name;
 
-            private:
-                std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-                std::chrono::time_point<std::chrono::high_resolution_clock> end_;
+        private:
+            std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+            std::chrono::time_point<std::chrono::high_resolution_clock> end_;
         };
 
-        static void Start(ProfileInfo& profile_info);
-        static void End(ProfileInfo& profile_info);
-        
+        class ProfileDescription
+        {
+            friend class Profiler;
+        public:
+            using ProfileValues = std::array<std::chrono::milliseconds, profiling_history_length>;
+
+        private:
+            std::string name_;
+            ProfileValues values_;
+            size_t write_index_ = 0;
+
+            ProfileDescription(std::string name);
+            void SaveValue(std::chrono::milliseconds value);
+
+        public:
+            std::string GetName();
+            ProfileValues GetValues();
+        };
+
+    private:
+        std::map<std::string, ProfileDescription> descriptions_;
+
+    public:
+        std::map<std::string, ProfileDescription>& GetDescriptions();
+
+        static Profiler& GetInstance();
+
+        static void Start(ProfileInfo &profile_info);
+        static void End(ProfileInfo &profile_info);
     };
 
 #ifndef NDEBUG
 #define MEASURE(name_param, code) \
-    Profiler::ProfileInfo info; \
-    info.name = name_param; \
-    Profiler::Start(info); \
-    code \
-    Profiler::End(info);
+    {                             \
+    Profiler::ProfileInfo info;   \
+    info.name = name_param;       \
+    Profiler::Start(info);        \
+    code                          \
+    Profiler::End(info);          \
+    }
 #else
 #define MEASURE(name, code) code
 #endif // NDEBUG

@@ -11,8 +11,6 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/descriptors/vulkan_descriptor_writer.hpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.cpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.hpp
-    src/plaincraft/render_engine_vulkan/gui/vulkan_gui_context.cpp
-    src/plaincraft/render_engine_vulkan/gui/vulkan_gui_context.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.cpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance.cpp
@@ -34,13 +32,19 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline_config.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vertex_utils.cpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vertex_utils.hpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vulkan_drawable.hpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vulkan_scene_renderer_config.hpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vulkan_scene_renderer_frame_config.hpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vulkan_scene_renderer.cpp
-    src/plaincraft/render_engine_vulkan/scene_rendering/vulkan_scene_renderer.hpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.hpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_renderer.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_renderer.hpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_widget.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_widget.hpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vertex_utils.cpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vertex_utils.hpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_drawable.hpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer_config.hpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer.cpp
+    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer.hpp
+    src/plaincraft/render_engine_vulkan/rendering/vulkan_renderer_frame_config.hpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.cpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.hpp
     src/plaincraft/render_engine_vulkan/swapchain/vulkan_swapchain.cpp
@@ -65,5 +69,5 @@ find_package(Vulkan)
 target_include_directories("RenderEngine_Vulkan" PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_include_directories("RenderEngine_Vulkan" INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_link_libraries("RenderEngine_Vulkan" PRIVATE "Common" "RenderEngine" "ImGui_Vulkan")
+target_link_libraries("RenderEngine_Vulkan" PRIVATE "Common" "RenderEngine" "Dear_ImGui_Vulkan")
 target_link_libraries("RenderEngine_Vulkan" PUBLIC ${Vulkan_LIBRARIES})

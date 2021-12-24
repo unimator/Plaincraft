@@ -41,9 +41,9 @@ namespace plaincraft_core
 	{
 		const auto model = models_cache.Fetch("cube_half");
 
-		for (int i = -10; i < 10; ++i)
+		for (int i = -20; i < 20; ++i)
 		{
-			for (int j = -10; j < 10; ++j)
+			for (int j = -20; j < 20; ++j)
 			{
 				auto entity = std::make_shared<Entity>();
 				auto drawable = std::make_shared<Drawable>();

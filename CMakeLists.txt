@@ -30,5 +30,5 @@ add_subdirectory("RenderEngine")
 add_subdirectory("RenderEngine_OpenGL")
 add_subdirectory("RenderEngine_Vulkan")
 add_subdirectory("Runner")
-add_subdirectory("ImGui")
+add_subdirectory("Dear_ImGui")
 

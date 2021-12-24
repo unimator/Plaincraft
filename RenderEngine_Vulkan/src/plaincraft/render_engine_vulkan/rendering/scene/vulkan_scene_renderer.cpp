@@ -55,7 +55,7 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyPipelineLayout(device_.GetDevice(), pipeline_layout_, nullptr);
 	}
 
-	void VulkanSceneRenderer::Render(VulkanSceneRendererFrameConfig& frame_config)
+	void VulkanSceneRenderer::Render(VulkanRendererFrameConfig& frame_config)
 	{
 		auto command_buffer = frame_config.command_buffer;
 		auto descriptor_set = frame_config.descriptor_set;
@@ -67,7 +67,7 @@ namespace plaincraft_render_engine_vulkan
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto drawable = drawables_list_[i];
-			uint32_t dynamic_offset = i * frame_config.d;
+			uint32_t dynamic_offset = i * frame_config.alignment_size;
 			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
 			auto model = drawable->GetModel();
 			if(model.expired()) {

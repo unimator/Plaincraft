@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include "../device/vulkan_device.hpp"
 #include "../memory/vulkan_buffer.hpp"
-#include "../scene_rendering/vulkan_drawable.hpp"
+#include "../rendering/scene/vulkan_drawable.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 

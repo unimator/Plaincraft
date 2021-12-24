@@ -1,4 +1,4 @@
-/*
+/* 
 MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
@@ -24,28 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
-#define PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+#ifndef VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG
+#define VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG
 
-#include "../common.hpp"
-#include "../camera/camera.hpp"
-#include "./drawable.hpp"
+#include <vulkan/vulkan.h>
 
-namespace plaincraft_render_engine {
-	class SceneRenderer
-	{
-	protected:
-		std::vector<std::shared_ptr<Drawable>> drawables_list_;
-		std::shared_ptr<Camera> camera_;
+namespace plaincraft_render_engine_vulkan {
+    struct VulkanRendererFrameConfig {
+        VkCommandBuffer& command_buffer;
+        VkDescriptorSet descriptor_set;
+        size_t alignment_size;
+    };
+};
 
-		SceneRenderer(std::shared_ptr<Camera> camera);
-
-	public:
-
-		virtual ~SceneRenderer();
-
-		void Batch(std::shared_ptr<Drawable> drawable);
-		void HasRendered();
-	};
-}
-#endif // PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+#endif // VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG

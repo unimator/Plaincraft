@@ -35,6 +35,11 @@ namespace plaincraft_common
     {
     }
 
+    Profiler& Profiler::GetInstance()
+    {
+        return instance_;
+    }
+
     void Profiler::Start(ProfileInfo& profile_info)
     {
         profile_info.start_ = std::chrono::high_resolution_clock::now();
@@ -45,6 +50,36 @@ namespace plaincraft_common
         profile_info.end_ = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(profile_info.end_ - profile_info.start_);
 
-        // std::cout << profile_info.name << ": " << duration.count() << std::endl;
+        if(!instance_.descriptions_.count(profile_info.name))
+        {
+            auto pair = std::pair<std::string, ProfileDescription>(profile_info.name, profile_info.name);
+            instance_.descriptions_.insert(pair);
+        }
+        instance_.descriptions_.at(profile_info.name).SaveValue(duration);
+    }
+
+    std::map<std::string, Profiler::ProfileDescription>& Profiler::GetDescriptions() 
+    {
+        return descriptions_;
+    }
+
+    Profiler::ProfileDescription::ProfileDescription(std::string name)
+    : name_(name) {}
+
+    void Profiler::ProfileDescription::SaveValue(std::chrono::milliseconds value)
+    {
+        values_[write_index_] = value;
+
+        write_index_ = (write_index_ + 1) % profiling_history_length;
+    }
+
+    std::string Profiler::ProfileDescription::GetName()
+    {
+        return name_;
+    }
+
+    Profiler::ProfileDescription::ProfileValues Profiler::ProfileDescription::GetValues()
+    {
+        return values_;
     }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
 MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
@@ -24,17 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef VULKAN_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER_FRAME_CONFIG
-#define VULKAN_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER_FRAME_CONFIG
+#include "../../common.hpp"
 
-#include <vulkan/vulkan.h>
+#ifndef PLAINCRAFT_RENDER_ENGINE_VERTEX
+#define PLAINCRAFT_RENDER_ENGINE_VERTEX
 
-namespace plaincraft_render_engine_vulkan {
-    struct VulkanSceneRendererFrameConfig {
-        VkCommandBuffer& command_buffer;
-        VkDescriptorSet descriptor_set;
-        size_t d;
-    };
-};
+namespace plaincraft_render_engine {
 
-#endif // VULKAN_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER_FRAME_CONFIG
+	struct Vertex
+	{
+		glm::vec3 position;
+		glm::vec3 color;
+		glm::vec3 normal;
+		glm::vec2 text_coordinates;
+
+		bool operator==(const Vertex& other) const;
+	};
+}
+
+#endif // PLAINCRAFT_RENDER_ENGINE_VERTEX

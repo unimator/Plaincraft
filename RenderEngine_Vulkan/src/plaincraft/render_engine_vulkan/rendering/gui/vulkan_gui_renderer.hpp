@@ -24,22 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_GUI_CONTEXT
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_GUI_CONTEXT
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT
 
-#include "../instance/vulkan_instance.hpp"
-#include "../device/vulkan_device.hpp"
-#include "../scene_rendering/vulkan_drawable.hpp"
-#include "../window/vulkan_window.hpp"
+#include "../../instance/vulkan_instance.hpp"
+#include "../../device/vulkan_device.hpp"
+#include "../scene/vulkan_drawable.hpp"
+#include "../../window/vulkan_window.hpp"
+#include "../vulkan_renderer_frame_config.hpp"
+#include "vulkan_gui_widget.hpp"
 
 #include <vulkan/vulkan.h>
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
+#include <vector>
 
 namespace plaincraft_render_engine_vulkan
 {
-    class VulkanGuiContext final : public VulkanDrawable
+    class VulkanGuiRenderer final
     {
     private:
         std::reference_wrapper<const VulkanDevice> vulkan_device_;
@@ -49,25 +52,24 @@ namespace plaincraft_render_engine_vulkan
 
         VkDescriptorPool imgui_descriptor_pool_;
 
+        std::vector<std::unique_ptr<VulkanGuiWidget>> widgets_;
+
     public:
-        VulkanGuiContext(const VulkanInstance &vulkan_instance,
+        VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
+                         const VulkanDevice &vulkan_device,
+                         std::shared_ptr<VulkanWindow> vulkan_window,
+                         VkRenderPass render_pass);
+        VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
                          const VulkanDevice &vulkan_device,
                          std::shared_ptr<VulkanWindow> vulkan_window,
                          VkRenderPass render_pass,
-                         VkSurfaceKHR surface);
-        VulkanGuiContext(const VulkanInstance &vulkan_instance,
-                         const VulkanDevice &vulkan_device,
-                         std::shared_ptr<VulkanWindow> vulkan_window,
-                         VkRenderPass render_pass,
-                         VkSurfaceKHR surface,
-                         std::unique_ptr<VulkanGuiContext> old_context);
+                         std::unique_ptr<VulkanGuiRenderer> old_context);
 
-        VulkanGuiContext(const VulkanGuiContext& other) = delete;
-        VulkanGuiContext& operator=(const VulkanGuiContext& other) = delete;
-        ~VulkanGuiContext();
+        VulkanGuiRenderer(const VulkanGuiRenderer& other) = delete;
+        VulkanGuiRenderer& operator=(const VulkanGuiRenderer& other) = delete;
+        ~VulkanGuiRenderer();
 
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
+        void Render(VulkanRendererFrameConfig frame_config);
 
     private:
         void Initialize(VkRenderPass render_pass);
@@ -75,4 +77,4 @@ namespace plaincraft_render_engine_vulkan
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_GUI_CONTEXT
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT

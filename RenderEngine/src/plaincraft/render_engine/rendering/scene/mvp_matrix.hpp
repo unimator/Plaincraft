@@ -27,7 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX
 #define PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX
 
-#include "../common.hpp"
+#include "../../common.hpp"
 
 namespace plaincraft_render_engine {
 	struct ModelViewProjectionMatrix {

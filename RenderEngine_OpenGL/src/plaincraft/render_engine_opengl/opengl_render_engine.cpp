@@ -25,10 +25,10 @@ SOFTWARE.
 */
 
 #include "opengl_render_engine.hpp"
-#include "shader\opengl_shader.hpp"
-#include "scene_rendering\opengl_scene_renderer.hpp"
-#include "texture\opengl_textures_factory.hpp"
-#include "window\opengl_window.hpp"
+#include "shader/opengl_shader.hpp"
+#include "rendering/scene/opengl_scene_renderer.hpp"
+#include "texture/opengl_textures_factory.hpp"
+#include "window/opengl_window.hpp"
 
 namespace plaincraft_render_engine_opengl 
 {

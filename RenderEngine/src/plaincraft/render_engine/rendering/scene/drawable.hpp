@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
-#define PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
+#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#include "../../common.hpp"
+#include "../../models/model.hpp"
 
-#include "../src/plaincraft/render_engine_opengl/shader/opengl_shader.hpp"
-#include "../src/plaincraft/render_engine_opengl/opengl_render_engine.hpp"
-#include "../src/plaincraft/render_engine_opengl/rendering/scene/opengl_scene_renderer.hpp"
-#include "../src/plaincraft/render_engine_opengl/texture/opengl_texture.hpp"
+namespace plaincraft_render_engine
+{
+	class Drawable
+	{
+	private:
+		std::weak_ptr<Model> model_;
+		Vector3d position_;
+		Vector3d color_;
+		Quaternion rotation_;
+		float scale_ = 1.0f;
 
-#endif // PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
+	public:
+		void SetModel(std::shared_ptr<Model> model);
+		std::weak_ptr<Model> GetModel() const;
+
+		auto SetScale(float scale) -> void { scale_ = scale; }
+		auto GetScale() const -> const float { return scale_; }
+
+		void SetRotation(Quaternion rotation) { rotation_ = rotation; }
+		auto GetRotation() -> Quaternion { return rotation_; }
+
+		void SetPosition(Vector3d position);
+		auto GetPosition() -> Vector3d { return position_; }
+
+		void SetColor(Vector3d color);
+		auto GetColor() -> Vector3d { return color_; }
+	};
+}
+
+
+#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE

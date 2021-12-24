@@ -24,39 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#include "../common.hpp"
-#include "../models/model.hpp"
+#ifndef PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER
+#define PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER
 
-namespace plaincraft_render_engine
-{
-	class Drawable
-	{
+#include "../../common.hpp"
+#include "../../shader/opengl_shader.hpp"
+#include <plaincraft_render_engine.hpp>
+
+namespace plaincraft_render_engine_opengl {
+	using namespace plaincraft_render_engine;
+
+	class OpenGLSceneRenderer : public SceneRenderer {
 	private:
-		std::weak_ptr<Model> model_;
-		Vector3d position_;
-		Vector3d color_;
-		Quaternion rotation_;
-		float scale_ = 1.0f;
+		uint32_t vbo_, ebo_, vao_;
+		std::unique_ptr<OpenGLShader> shader_;
 
 	public:
-		void SetModel(std::shared_ptr<Model> model);
-		std::weak_ptr<Model> GetModel() const;
+		OpenGLSceneRenderer(std::shared_ptr<Camera> camera);
 
-		auto SetScale(float scale) -> void { scale_ = scale; }
-		auto GetScale() const -> const float { return scale_; }
+		void Render();
 
-		void SetRotation(Quaternion rotation) { rotation_ = rotation; }
-		auto GetRotation() -> Quaternion { return rotation_; }
-
-		void SetPosition(Vector3d position);
-		auto GetPosition() -> Vector3d { return position_; }
-
-		void SetColor(Vector3d color);
-		auto GetColor() -> Vector3d { return color_; }
+	private:
+		OpenGLShader CreateDefaultShader();
 	};
 }
 
 
-#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+
+#endif // PLAINCRAFT_RENDER_ENGINE_OPENGL_OPENGL_SCENE_RENDERER

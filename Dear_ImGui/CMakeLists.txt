@@ -1,6 +1,6 @@
-add_library("ImGui_Vulkan" "")
+add_library("Dear_ImGui_Vulkan" "")
 
-target_sources("ImGui_Vulkan" 
+target_sources("Dear_ImGui_Vulkan" 
 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/imgui/imgui.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/imgui/imgui.cpp"

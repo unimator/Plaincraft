@@ -27,12 +27,12 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER
 
-#include "../device/vulkan_device.hpp"
-#include "../swapchain/vulkan_swapchain.hpp"
-#include "../pipeline/vulkan_pipeline.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../models/vulkan_model.hpp"
-#include "vulkan_scene_renderer_frame_config.hpp"
+#include "../../device/vulkan_device.hpp"
+#include "../../swapchain/vulkan_swapchain.hpp"
+#include "../../pipeline/vulkan_pipeline.hpp"
+#include "../../memory/vulkan_buffer.hpp"
+#include "../../models/vulkan_model.hpp"
+#include "../vulkan_renderer_frame_config.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -67,7 +67,7 @@ namespace plaincraft_render_engine_vulkan {
         VulkanSceneRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera);
         ~VulkanSceneRenderer() override;
 
-        void Render(VulkanSceneRendererFrameConfig& frame_config);
+        void Render(VulkanRendererFrameConfig& frame_config);
         auto GetLayout() const -> VkPipelineLayout { return pipeline_layout_; }
         
         //void UpdateUniformBuffer(uint32_t image_index);

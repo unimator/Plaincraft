@@ -29,12 +29,12 @@ SOFTWARE.
 #include "vulkan_render_engine.hpp"
 #include "texture/vulkan_textures_factory.hpp"
 #include "shader/vulkan_shader.hpp"
-#include "scene_rendering/vertex_utils.hpp"
+#include "rendering/scene/vertex_utils.hpp"
 #include "window/vulkan_window.hpp"
 #include "utils/queue_family.hpp"
 #include "swapchain/vulkan_swapchain.hpp"
-#include "scene_rendering/vulkan_scene_renderer.hpp"
-#include "scene_rendering/vulkan_scene_renderer_frame_config.hpp"
+#include "rendering/scene/vulkan_scene_renderer.hpp"
+#include "rendering/vulkan_renderer_frame_config.hpp"
 #include "models/vulkan_models_factory.hpp"
 #include <stdexcept>
 #include <iostream>
@@ -73,9 +73,9 @@ namespace plaincraft_render_engine_vulkan
 			vkDestroyFence(device_.GetDevice(), in_flight_fences_[i], nullptr);
 		}
 
-		if(gui_context_ != nullptr)
+		if(gui_renderer_ != nullptr)
 		{
-			gui_context_.reset();
+			gui_renderer_.reset();
 		}
 
 		if(swapchain_ != nullptr)
@@ -162,13 +162,13 @@ namespace plaincraft_render_engine_vulkan
 							   .AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
 							   .Build();
 
-		if(gui_context_ == nullptr) 
+		if(gui_renderer_ == nullptr) 
 		{
-			gui_context_ = std::make_unique<VulkanGuiContext>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass(), surface_);
+			gui_renderer_ = std::make_unique<VulkanGuiRenderer>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass());
 		}
 		else
 		{
-			gui_context_ = std::make_unique<VulkanGuiContext>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass(), surface_, std::move(gui_context_));
+			gui_renderer_ = std::make_unique<VulkanGuiRenderer>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass(), std::move(gui_renderer_));
 		}
 
 		CreateUniformBuffers();
@@ -313,14 +313,15 @@ namespace plaincraft_render_engine_vulkan
 			uniform_buffer->Unmap();
 		}
 
-		VulkanSceneRendererFrameConfig frame_config{
+		VulkanRendererFrameConfig frame_config{
 			command_buffer,
 			descriptor_sets_[image_index],
 			alignment_size};
+		
 		vulkan_renderer->Render(frame_config);
-		scene_renderer_->HasRendered();
+		vulkan_renderer->HasRendered();
 
-		gui_context_->Draw(command_buffer);
+		gui_renderer_->Render(frame_config);
 
 		vkCmdEndRenderPass(command_buffer);
 

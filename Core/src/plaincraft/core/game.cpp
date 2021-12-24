@@ -164,7 +164,10 @@ namespace plaincraft_core
 			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
 			camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
 
-			render_engine_->RenderFrame();
+			MEASURE("graphics render", 
+			{
+				render_engine_->RenderFrame();
+			})
 
 			last_cursor_position_x_ = cursor_position_x;
 			last_cursor_position_y_ = cursor_position_y;

@@ -29,8 +29,8 @@ SOFTWARE.
 
 #include "common.hpp"
 #include <GLFW/glfw3.h>
-#include "scene_rendering/drawable.hpp"
-#include "scene_rendering/scene_renderer.hpp"
+#include "rendering/scene/drawable.hpp"
+#include "rendering/scene/scene_renderer.hpp"
 #include "texture/textures_factory.hpp"
 #include "texture/textures_repository.hpp"
 #include "window/window.hpp"

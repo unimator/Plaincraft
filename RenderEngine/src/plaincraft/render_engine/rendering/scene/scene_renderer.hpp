@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin G�rka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
-#define PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
+#ifndef PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+#define PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
 
-#include "../src/plaincraft/render_engine_opengl/shader/opengl_shader.hpp"
-#include "../src/plaincraft/render_engine_opengl/opengl_render_engine.hpp"
-#include "../src/plaincraft/render_engine_opengl/rendering/scene/opengl_scene_renderer.hpp"
-#include "../src/plaincraft/render_engine_opengl/texture/opengl_texture.hpp"
+#include "../../common.hpp"
+#include "../../camera/camera.hpp"
+#include "drawable.hpp"
 
-#endif // PLAINCRAFT_RENDER_ENGINE_OPENGL_PLAINCRAFT_RENDER_ENGINE_OPENGL
+namespace plaincraft_render_engine {
+	class SceneRenderer
+	{
+	protected:
+		std::vector<std::shared_ptr<Drawable>> drawables_list_;
+		std::shared_ptr<Camera> camera_;
+
+		SceneRenderer(std::shared_ptr<Camera> camera);
+
+	public:
+
+		virtual ~SceneRenderer();
+
+		void Batch(std::shared_ptr<Drawable> drawable);
+		void HasRendered();
+	};
+}
+#endif // PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER

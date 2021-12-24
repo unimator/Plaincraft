@@ -24,26 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "vulkan_gui_context.hpp"
-#include "../utils/queue_family.hpp"
+#include "vulkan_gui_renderer.hpp"
+#include "../../utils/queue_family.hpp"
+#include "windows/diagnostic/vulkan_diagnostic_widget.hpp"
 
 namespace plaincraft_render_engine_vulkan
 {
-  VulkanGuiContext::VulkanGuiContext(const VulkanInstance &vulkan_instance,
+  VulkanGuiRenderer::VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
                                      const VulkanDevice &vulkan_device,
                                      std::shared_ptr<VulkanWindow> vulkan_window,
-                                     VkRenderPass render_pass,
-                                     VkSurfaceKHR surface)
-      : VulkanGuiContext(vulkan_instance, vulkan_device, vulkan_window, render_pass, surface, nullptr)
+                                     VkRenderPass render_pass)
+      : VulkanGuiRenderer(vulkan_instance, vulkan_device, vulkan_window, render_pass, nullptr)
   {
   }
 
-  VulkanGuiContext::VulkanGuiContext(const VulkanInstance &vulkan_instance,
+  VulkanGuiRenderer::VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
                                      const VulkanDevice &vulkan_device,
                                      std::shared_ptr<VulkanWindow> vulkan_window,
                                      VkRenderPass render_pass,
-                                     VkSurfaceKHR surface,
-                                     std::unique_ptr<VulkanGuiContext> old_context)
+                                     std::unique_ptr<VulkanGuiRenderer> old_context)
       : vulkan_device_(vulkan_device), vulkan_instance_(vulkan_instance), vulkan_window_(vulkan_window)
   {
     if (old_context != nullptr)
@@ -52,9 +51,11 @@ namespace plaincraft_render_engine_vulkan
     }
     Initialize(render_pass);
     UploadFonts();
+
+    widgets_.push_back(std::make_unique<VulkanDiagnosticWidget>());
   }
 
-  VulkanGuiContext::~VulkanGuiContext()
+  VulkanGuiRenderer::~VulkanGuiRenderer()
   {
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -66,26 +67,24 @@ namespace plaincraft_render_engine_vulkan
     }
   }
 
-  void VulkanGuiContext::Bind(VkCommandBuffer command_buffer)
-  {
-  }
-
-  void VulkanGuiContext::Draw(VkCommandBuffer command_buffer)
+  void VulkanGuiRenderer::Render(VulkanRendererFrameConfig frame_config)
   {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    bool show_demo_window = true;
-    ImGui::ShowDemoWindow(&show_demo_window);
+    for(auto& widget : widgets_)
+    {
+      widget->Draw();
+    }
 
     ImGui::Render();
     ImDrawData *draw_data = ImGui::GetDrawData();
 
-    ImGui_ImplVulkan_RenderDrawData(draw_data, command_buffer);
+    ImGui_ImplVulkan_RenderDrawData(draw_data, frame_config.command_buffer);
   }
 
-  void VulkanGuiContext::Initialize(VkRenderPass render_pass)
+  void VulkanGuiRenderer::Initialize(VkRenderPass render_pass)
   {
     auto &vulkan_device = vulkan_device_.get();
     auto &vulkan_instance = vulkan_instance_.get();
@@ -133,7 +132,7 @@ namespace plaincraft_render_engine_vulkan
     ImGui_ImplVulkan_Init(&vulkan_init_info, render_pass);
   }
 
-  void VulkanGuiContext::UploadFonts()
+  void VulkanGuiRenderer::UploadFonts()
   {
     auto &device = vulkan_device_.get();
     VkCommandPool command_pool = device.GetCommandPool();

@@ -38,11 +38,11 @@ SOFTWARE.
 #include "memory/vulkan_texture.hpp"
 #include "memory/vulkan_image.hpp"
 #include "models/vulkan_model.hpp"
-#include "scene_rendering/vulkan_scene_renderer.hpp"
+#include "rendering/scene/vulkan_scene_renderer.hpp"
 #include "descriptors/vulkan_descriptor_set_layout.hpp"
 #include "descriptors/vulkan_descriptor_pool.hpp"
 #include "descriptors/vulkan_descriptor_writer.hpp"
-#include "gui/vulkan_gui_context.hpp"
+#include "rendering/gui/vulkan_gui_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -76,7 +76,7 @@ namespace plaincraft_render_engine_vulkan {
 		std::vector<VkFence> images_in_flight_;
 		size_t current_frame_ = 0;
 		
-		std::unique_ptr<VulkanGuiContext> gui_context_;
+		std::unique_ptr<VulkanGuiRenderer> gui_renderer_;
 
 		bool enable_debug_ = false;
 
