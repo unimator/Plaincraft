@@ -28,6 +28,8 @@ SOFTWARE.
 #include <imgui.h>
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <string>
 #include <plaincraft_common.hpp>
 
 namespace plaincraft_render_engine_vulkan
@@ -36,21 +38,26 @@ namespace plaincraft_render_engine_vulkan
 
     VulkanDiagnosticWidget::VulkanDiagnosticWidget()
     {
-
     }
 
     void VulkanDiagnosticWidget::Draw()
     {
-        if(!is_visible_)
+        constexpr float padding = 10.0f;
+
+        if (!is_visible_)
         {
             return;
         }
 
-        const ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->Pos);
-        ImGui::SetNextWindowSize(viewport->Size);
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
+        ImVec2 window_position = {};
+        window_position.x = padding;
+        window_position.y = padding;
+        ImGui::SetNextWindowPos(window_position);
+        ImGui::SetNextWindowSize({viewport->WorkSize.x - 2 * padding, 0});
+        ImGui::SetNextWindowBgAlpha(0.35f);
 
-        ImGuiWindowFlags window_flags = 0;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
         if (!ImGui::Begin("Diagnostic", &is_visible_, window_flags))
         {
             ImGui::End();
@@ -58,25 +65,41 @@ namespace plaincraft_render_engine_vulkan
         }
 
         auto profiler = Profiler::GetInstance();
-        auto& descriptions = profiler.GetDescriptions();
+        auto &descriptions = profiler.GetDescriptions();
 
-        for(auto& description : descriptions)
+        ImGui::BeginTable("Diagnostics", 3, ImGuiTableFlags_None, {0, 0});
+        for (auto &[name, description] : descriptions)
         {
-            if(ImGui::TreeNode(description.second.GetName().c_str()))
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text(name.c_str());
+
+            std::vector<float> plot_values;
+            auto values = description.GetValues();
+            float avarage_time = 0.0f;
+
+            for (auto it = values.begin();
+                 it != values.end();
+                 ++it)
             {
-                std::vector<float> values;
-                for(auto& value : description.second.GetValues())
-                {
-                    values.push_back(value.count());
-                }
-
-                //PlotLines(const char* label, const float* values, int values_count, int values_offset, const char* overlay_text, float scale_min, float scale_max, ImVec2 graph_size, int stride)
-                ImGui::PlotLines("time", values.data(), profiling_history_length, 0, nullptr, 0, 10);
-                ImGui::TreePop();
+                auto value = (*it).count();
+                plot_values.push_back(value);
+                avarage_time += value;
             }
-        }
 
-        
+            avarage_time /= plot_values.size();
+            const char* format = "Avg: %f ms";
+            size_t size = std::snprintf(nullptr, 0, format, avarage_time);
+            std::vector<char> buffer(size + 1);
+            std::snprintf(&buffer[0], buffer.size(), format, avarage_time);
+
+            ImGui::TableNextColumn();
+            ImVec2 plot_size = {500.0f, 0.0f};
+            ImGui::PlotLines("time", plot_values.data(), plot_values.size(), 0, nullptr, FLT_MAX, FLT_MAX, plot_size);
+            ImGui::TableNextColumn();
+            ImGui::Text(buffer.data());
+        }
+        ImGui::EndTable();
 
         ImGui::End();
     }

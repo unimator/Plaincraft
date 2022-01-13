@@ -24,44 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_GAME
-#define PLAINCRAFT_CORE_GAME
+#ifndef PLAINCRAFT_CORE_CHUNK
+#define PLAINCRAFT_CORE_CHUNK
 
-#include "common.hpp"
-#include "scene.hpp"
-#include "camera_operators/camera_operator.hpp"
-#include "models/models_cache.hpp"
-#include "events/loop_events_handler.hpp"
+#include "../blocks/block.hpp"
 #include <plaincraft_render_engine.hpp>
+#include <array>
 
-namespace plaincraft_core {
-	class Game {
-	private:
-		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
-		std::unique_ptr<CameraOperator> camera_operator_;
-		ModelsCache models_cache_;
-		LoopEventsHandler loop_events_handler_;
+namespace plaincraft_core
+{
+    using namespace plaincraft_render_engine;
 
-		rp3d::PhysicsCommon physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		float physics_time_step_ = 1.0f / 60.0f;
+    class Chunk
+    {
+    public:
+        static constexpr size_t chunk_size = 2;
+        static constexpr size_t chunk_height = 8;
 
-		Scene scene_;
+        using Data = std::array<std::array<std::array<std::unique_ptr<Block>, chunk_size>, chunk_size>, chunk_height>;
 
-	public:
-		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
-		~Game();
+    private:
+        Data blocks_;
 
-		void Run();
+        int32_t pos_x_, pos_y_;
+        std::shared_ptr<Drawable> mesh_;
 
-		auto GetScene() -> Scene& {return scene_;}
-		WindowEventsHandler& GetWindowEventsHandler();
-		LoopEventsHandler& GetLoopEventsHandler();
-		std::shared_ptr<Camera> GetCamera();
+    public:
+        Chunk(int32_t position_x, int32_t position_y, Data&& blocks);
 
-	private:
-		void MainLoop();
-		void Initialize();
-	};
+        void OrganizeMesh();
+
+        int32_t GetPositionX() const;
+        int32_t GetPositionY() const;
+    };
 }
-#endif // PLAINCRAFT_CORE_GAME
+
+#endif // PLAINCRAFT_CORE_CHUNK

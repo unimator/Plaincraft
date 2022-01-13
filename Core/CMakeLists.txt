@@ -21,6 +21,17 @@ PRIVATE
     src/plaincraft/core/camera_operators/camera_operator.cpp
     src/plaincraft/core/camera_operators/camera_operator.hpp
     src/plaincraft/core/components/component.hpp
+    src/plaincraft/core/entities/blocks/block.hpp
+    src/plaincraft/core/entities/blocks/dirt.cpp
+    src/plaincraft/core/entities/blocks/dirt.hpp
+    src/plaincraft/core/entities/map/chunk.cpp
+    src/plaincraft/core/entities/map/chunk.hpp
+    src/plaincraft/core/entities/map/map.cpp
+    src/plaincraft/core/entities/map/map.hpp
+    src/plaincraft/core/entities/player/events/player_events_handler.cpp
+    src/plaincraft/core/entities/player/events/player_events_handler.hpp
+    src/plaincraft/core/entities/player/player.cpp
+    src/plaincraft/core/entities/player/player.hpp
     src/plaincraft/core/entities/entity.cpp
     src/plaincraft/core/entities/entity.hpp
     src/plaincraft/core/events/loop_events_handler.cpp

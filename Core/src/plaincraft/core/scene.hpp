@@ -49,12 +49,13 @@ namespace plaincraft_core
 	private:
 		std::list<std::shared_ptr<Entity>> entities_list_;
 		std::map<std::shared_ptr<Entity>, rp3d::Transform> previous_transforms_;
+		std::shared_ptr<RenderEngine> render_engine_;
 
 	public:
-		Scene();
+		Scene(std::shared_ptr<RenderEngine> render_engine);
 		~Scene();
 
-		void AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine>& render_engine);
+		void AddEntity(std::shared_ptr<Entity> entity);
 		std::shared_ptr<Entity> FindEntityByName(const std::string& name) const;
 
 		void UpdateFrame(float interpolation_factor = 0.0f);

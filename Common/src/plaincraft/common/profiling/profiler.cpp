@@ -68,9 +68,7 @@ namespace plaincraft_common
 
     void Profiler::ProfileDescription::SaveValue(std::chrono::milliseconds value)
     {
-        values_[write_index_] = value;
-
-        write_index_ = (write_index_ + 1) % profiling_history_length;
+        values_.push_front(value);
     }
 
     std::string Profiler::ProfileDescription::GetName()
@@ -78,7 +76,7 @@ namespace plaincraft_common
         return name_;
     }
 
-    Profiler::ProfileDescription::ProfileValues Profiler::ProfileDescription::GetValues()
+    Profiler::ProfileDescription::ProfileValues& Profiler::ProfileDescription::GetValues()
     {
         return values_;
     }

@@ -24,44 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_GAME
-#define PLAINCRAFT_CORE_GAME
+#include "chunk.hpp"
 
-#include "common.hpp"
-#include "scene.hpp"
-#include "camera_operators/camera_operator.hpp"
-#include "models/models_cache.hpp"
-#include "events/loop_events_handler.hpp"
-#include <plaincraft_render_engine.hpp>
+namespace plaincraft_core
+{
+    Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
+        : pos_x_(position_x), pos_y_(position_y), blocks_(std::move(blocks))
+    {
+    }
 
-namespace plaincraft_core {
-	class Game {
-	private:
-		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
-		std::unique_ptr<CameraOperator> camera_operator_;
-		ModelsCache models_cache_;
-		LoopEventsHandler loop_events_handler_;
+    int32_t Chunk::GetPositionX() const
+    {
+        return pos_x_;
+    }
 
-		rp3d::PhysicsCommon physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		float physics_time_step_ = 1.0f / 60.0f;
-
-		Scene scene_;
-
-	public:
-		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
-		~Game();
-
-		void Run();
-
-		auto GetScene() -> Scene& {return scene_;}
-		WindowEventsHandler& GetWindowEventsHandler();
-		LoopEventsHandler& GetLoopEventsHandler();
-		std::shared_ptr<Camera> GetCamera();
-
-	private:
-		void MainLoop();
-		void Initialize();
-	};
+    int32_t Chunk::GetPositionY() const
+    {
+        return pos_y_;
+    }
 }
-#endif // PLAINCRAFT_CORE_GAME

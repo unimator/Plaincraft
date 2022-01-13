@@ -42,20 +42,30 @@ namespace plaincraft_core
 {
 	using namespace plaincraft_render_engine;
 
-	Scene::Scene()
+	Scene::Scene(std::shared_ptr<RenderEngine> render_engine)
+		: render_engine_(render_engine)
 	{
 	}
 
-	Scene::~Scene() 
+	Scene::~Scene()
 	{
 	}
 
-	void Scene::AddEntity(std::shared_ptr<Entity> entity, std::unique_ptr<RenderEngine> &render_engine)
+	void Scene::AddEntity(std::shared_ptr<Entity> entity)
 	{
 		entities_list_.push_back(entity);
-		const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
-		previous_transforms_.insert({entity, transform});
-		render_engine->AddDrawable(entity->GetDrawable());
+
+		auto rigid_body = entity->GetRigidBody();
+		if (rigid_body != nullptr)
+		{
+			const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
+			previous_transforms_.insert({entity, transform});
+		}
+
+		if (entity->GetDrawable() != nullptr)
+		{
+			render_engine_->AddDrawable(entity->GetDrawable());
+		}
 	}
 
 	std::shared_ptr<Entity> Scene::FindEntityByName(const std::string &name) const
@@ -75,6 +85,12 @@ namespace plaincraft_core
 		for (auto entity : entities_list_)
 		{
 			const auto rb = entity->GetRigidBody();
+
+			if(rb == nullptr)
+			{
+				continue;
+			}
+
 			auto transform = rb->getTransform();
 			auto previous_transform = previous_transforms_[entity];
 			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);

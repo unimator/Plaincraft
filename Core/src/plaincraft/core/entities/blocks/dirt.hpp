@@ -24,44 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_GAME
-#define PLAINCRAFT_CORE_GAME
+#ifndef PLAINCRAFT_BLOCKS_DIRT
+#define PLAINCRAFT_BLOCKS_DIRT
 
-#include "common.hpp"
-#include "scene.hpp"
-#include "camera_operators/camera_operator.hpp"
-#include "models/models_cache.hpp"
-#include "events/loop_events_handler.hpp"
-#include <plaincraft_render_engine.hpp>
+#include "../entity.hpp"
 
-namespace plaincraft_core {
-	class Game {
-	private:
-		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
-		std::unique_ptr<CameraOperator> camera_operator_;
-		ModelsCache models_cache_;
-		LoopEventsHandler loop_events_handler_;
-
-		rp3d::PhysicsCommon physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		float physics_time_step_ = 1.0f / 60.0f;
-
-		Scene scene_;
-
-	public:
-		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
-		~Game();
-
-		void Run();
-
-		auto GetScene() -> Scene& {return scene_;}
-		WindowEventsHandler& GetWindowEventsHandler();
-		LoopEventsHandler& GetLoopEventsHandler();
-		std::shared_ptr<Camera> GetCamera();
-
-	private:
-		void MainLoop();
-		void Initialize();
-	};
+namespace plaincraft_core
+{
+    class Dirt : public Entity
+    {
+        
+    };
 }
-#endif // PLAINCRAFT_CORE_GAME
+
+#endif // PLAINCRAFT_BLOCKS_DIRT

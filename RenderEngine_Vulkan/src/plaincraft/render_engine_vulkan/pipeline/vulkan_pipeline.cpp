@@ -147,8 +147,8 @@ namespace plaincraft_render_engine_vulkan
 		pipeline_config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		pipeline_config.rasterization_info.depthClampEnable = VK_FALSE;
 		pipeline_config.rasterization_info.rasterizerDiscardEnable = VK_FALSE;
-		pipeline_config.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
-		pipeline_config.rasterization_info.lineWidth = 1.0f;
+		pipeline_config.rasterization_info.polygonMode = VK_POLYGON_MODE_LINE;
+		pipeline_config.rasterization_info.lineWidth = 2.0f;
 		pipeline_config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT;
 		pipeline_config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		pipeline_config.rasterization_info.depthBiasEnable = VK_FALSE;

@@ -24,44 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_GAME
-#define PLAINCRAFT_CORE_GAME
+#ifndef PLAINCRAFT_CORE_MAP
+#define PLAINCRAFT_CORE_MAP
 
-#include "common.hpp"
-#include "scene.hpp"
-#include "camera_operators/camera_operator.hpp"
-#include "models/models_cache.hpp"
-#include "events/loop_events_handler.hpp"
-#include <plaincraft_render_engine.hpp>
+#include "chunk.hpp"
+#include "../entity.hpp"
+#include "../../world/world_generator.hpp"
+#include <vector>
 
-namespace plaincraft_core {
-	class Game {
-	private:
-		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
-		std::unique_ptr<CameraOperator> camera_operator_;
-		ModelsCache models_cache_;
-		LoopEventsHandler loop_events_handler_;
+namespace plaincraft_core 
+{
+    class Map : public Entity
+    {
+    public:
+        using ChunksRow = std::vector<std::unique_ptr<Chunk>>;
+        using ChunksGrid = std::vector<ChunksRow>;
 
-		rp3d::PhysicsCommon physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		float physics_time_step_ = 1.0f / 60.0f;
+        static constexpr size_t map_size = 8;
 
-		Scene scene_;
+    private:
+        ChunksGrid grid_;
+        WorldGenerator world_generator_;
 
-	public:
-		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);
-		~Game();
+        std::shared_ptr<Entity> origin_entity_;
 
-		void Run();
+    public:
+        Map(WorldGenerator world_generator, std::shared_ptr<Entity> origin_entity);
+        
+        void OnLoopTick(float delta_time);
 
-		auto GetScene() -> Scene& {return scene_;}
-		WindowEventsHandler& GetWindowEventsHandler();
-		LoopEventsHandler& GetLoopEventsHandler();
-		std::shared_ptr<Camera> GetCamera();
-
-	private:
-		void MainLoop();
-		void Initialize();
-	};
+    private:
+        void ReloadGrid();
+    };
 }
-#endif // PLAINCRAFT_CORE_GAME
+
+#endif // PLAINCRAFT_CORE_MAP

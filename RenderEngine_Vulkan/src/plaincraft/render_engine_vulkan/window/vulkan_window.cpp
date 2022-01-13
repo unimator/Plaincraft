@@ -63,7 +63,7 @@ namespace plaincraft_render_engine_vulkan
 
 		instance_ = glfwCreateWindow(width_, height_, title_.c_str(), nullptr, nullptr);
 
-		//glfwSetInputMode(instance_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(instance_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

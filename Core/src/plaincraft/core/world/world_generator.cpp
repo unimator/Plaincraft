@@ -33,24 +33,34 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	WorldGenerator::WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world) 
-		: physics_common_(physics_common), physics_world_(physics_world)
-	{}
- 
-	void WorldGenerator::GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine>& render_engine, ModelsCache& models_cache)
+	WorldGenerator::WorldGenerator(rp3d::PhysicsCommon &physics_common,
+								   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
+								   std::shared_ptr<RenderEngine> render_engine,
+								   Scene &scene,
+								   ModelsCache &models_cache)
+		: physics_common_(physics_common),
+		  physics_world_(physics_world),
+		  render_engine_(render_engine),
+		  scene_(scene),
+		  models_cache_(models_cache)
 	{
-		const auto model = models_cache.Fetch("cube_half");
+	}
 
-		for (int i = -20; i < 20; ++i)
+	Chunk WorldGenerator::CreateChunk(Vector3d offset)
+	{
+		const auto model = models_cache_.Fetch("cube_half");
+
+		for (auto i = 0; i < Chunk::chunk_size; ++i)
 		{
-			for (int j = -20; j < 20; ++j)
+			for (auto j = 0; j < Chunk::chunk_size; ++j)
 			{
 				auto entity = std::make_shared<Entity>();
 				auto drawable = std::make_shared<Drawable>();
 				drawable->SetModel(model);
 				entity->SetDrawable(drawable);
-				
-				auto position = Vector3d(i * 1.0f, round(2 * sin(i) * cos(j)), j * 1.0f);
+
+				//auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
+				auto position = Vector3d(Chunk::chunk_size * offset.x + i * 1.0f, 0, Chunk::chunk_size * offset.z + j * 1.0f);
 				auto orientation = rp3d::Quaternion::identity();
 				rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 				auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
@@ -60,16 +70,25 @@ namespace plaincraft_core
 				rigid_body->enableGravity(false);
 				rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
 				entity->SetRigidBody(rigid_body);
-				
-				//body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
-				float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-				float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-				float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+				// body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
+				// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+				float r = static_cast<float>(offset.x * offset.x / 10.0f);
+				float g = static_cast<float>(offset.y);
+				float b = static_cast<float>(offset.z * offset.z / 10.0f);
 				auto color = glm::vec3(r, g, b);
 				entity->SetColor(color);
 
-				scene.AddEntity(entity, render_engine);
+				scene_.AddEntity(entity);
 			}
 		}
+
+		auto chunk_data = Chunk::Data();
+		auto position_x = static_cast<int32_t>(offset.x);
+		auto position_y = static_cast<int32_t>(offset.z);
+
+		return Chunk(position_x, position_y, std::move(chunk_data));
 	}
 }

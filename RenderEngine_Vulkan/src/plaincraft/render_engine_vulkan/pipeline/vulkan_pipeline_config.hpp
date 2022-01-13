@@ -31,8 +31,8 @@ SOFTWARE.
 #include <vector>
 namespace plaincraft_render_engine_vulkan {
     struct VulkanPipelineConfig {
-        VulkanPipelineConfig(const VulkanPipelineConfig& other) = delete;
-        VulkanPipelineConfig& operator=(const VulkanPipelineConfig& other) = delete;
+        // VulkanPipelineConfig(const VulkanPipelineConfig& other) = delete;
+        // VulkanPipelineConfig& operator=(const VulkanPipelineConfig& other) = delete;
 
         VkPipelineViewportStateCreateInfo viewport_info;
         VkPipelineInputAssemblyStateCreateInfo input_assembly_info;

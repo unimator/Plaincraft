@@ -24,6 +24,8 @@ PRIVATE
     src/plaincraft/common/profiling/profiler.hpp
     src/plaincraft/common/utils/file_utils.cpp
     src/plaincraft/common/utils/file_utils.hpp
+    src/plaincraft/common/utils/fixed_list.hpp
+    src/plaincraft/common/utils/hash_utils.hpp
     src/plaincraft/common/common.hpp
     src/plaincraft/common/system_types.hpp
     src/plaincraft/common/system_types_glm.hpp

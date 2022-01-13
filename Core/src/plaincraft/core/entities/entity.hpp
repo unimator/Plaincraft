@@ -46,7 +46,7 @@ namespace plaincraft_core {
 
 	public:
 		Entity();
-		~Entity();
+		virtual ~Entity();
 
 		void SetDrawable(std::shared_ptr<Drawable> drawable);
 		std::shared_ptr<Drawable> GetDrawable() const;

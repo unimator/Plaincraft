@@ -25,6 +25,7 @@ SOFTWARE.
 #include "../common.hpp"
 #include "../scene.hpp"
 #include "../models/models_cache.hpp"
+#include "../entities/map/chunk.hpp"
 
 namespace plaincraft_core
 {
@@ -32,12 +33,19 @@ namespace plaincraft_core
 	{
 	private:
 		rp3d::PhysicsCommon& physics_common_;
-		rp3d::PhysicsWorld* physics_world_;
+		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
+		std::shared_ptr<RenderEngine> render_engine_;
+		Scene& scene_;
+		ModelsCache& models_cache_;
 
 	public:
-		WorldGenerator(rp3d::PhysicsCommon& physics_common, rp3d::PhysicsWorld *physics_world);
+		WorldGenerator(rp3d::PhysicsCommon& physics_common, 
+			std::shared_ptr<rp3d::PhysicsWorld> physics_world, 
+			std::shared_ptr<RenderEngine> render_engine,
+			Scene& scene,
+			ModelsCache& models_cache);
 
-		void GenerateWorld(Scene &scene, std::unique_ptr<RenderEngine> &render_engine, ModelsCache& models_cache);
+		Chunk CreateChunk(Vector3d offset);
 	};
 }
 

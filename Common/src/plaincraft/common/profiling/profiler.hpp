@@ -25,7 +25,9 @@ SOFTWARE.
 */
 
 #ifndef PLAINCRAFT_COMMON_PROFILER
+#define PLAINCRAFT_COMMON_PROFILER
 
+#include "../utils/fixed_list.hpp"
 #include <string>
 #include <chrono>
 #include <array>
@@ -58,19 +60,18 @@ namespace plaincraft_common
         {
             friend class Profiler;
         public:
-            using ProfileValues = std::array<std::chrono::milliseconds, profiling_history_length>;
+            using ProfileValues = std::FixedList<std::chrono::milliseconds, profiling_history_length>;
 
         private:
             std::string name_;
             ProfileValues values_;
-            size_t write_index_ = 0;
 
             ProfileDescription(std::string name);
             void SaveValue(std::chrono::milliseconds value);
 
         public:
             std::string GetName();
-            ProfileValues GetValues();
+            ProfileValues& GetValues();
         };
 
     private:

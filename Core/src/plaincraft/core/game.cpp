@@ -27,6 +27,7 @@ SOFTWARE.
 #include "game.hpp"
 #include "entities/entity.hpp"
 #include "world/world_generator.hpp"
+#include "entities/map/map.hpp"
 #include "utils/conversions.hpp"
 //#include "camera_operators/eyes/camera_operator_eyes.hpp"
 #include "camera_operators/follow/camera_operator_follow.hpp"
@@ -36,9 +37,9 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	Game::Game(std::unique_ptr<plaincraft_render_engine::RenderEngine> render_engine)
+	Game::Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine)
 		: render_engine_(std::move(render_engine)),
-		  scene_(Scene())
+		  scene_(Scene(render_engine_))
 	{
 		Initialize();
 	}
@@ -56,7 +57,7 @@ namespace plaincraft_core
 	{
 		std::shared_ptr<Entity> player;
 
-		physics_world_ = physics_common_.createPhysicsWorld();
+		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(), rp3d::PhysicsWorldDeleter(physics_common_));
 
 		// auto logger = physics_common_.createDefaultLogger();
 		// uint32_t log_level = static_cast<uint32_t>(static_cast<uint32_t>(rp3d::Logger::Level::Warning)
@@ -80,8 +81,7 @@ namespace plaincraft_core
 		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
 		models_cache_.Store("capsule_half", std::move(capsule_model));
 
-		WorldGenerator world_generator(physics_common_, physics_world_);
-		world_generator.GenerateWorld(scene_, render_engine_, models_cache_);
+		WorldGenerator world_generator(physics_common_, physics_world_, render_engine_, scene_, models_cache_);
 
 		player = std::make_shared<Entity>();
 		player->SetName("player");
@@ -96,7 +96,7 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.2f, 2.25f, 0.25f);
+		auto player_position = Vector3d(0.75f, 3.75f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
@@ -113,9 +113,13 @@ namespace plaincraft_core
 		rigid_body->setIsBouncingFreezed(true);
 		player->SetRigidBody(rigid_body);
 
-		scene_.AddEntity(player, render_engine_);
+		scene_.AddEntity(player);
 
 		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+
+		auto map = std::make_shared<Map>(world_generator, player);
+		scene_.AddEntity(map);
+		loop_events_handler_.loop_event_trigger.AddSubscription(map.get(), &Map::OnLoopTick);
 	}
 
 	void Game::Run()
@@ -149,25 +153,27 @@ namespace plaincraft_core
 			last_time = current_time;
 
 			MEASURE("physics",
-						 {
-							 while (accumulator >= physics_time_step_)
-							 {
-								 physics_world_->update(physics_time_step_);
-								 accumulator -= physics_time_step_;
-							 }
-						 })
+					{
+						while (accumulator >= physics_time_step_)
+						{
+							physics_world_->update(physics_time_step_);
+							accumulator -= physics_time_step_;
+						}
+					})
 
-			scene_.UpdateFrame();
+			MEASURE("update scene objects", {
+				scene_.UpdateFrame();
+			});
 
 			loop_events_handler_.loop_event_trigger.Trigger(delta_time);
 
 			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
 			camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
 
-			MEASURE("graphics render", 
-			{
-				render_engine_->RenderFrame();
-			})
+			MEASURE("graphics render",
+					{
+						render_engine_->RenderFrame();
+					})
 
 			last_cursor_position_x_ = cursor_position_x;
 			last_cursor_position_y_ = cursor_position_y;
