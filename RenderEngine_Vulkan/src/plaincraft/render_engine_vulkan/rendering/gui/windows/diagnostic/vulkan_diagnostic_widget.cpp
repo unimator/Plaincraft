@@ -64,6 +64,14 @@ namespace plaincraft_render_engine_vulkan
             return;
         }
 
+        RenderProfiling();
+        RenderLogValues();
+
+        ImGui::End();
+    }
+
+    void VulkanDiagnosticWidget::RenderProfiling()
+    {
         auto profiler = Profiler::GetInstance();
         auto &descriptions = profiler.GetDescriptions();
 
@@ -88,7 +96,7 @@ namespace plaincraft_render_engine_vulkan
             }
 
             avarage_time /= plot_values.size();
-            const char* format = "Avg: %f ms";
+            const char *format = "Avg: %f ms";
             size_t size = std::snprintf(nullptr, 0, format, avarage_time);
             std::vector<char> buffer(size + 1);
             std::snprintf(&buffer[0], buffer.size(), format, avarage_time);
@@ -100,7 +108,23 @@ namespace plaincraft_render_engine_vulkan
             ImGui::Text(buffer.data());
         }
         ImGui::EndTable();
+    }
 
-        ImGui::End();
+    void VulkanDiagnosticWidget::RenderLogValues()
+    {
+        auto& log_values = Logger::GetValues();
+        ImGui::BeginTable("LogValues", 2, ImGuiTabBarFlags_None, {0, 0});
+        {
+            for(auto &[key, value] : log_values)
+            {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text(key.c_str());
+                ImGui::TableNextColumn();
+                ImGui::Text(value.c_str());
+
+            }
+        }
+        ImGui::EndTable();
     }
 }

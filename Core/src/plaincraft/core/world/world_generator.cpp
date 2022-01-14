@@ -50,45 +50,78 @@ namespace plaincraft_core
 	{
 		const auto model = models_cache_.Fetch("cube_half");
 
-		for (auto i = 0; i < Chunk::chunk_size; ++i)
+		auto chunk_data = Chunk::Data();
+		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+
+		int32_t i = 0, j = 0;
+		for (auto &plane : chunk_data)
 		{
-			for (auto j = 0; j < Chunk::chunk_size; ++j)
+			for (auto &row : plane)
 			{
-				auto entity = std::make_shared<Entity>();
-				auto drawable = std::make_shared<Drawable>();
-				drawable->SetModel(model);
-				entity->SetDrawable(drawable);
+				for (auto &block : row)
+				{
+					auto entity = std::make_shared<Block>();
+					auto drawable = std::make_shared<Drawable>();
+					drawable->SetModel(model);
+					entity->SetDrawable(drawable);
 
-				//auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
-				auto position = Vector3d(Chunk::chunk_size * offset.x + i * 1.0f, 0, Chunk::chunk_size * offset.z + j * 1.0f);
-				auto orientation = rp3d::Quaternion::identity();
-				rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-				auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
-				auto rigid_body = physics_world_->createRigidBody(transform);
-				auto collider = rigid_body->addCollider(cube_shape, transform);
-				rigid_body->setType(rp3d::BodyType::STATIC);
-				rigid_body->enableGravity(false);
-				rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
-				entity->SetRigidBody(rigid_body);
+					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
+					auto position = Vector3d(Chunk::chunk_size * offset.x + i * 1.0f, round(2 * sin(offset.x) * cos(offset.z)), Chunk::chunk_size * offset.z + j * 1.0f);
+					auto orientation = rp3d::Quaternion::identity();
+					rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
+					auto rigid_body = physics_world_->createRigidBody(transform);
+					auto collider = rigid_body->addCollider(cube_shape, transform);
+					rigid_body->setType(rp3d::BodyType::STATIC);
+					rigid_body->enableGravity(false);
+					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
+					entity->SetRigidBody(rigid_body);
 
-				// body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
-				// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-				// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-				// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-				float r = static_cast<float>(offset.x * offset.x / 10.0f);
-				float g = static_cast<float>(offset.y);
-				float b = static_cast<float>(offset.z * offset.z / 10.0f);
-				auto color = glm::vec3(r, g, b);
-				entity->SetColor(color);
+					// body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
+					// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+					// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+					// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+					float r = static_cast<float>(offset.x * offset.x / 10.0f);
+					float g = static_cast<float>(offset.y);
+					float b = static_cast<float>(offset.z * offset.z / 10.0f);
+					auto color = glm::vec3(r, g, b);
+					entity->SetColor(color);
 
-				scene_.AddEntity(entity);
+					scene_.AddEntity(entity);
+
+					block = entity;
+					
+					++j;
+				}
+				++i;
 			}
+			break;
 		}
 
-		auto chunk_data = Chunk::Data();
 		auto position_x = static_cast<int32_t>(offset.x);
 		auto position_y = static_cast<int32_t>(offset.z);
 
 		return Chunk(position_x, position_y, std::move(chunk_data));
+	}
+
+	void WorldGenerator::DisposeChunk(std::unique_ptr<Chunk> chunk)
+	{
+		auto& blocks = chunk->GetData();
+		if (!blocks.empty())
+        {
+            for (auto &plane : blocks)
+            {
+                for (auto &row : plane)
+                {
+                    for (auto &block : row)
+                    {
+                        if(block != nullptr)
+                        {
+                            scene_.RemoveEntity(block);
+							physics_world_->destroyRigidBody(block->GetRigidBody());
+                        }
+                    }
+                }
+            }
+        }
 	}
 }

@@ -41,12 +41,11 @@ namespace plaincraft_render_engine
 		camera_->fov = 45.0f;
 	}
 
-	RenderEngine::~RenderEngine() 
-	{
+	RenderEngine::~RenderEngine(){
 
 	};
 
-	RenderEngine::RenderEngine(RenderEngine&& other)
+	RenderEngine::RenderEngine(RenderEngine &&other)
 		: window_(std::move(other.window_))
 	{
 		this->camera_ = other.camera_;
@@ -61,7 +60,7 @@ namespace plaincraft_render_engine
 		other.textures_repository_ = nullptr;
 	}
 
-	RenderEngine& RenderEngine::operator=(RenderEngine&& other) 
+	RenderEngine &RenderEngine::operator=(RenderEngine &&other)
 	{
 		this->camera_ = other.camera_;
 		other.camera_ = nullptr;
@@ -82,8 +81,16 @@ namespace plaincraft_render_engine
 		glfwGetCursorPos(window_->GetInstance(), cursor_position_x, cursor_position_y);
 	}
 
-	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable)
+	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable_to_add)
 	{
-		drawables_list_.push_back(drawable);
+		drawables_list_.push_back(drawable_to_add);
+	}
+
+	void RenderEngine::RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove)
+	{
+		drawables_list_.erase(std::remove_if(drawables_list_.begin(),
+											 drawables_list_.end(),
+											 [&](std::shared_ptr<Drawable> const &drawable)
+											 { return drawable == drawable_to_remove; }));
 	}
 }

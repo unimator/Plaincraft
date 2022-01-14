@@ -41,7 +41,7 @@ namespace plaincraft_core
         static constexpr size_t chunk_size = 2;
         static constexpr size_t chunk_height = 8;
 
-        using Data = std::array<std::array<std::array<std::unique_ptr<Block>, chunk_size>, chunk_size>, chunk_height>;
+        using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_size>, chunk_height>;
 
     private:
         Data blocks_;
@@ -51,11 +51,14 @@ namespace plaincraft_core
 
     public:
         Chunk(int32_t position_x, int32_t position_y, Data&& blocks);
+        Chunk(Chunk&& other) noexcept;
 
         void OrganizeMesh();
 
         int32_t GetPositionX() const;
         int32_t GetPositionY() const;
+
+        Data& GetData();
     };
 }
 

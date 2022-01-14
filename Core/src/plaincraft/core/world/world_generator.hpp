@@ -31,7 +31,7 @@ namespace plaincraft_core
 {
 	class WorldGenerator
 	{
-	private:
+	public:
 		rp3d::PhysicsCommon& physics_common_;
 		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
 		std::shared_ptr<RenderEngine> render_engine_;
@@ -46,6 +46,7 @@ namespace plaincraft_core
 			ModelsCache& models_cache);
 
 		Chunk CreateChunk(Vector3d offset);
+		void DisposeChunk(std::unique_ptr<Chunk> chunk);
 	};
 }
 

@@ -25,12 +25,22 @@ SOFTWARE.
 */
 
 #include "chunk.hpp"
+#include <iostream>
 
 namespace plaincraft_core
 {
     Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
         : pos_x_(position_x), pos_y_(position_y), blocks_(std::move(blocks))
     {
+    }
+
+    Chunk::Chunk(Chunk &&other) noexcept
+        : pos_x_(other.pos_x_),
+          pos_y_(other.pos_y_),
+          blocks_(std::move(other.blocks_))
+    {
+        other.pos_x_ = 0;
+        other.pos_y_ = 0;
     }
 
     int32_t Chunk::GetPositionX() const
@@ -41,5 +51,10 @@ namespace plaincraft_core
     int32_t Chunk::GetPositionY() const
     {
         return pos_y_;
+    }
+
+    Chunk::Data& Chunk::GetData()
+    {
+        return blocks_;
     }
 }

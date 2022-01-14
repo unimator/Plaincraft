@@ -38,6 +38,7 @@ SOFTWARE.
 
 #include "../src/plaincraft/common/exceptions/not_implemented_exception.hpp"
 
-#include "../src/plaincraft/common/profiling/profiler.hpp"
+#include "../src/plaincraft/common/debugging/logging/logger.hpp"
+#include "../src/plaincraft/common/debugging/profiling/profiler.hpp"
 
 #endif // PLAINCRAFT_COMMON_PLAINCRAFT_COMMON

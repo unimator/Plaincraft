@@ -66,17 +66,17 @@ namespace plaincraft_core
 		// logger->addStreamDestination(std::cout, log_level, rp3d::DefaultLogger::Format::Text);
 		// physics_common_.setLogger(logger);
 
-		auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/cube_half.obj");
+		auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube_half.obj");
 		auto cube_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model_obj.data())));
 		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
 		models_cache_.Store("cube_half", std::move(cube_model));
 
-		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/sphere_half.obj");
+		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/sphere_half.obj");
 		auto sphere_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(sphere_model_obj.data())));
 		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
 		models_cache_.Store("sphere_half", std::move(sphere_model));
 
-		auto capsule_model_obj = read_file_raw("F:/Projekty/Plaincraft/Models/capsule_half.obj");
+		auto capsule_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/capsule_half.obj");
 		auto capsule_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(capsule_model_obj.data())));
 		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
 		models_cache_.Store("capsule_half", std::move(capsule_model));
@@ -86,7 +86,7 @@ namespace plaincraft_core
 		player = std::make_shared<Entity>();
 		player->SetName("player");
 
-		const auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\player.png");
+		const auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/player.png");
 		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
 
 		auto player_model = models_cache_.Fetch("capsule_half");
@@ -165,6 +165,16 @@ namespace plaincraft_core
 				scene_.UpdateFrame();
 			});
 
+			auto player = scene_.FindEntityByName("player");
+			if(player != nullptr) 
+			{				
+				auto player_position = player->GetRigidBody()->getTransform().getPosition();
+				const char* format = "(%f, %f, %f)";
+				size_t size = std::snprintf(nullptr, 0, format, player_position.x, player_position.y, player_position.z);
+				std::vector<char> buffer(size + 1);
+				std::snprintf(&buffer[0], buffer.size(), format, player_position.x, player_position.y, player_position.z);
+				LOGVALUE("player position", std::string(buffer.begin(), buffer.end()));
+			}
 			loop_events_handler_.loop_event_trigger.Trigger(delta_time);
 
 			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);

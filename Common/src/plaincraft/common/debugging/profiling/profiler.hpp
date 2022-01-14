@@ -27,7 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_COMMON_PROFILER
 #define PLAINCRAFT_COMMON_PROFILER
 
-#include "../utils/fixed_list.hpp"
+#include "../../utils/fixed_list.hpp"
 #include <string>
 #include <chrono>
 #include <array>
@@ -35,8 +35,8 @@ SOFTWARE.
 
 namespace plaincraft_common
 {
-    
     constexpr uint32_t profiling_history_length = 60 * 10;
+
     class Profiler final
     {
     private:

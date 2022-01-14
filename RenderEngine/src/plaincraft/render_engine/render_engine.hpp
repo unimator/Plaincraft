@@ -57,7 +57,8 @@ namespace plaincraft_render_engine {
 		auto GetCamera() const -> const std::shared_ptr<Camera>& { return camera_; }
 		auto GetWindow() -> std::shared_ptr<Window> { return window_; }
 		
-		void AddDrawable(std::shared_ptr<Drawable> drawable);
+		void AddDrawable(std::shared_ptr<Drawable> drawable_to_add);
+		void RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove);
 
 		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
 		auto GetTexturesFactory() const -> std::shared_ptr<TexturesFactory> { return textures_factory_; }

@@ -24,24 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET
+#ifndef PLAINCRAFT_COMMON_LOGGER
+#define PLAINCRAFT_COMMON_LOGGER
 
-#include "../../vulkan_gui_widget.hpp"
+#include <string>
+#include <map>
 
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_common
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    class Logger final
     {
     public:
-        VulkanDiagnosticWidget();
-
-        void Draw() override;
+        using LogValues = std::map<std::string, std::string>;
 
     private:
-        void RenderProfiling();
-        void RenderLogValues();
+        static Logger instance_;
+
+        Logger();
+
+        LogValues values_;
+
+    public:
+        static Logger& GetInstance();
+
+        static void LogValue(std::string key, std::string value);
+        static LogValues& GetValues();
     };
+
+#ifndef NDEBUG
+#define LOGVALUE(key, value) \
+    Logger::LogValue(key, value);
+#else
+#define LOGVALUE(key, value)
+#endif
+
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIGET
+#endif // PLAINCRAFT_COMMON_LOGGER

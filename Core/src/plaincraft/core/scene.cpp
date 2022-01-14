@@ -49,22 +49,39 @@ namespace plaincraft_core
 
 	Scene::~Scene()
 	{
+		entities_list_.clear();
 	}
 
-	void Scene::AddEntity(std::shared_ptr<Entity> entity)
+	void Scene::AddEntity(std::shared_ptr<Entity> entity_to_add)
 	{
-		entities_list_.push_back(entity);
+		entities_list_.push_back(entity_to_add);
 
-		auto rigid_body = entity->GetRigidBody();
+		auto rigid_body = entity_to_add->GetRigidBody();
 		if (rigid_body != nullptr)
 		{
-			const rp3d::Transform &transform = entity->GetRigidBody()->getTransform();
-			previous_transforms_.insert({entity, transform});
+			const rp3d::Transform &transform = entity_to_add->GetRigidBody()->getTransform();
+			previous_transforms_.insert({entity_to_add, transform});
 		}
 
-		if (entity->GetDrawable() != nullptr)
+		if (entity_to_add->GetDrawable() != nullptr)
 		{
-			render_engine_->AddDrawable(entity->GetDrawable());
+			render_engine_->AddDrawable(entity_to_add->GetDrawable());
+		}
+	}
+
+	void Scene::RemoveEntity(std::shared_ptr<Entity> entity_to_remove)
+	{
+		entities_list_.remove_if([&](std::shared_ptr<Entity> const &entity)
+								 { return entity == entity_to_remove; });
+		auto rigid_body = entity_to_remove->GetRigidBody();
+		if(rigid_body != nullptr)
+		{
+			previous_transforms_.erase(previous_transforms_.find(entity_to_remove));
+		}
+
+		if(entity_to_remove->GetDrawable() != nullptr)
+		{
+			render_engine_->RemoveDrawable(entity_to_remove->GetDrawable());
 		}
 	}
 
@@ -86,7 +103,7 @@ namespace plaincraft_core
 		{
 			const auto rb = entity->GetRigidBody();
 
-			if(rb == nullptr)
+			if (rb == nullptr)
 			{
 				continue;
 			}

@@ -51,7 +51,8 @@ namespace plaincraft_render_engine_vulkan
 		  surface_(GetVulkanWindow()->CreateSurface(instance_.GetInstance())),
 		  device_(VulkanDevice(instance_, surface_))
 	{
-		auto image = load_bmp_image_from_file("C:\\Users\\unima\\OneDrive\\Pulpit\\text.png");
+		auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/text.png");
+		
 		texture_image_ = std::make_unique<VulkanTexture>(device_, image);
 		texture_image_view_ = std::make_unique<VulkanImageView>(device_, texture_image_->GetImage(), VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 
@@ -294,6 +295,7 @@ namespace plaincraft_render_engine_vulkan
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto drawable = drawables_list_[i];
+
 			scene_renderer_->Batch(drawable);
 			auto color = drawable->GetColor();
 			const auto scale = drawable->GetScale();
