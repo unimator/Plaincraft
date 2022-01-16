@@ -42,13 +42,17 @@ namespace plaincraft_render_engine {
 		Model(std::shared_ptr<Mesh const> mesh);
 		Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture);
 
+		Model(const Model& other) = delete;
+		Model& operator=(const Model& other) = delete;
+
+		Model(Model&& other) noexcept;
+		Model& operator=(Model&& other) noexcept;
+
 		virtual ~Model() { }
 
-		auto GetMesh() -> std::shared_ptr<Mesh const> { return mesh_; }
-		auto GetTexture() -> std::shared_ptr<Texture const> { return texture_; }
+		std::shared_ptr<Mesh const> GetMesh();
+		std::shared_ptr<Texture const> GetTexture();
 	};
 }
-
-
 
 #endif // PLAINCRAFT_RENDER_ENGINE_MODEL

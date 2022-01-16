@@ -24,22 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_COMMON_SYSTEM_TYPES_GLM
-#define PLAINCRAFT_COMMON_SYSTEM_TYPES_GLM
+#include "block.hpp"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-
-
-namespace plaincraft_common {
-	using Vector3d = glm::vec3;
-	using I32Vector3d = glm::i32vec3;
-
-	using Quaternion = glm::quat;
-
-	template <typename... Args>
-	auto Rotate(Args&&... args) -> decltype(glm::rotate(std::forward<Args>(args)...)) {
-		return glm::rotate(std::forward<Args>(args)...);
-	}
+namespace plaincraft_core
+{
+    Block::Block(I32Vector3d position)
+        : position_(position)
+    {
+    }
 }
-#endif // PLAINCRAFT_COMMON_SYSTEM_TYPES_GLM

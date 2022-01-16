@@ -35,13 +35,17 @@ namespace plaincraft_core
 {
     using namespace plaincraft_render_engine;
 
+    class ModelsCache;
+
     class Chunk
     {
     public:
-        static constexpr size_t chunk_size = 2;
-        static constexpr size_t chunk_height = 8;
+        static constexpr uint32_t chunk_size = 8;
+        static constexpr uint32_t chunk_height = 8;
 
-        using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_size>, chunk_height>;
+        static constexpr const char* chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
+
+        using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
 
     private:
         Data blocks_;
@@ -53,7 +57,7 @@ namespace plaincraft_core
         Chunk(int32_t position_x, int32_t position_y, Data&& blocks);
         Chunk(Chunk&& other) noexcept;
 
-        void OrganizeMesh();
+        void OrganizeMesh(std::unique_ptr<ModelsFactory>& models_factory, ModelsCache& models_cache);
 
         int32_t GetPositionX() const;
         int32_t GetPositionY() const;

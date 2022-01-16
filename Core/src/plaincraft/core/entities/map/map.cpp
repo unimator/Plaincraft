@@ -36,6 +36,7 @@ namespace plaincraft_core
           origin_entity_(origin_entity)
     {
         ReloadGrid();
+        OptimizeChunks();
     }
 
     void Map::OnLoopTick(float delta_time)
@@ -65,6 +66,7 @@ namespace plaincraft_core
         || origin_position.z > static_cast<float>(higher_boundary_y) + Chunk::chunk_size)
         {
             ReloadGrid();
+            OptimizeChunks();
         }
     }
 
@@ -103,7 +105,7 @@ namespace plaincraft_core
 
                 if (chunk == nullptr)
                 {
-                    chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(Vector3d(current_x, 0, current_y)));
+                    chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_y)));
                 }
 
                 ++current_x;
@@ -124,5 +126,16 @@ namespace plaincraft_core
         }
 
         grid_ = std::move(new_grid);
+    }
+
+    void Map::OptimizeChunks()
+    {
+        for(auto& row: grid_)
+        {
+            for(auto& chunk: row)
+            {
+                chunk->OrganizeMesh(world_generator_.render_engine_->GetModelsFactory(), world_generator_.models_cache_);
+            }
+        }
     }
 }

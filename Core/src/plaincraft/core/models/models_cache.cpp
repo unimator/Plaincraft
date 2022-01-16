@@ -38,6 +38,11 @@ namespace plaincraft_core {
         return models_[name];
     }
 
+    bool ModelsCache::Contains(std::string name)
+    {
+        return models_.contains(name);
+    }
+
     void ModelsCache::Remove(std::string name)
     {
         models_.erase(name);

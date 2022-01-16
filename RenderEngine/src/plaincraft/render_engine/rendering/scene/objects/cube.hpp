@@ -27,16 +27,29 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_CUBE
 #define PLAINCRAFT_RENDER_ENGINE_CUBE
 #include "mesh.hpp"
+#include <set>
 
 namespace plaincraft_render_engine
 {
-	class Cube : public Mesh
+	class Cube final : public Mesh
 	{
+	public:
+		enum Faces
+		{
+			PositiveX,
+			NegativeX,
+			PositiveY,
+			NegativeY,
+			PositiveZ,
+			NegativeZ
+		};
+
 	public:
 		Cube();
 		~Cube();
+
+		void FaceOptimize(std::set<Faces> visible_faces);
 	};
 }
-
 
 #endif // PLAINCRAFT_RENDER_ENGINE_CUBE

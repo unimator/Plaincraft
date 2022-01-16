@@ -26,10 +26,40 @@ SOFTWARE.
 
 #include "model.hpp"
 
-namespace plaincraft_render_engine {
+namespace plaincraft_render_engine
+{
 	Model::Model() {}
 
 	Model::Model(std::shared_ptr<Mesh const> mesh) : mesh_(mesh) {}
 
 	Model::Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) : mesh_(mesh), texture_(texture) {}
+
+	Model::Model(Model &&other) noexcept
+		: mesh_(std::move(other.mesh_)),
+		  texture_(std::move(other.texture_))
+	{
+	}
+
+	Model &Model::operator=(Model &&other) noexcept
+	{
+		if (this == &other)
+		{
+			return *this;
+		}
+
+		this->mesh_ = std::move(other.mesh_);
+		this->texture_ = std::move(other.texture_);
+
+		return *this;
+	}
+
+	std::shared_ptr<Mesh const> Model::GetMesh()
+	{
+		return mesh_;
+	}
+
+	std::shared_ptr<Texture const> Model::GetTexture()
+	{
+		return texture_;
+	}
 }

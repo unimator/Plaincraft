@@ -31,9 +31,19 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
+    class Map;
+    class Chunk;
+
     class Block : public Entity
     {
+    friend class Map;
+    friend class Chunk;
 
+    private:
+        I32Vector3d position_;
+
+    public:
+        Block(I32Vector3d position);
     };
 }
 

@@ -30,6 +30,7 @@ SOFTWARE.
 #include <plaincraft_render_engine.hpp>
 #include <plaincraft_render_engine_opengl.hpp>
 #include <cmath>
+#include <random>
 
 namespace plaincraft_core
 {
@@ -46,27 +47,105 @@ namespace plaincraft_core
 	{
 	}
 
-	Chunk WorldGenerator::CreateChunk(Vector3d offset)
+	Chunk WorldGenerator::CreateChunk(I32Vector3d offset)
 	{
 		const auto model = models_cache_.Fetch("cube_half");
 
 		auto chunk_data = Chunk::Data();
 		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 
-		int32_t i = 0, j = 0;
-		for (auto &plane : chunk_data)
+		std::shared_ptr<Block> entity;
+		// auto entity = std::make_shared<Block>(offset + I32Vector3d(0, 0, 1));
+
+		// auto create_block = [&](I32Vector3d relative_position) -> std::shared_ptr<Block>
+		// {
+		// 	auto entity = std::make_shared<Block>(offset + relative_position);
+		// 	auto drawable = std::make_shared<Drawable>();
+		// 	drawable->SetModel(model);
+		// 	entity->SetDrawable(drawable);
+
+		// 	// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
+		// 	auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + relative_position.x * 1.0;
+		// 	auto y = static_cast<int32_t>(Chunk::chunk_size) * offset.y + relative_position.y * 1.0;
+		// 	auto z = static_cast<int32_t>(Chunk::chunk_size) * offset.z + relative_position.z * 1.0;
+		// 	auto position = Vector3d(x, y, z);
+		// 	auto orientation = rp3d::Quaternion::identity();
+		// 	rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
+		// 	auto rigid_body = physics_world_->createRigidBody(transform);
+		// 	auto collider = rigid_body->addCollider(cube_shape, transform);
+		// 	rigid_body->setType(rp3d::BodyType::STATIC);
+		// 	rigid_body->enableGravity(false);
+		// 	rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
+		// 	entity->SetRigidBody(rigid_body);
+
+		// 	// body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
+		// 	// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+		// 	// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+		// 	// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+		// 	float r = static_cast<float>((rand() % 100) / 100.0f);
+		// 	float g = static_cast<float>((rand() % 100) / 100.0f);
+		// 	float b = static_cast<float>((rand() % 100) / 100.0f);
+		// 	auto color = glm::vec3(r, g, b);
+		// 	entity->SetColor(color);
+
+		// 	scene_.AddEntity(entity);
+		// 	chunk_data[relative_position.x][relative_position.y][relative_position.z] = entity;
+
+		// 	return entity;
+		// };
+
+		// create_block(I32Vector3d(0, 0, 0));
+		// create_block(I32Vector3d(0, 0, Chunk::chunk_size - 1));
+		// create_block(I32Vector3d(0, Chunk::chunk_height - 1, 0));
+		// create_block(I32Vector3d(Chunk::chunk_size - 1, 0, 0));
+		// create_block(I32Vector3d(Chunk::chunk_size - 1, 0, Chunk::chunk_size - 1));
+		// create_block(I32Vector3d(0, Chunk::chunk_height - 1, Chunk::chunk_size - 1));
+		// // create_block(I32Vector3d(Chunk::chunk_size - 1, Chunk::chunk_height - 1, 0));
+		// // create_block(I32Vector3d(Chunk::chunk_size - 1, Chunk::chunk_height - 1, Chunk::chunk_size - 1));
+
+		// create_block(I32Vector3d(1, 2, 2));
+		// create_block(I32Vector3d(3, 2, 2));
+		// create_block(I32Vector3d(4, 2, 2));
+		// create_block(I32Vector3d(5, 2, 2));
+		// create_block(I32Vector3d(2, 1, 2));
+		// create_block(I32Vector3d(2, 3, 2));
+		// create_block(I32Vector3d(2, 2, 1));
+		// create_block(I32Vector3d(2, 2, 3));
+		// create_block(I32Vector3d(2, 2, 4));
+		// create_block(I32Vector3d(2, 2, 5));
+		// create_block(I32Vector3d(2, 2, 2));
+
+		float r = static_cast<float>((rand() % 255) / 255.0f);
+		float g = static_cast<float>((rand() % 255) / 255.0f);
+		float b = static_cast<float>((rand() % 255) / 255.0f);
+		auto color = glm::vec3(r, g, b);
+
+		for (auto i = 0; i < Chunk::chunk_size; ++i)
 		{
-			for (auto &row : plane)
+			for (auto j = 0; j < Chunk::chunk_height; ++j)
 			{
-				for (auto &block : row)
+				if (j > 2)
 				{
-					auto entity = std::make_shared<Block>();
+					continue;
+				}
+
+				for (auto k = 0; k < Chunk::chunk_size; ++k)
+				{
+					if ((rand() % 100) < 65)
+					{
+						continue;
+					}
+
+					auto entity = std::make_shared<Block>(offset + I32Vector3d(i, j, k));
 					auto drawable = std::make_shared<Drawable>();
 					drawable->SetModel(model);
 					entity->SetDrawable(drawable);
 
 					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
-					auto position = Vector3d(Chunk::chunk_size * offset.x + i * 1.0f, round(2 * sin(offset.x) * cos(offset.z)), Chunk::chunk_size * offset.z + j * 1.0f);
+					auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + i * 1.0;
+					auto y = static_cast<int32_t>(Chunk::chunk_size) * offset.y + j * 1.0;
+					auto z = static_cast<int32_t>(Chunk::chunk_size) * offset.z + k * 1.0;
+					auto position = Vector3d(x, y, z);
 					auto orientation = rp3d::Quaternion::identity();
 					rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 					auto rigid_body = physics_world_->createRigidBody(transform);
@@ -80,21 +159,14 @@ namespace plaincraft_core
 					// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 					// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 					// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-					float r = static_cast<float>(offset.x * offset.x / 10.0f);
-					float g = static_cast<float>(offset.y);
-					float b = static_cast<float>(offset.z * offset.z / 10.0f);
-					auto color = glm::vec3(r, g, b);
+
 					entity->SetColor(color);
 
 					scene_.AddEntity(entity);
 
-					block = entity;
-					
-					++j;
+					chunk_data[i][j][k] = entity;
 				}
-				++i;
 			}
-			break;
 		}
 
 		auto position_x = static_cast<int32_t>(offset.x);
@@ -105,23 +177,23 @@ namespace plaincraft_core
 
 	void WorldGenerator::DisposeChunk(std::unique_ptr<Chunk> chunk)
 	{
-		auto& blocks = chunk->GetData();
+		auto &blocks = chunk->GetData();
 		if (!blocks.empty())
-        {
-            for (auto &plane : blocks)
-            {
-                for (auto &row : plane)
-                {
-                    for (auto &block : row)
-                    {
-                        if(block != nullptr)
-                        {
-                            scene_.RemoveEntity(block);
+		{
+			for (auto &plane : blocks)
+			{
+				for (auto &row : plane)
+				{
+					for (auto &block : row)
+					{
+						if (block != nullptr)
+						{
+							scene_.RemoveEntity(block);
 							physics_world_->destroyRigidBody(block->GetRigidBody());
-                        }
-                    }
-                }
-            }
-        }
+						}
+					}
+				}
+			}
+		}
 	}
 }

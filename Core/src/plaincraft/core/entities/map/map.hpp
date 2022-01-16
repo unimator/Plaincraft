@@ -40,7 +40,7 @@ namespace plaincraft_core
         using ChunksRow = std::vector<std::unique_ptr<Chunk>>;
         using ChunksGrid = std::vector<ChunksRow>;
 
-        static constexpr size_t map_size = 8;
+        static constexpr uint32_t map_size = 4;
 
     private:
         ChunksGrid grid_;
@@ -55,6 +55,7 @@ namespace plaincraft_core
 
     private:
         void ReloadGrid();
+        void OptimizeChunks();
     };
 }
 

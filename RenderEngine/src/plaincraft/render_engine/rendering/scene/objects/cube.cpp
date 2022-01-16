@@ -26,10 +26,11 @@ SOFTWARE.
 
 #include "cube.hpp"
 
-namespace plaincraft_render_engine {
-	Cube::Cube() {
-		vertices_ = std::vector<Vertex>
-		{
+namespace plaincraft_render_engine
+{
+	Cube::Cube()
+	{
+		vertices_ = std::vector<Vertex>{
 			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.5f}},
 			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.5f, 0.5f}},
 			{{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.5f, 0.0f}},
@@ -44,7 +45,7 @@ namespace plaincraft_render_engine {
 			{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
 			{{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.5f, 0.0f}},
 			{{-0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.5f, 0.5f}},
-			
+
 			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.5f}},
 			{{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
 			{{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.5f, 0.0f}},
@@ -62,8 +63,8 @@ namespace plaincraft_render_engine {
 		};
 
 		indices_ = std::vector<uint32_t>();
-
-		for (auto i = 0; i < 6; ++i) {
+		for (auto i = 0; i < 6; ++i)
+		{
 			indices_.push_back(0 + 4 * i);
 			indices_.push_back(1 + 4 * i);
 			indices_.push_back(2 + 4 * i);
@@ -75,6 +76,78 @@ namespace plaincraft_render_engine {
 
 	Cube::~Cube()
 	{
+	}
 
+	void Cube::FaceOptimize(std::set<Faces> visible_faces)
+	{
+		vertices_ = std::vector<Vertex>();
+
+		for (auto face : visible_faces)
+		{
+			switch (face)
+			{
+			case Faces::PositiveX:
+			{
+				vertices_.push_back({{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.5f}});
+				vertices_.push_back({{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}});
+				vertices_.push_back({{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.5f, 0.0f}});
+				vertices_.push_back({{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.5f, 0.5f}});
+				break;
+			}
+			case Faces::NegativeX:
+			{
+				vertices_.push_back({{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.5f}});
+				vertices_.push_back({{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}});
+				vertices_.push_back({{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.5f, 0.0f}});
+				vertices_.push_back({{-0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.5f, 0.5f}});
+				break;
+			}
+			case Faces::PositiveY:
+			{
+				vertices_.push_back({{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.5f}});
+				vertices_.push_back({{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.5f, 0.5f}});
+				vertices_.push_back({{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.5f, 1.0f}});
+				vertices_.push_back({{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}});
+				break;
+			}
+			case Faces::NegativeY:
+			{
+				vertices_.push_back({{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.5f, 0.0f}});
+				vertices_.push_back({{-0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}});
+				vertices_.push_back({{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.5f}});
+				vertices_.push_back({{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.5f, 0.5f}});
+				break;
+			}
+			case Faces::PositiveZ:
+			{
+				vertices_.push_back({{-0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.5f}});
+				vertices_.push_back({{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}});
+				vertices_.push_back({{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 0.0f}});
+				vertices_.push_back({{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 0.5f}});
+				break;
+			}
+			case Faces::NegativeZ:
+			{
+				vertices_.push_back({{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.5f}});
+				vertices_.push_back({{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.5f, 0.5f}});
+				vertices_.push_back({{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.5f, 0.0f}});
+				vertices_.push_back({{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}});
+				break;
+			}
+			}
+		}
+
+		indices_ = std::vector<uint32_t>();
+		for(auto i = 0; i < visible_faces.size(); ++i)
+		{
+			
+			indices_.push_back(2 + 4 * i);
+			indices_.push_back(1 + 4 * i);
+			indices_.push_back(0 + 4 * i);
+
+			indices_.push_back(2 + 4 * i);
+			indices_.push_back(0 + 4 * i);
+			indices_.push_back(3 + 4 * i);
+		}
 	}
 }

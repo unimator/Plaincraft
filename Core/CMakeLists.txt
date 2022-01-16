@@ -21,6 +21,7 @@ PRIVATE
     src/plaincraft/core/camera_operators/camera_operator.cpp
     src/plaincraft/core/camera_operators/camera_operator.hpp
     src/plaincraft/core/components/component.hpp
+    src/plaincraft/core/entities/blocks/block.cpp
     src/plaincraft/core/entities/blocks/block.hpp
     src/plaincraft/core/entities/blocks/dirt.cpp
     src/plaincraft/core/entities/blocks/dirt.hpp

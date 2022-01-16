@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 #include "chunk.hpp"
+#include "../../models/models_cache.hpp"
+#include <set>
 #include <iostream>
 
 namespace plaincraft_core
@@ -53,8 +55,105 @@ namespace plaincraft_core
         return pos_y_;
     }
 
-    Chunk::Data& Chunk::GetData()
+    Chunk::Data &Chunk::GetData()
     {
         return blocks_;
+    }
+
+    void Chunk::OrganizeMesh(std::unique_ptr<ModelsFactory>& models_factory, ModelsCache &models_cache)
+    {
+        for (auto x = 0; x < chunk_size; ++x)
+        {
+            for (auto y = 0; y < chunk_height; ++y)
+            {
+                for (auto z = 0; z < chunk_size; ++z)
+                {
+                    std::set<Cube::Faces> visible_faces;
+                    auto block = blocks_[x][y][z];
+
+                    if (block == nullptr)
+                    {
+                        continue;
+                    }
+
+                    // X axis check
+                    if (x > 0 && blocks_[x - 1][y][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::NegativeX);
+                    }
+                    if (x < chunk_size - 1 && blocks_[x + 1][y][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::PositiveX);
+                    }
+
+                    // Y axis check
+                    if (y > 0 && blocks_[x][y - 1][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::NegativeY);
+                    }
+                    if (y < chunk_height - 1 && blocks_[x][y + 1][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::PositiveY);
+                    }
+
+                    // Z axis check
+                    if (z > 0 && blocks_[x][y][z - 1] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::NegativeZ);
+                    }
+                    if (z < chunk_size - 1 && blocks_[x][y][z + 1] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::PositiveZ);
+                    }
+
+                    auto cube_faces_hash = [](std::set<Cube::Faces> &visible_faces) -> std::string
+                    {
+                        std::vector<char> buffer(strlen(chunk_model_name_template) + 1);
+                        sprintf(buffer.data(),
+                                chunk_model_name_template,
+                                visible_faces.contains(Cube::Faces::PositiveX),
+                                visible_faces.contains(Cube::Faces::NegativeX),
+                                visible_faces.contains(Cube::Faces::PositiveY),
+                                visible_faces.contains(Cube::Faces::NegativeY),
+                                visible_faces.contains(Cube::Faces::PositiveZ),
+                                visible_faces.contains(Cube::Faces::NegativeZ));
+                        return std::string(buffer.data());
+                    };
+
+                    auto drawable = block->GetDrawable();
+                    if(visible_faces.size() == 0)
+                    {
+                        drawable->SetModel(nullptr);
+                        continue;
+                    }
+                    auto old_model = drawable->GetModel().lock();
+                    // visible_faces = std::set<Cube::Faces>{
+                    //     Cube::Faces::PositiveX,
+                    //     Cube::Faces::NegativeX,
+                    //     Cube::Faces::PositiveY,
+                    //     Cube::Faces::NegativeY,
+                    //     Cube::Faces::PositiveZ,
+                    //     Cube::Faces::NegativeZ};
+
+                    std::shared_ptr<plaincraft_render_engine::Model> new_model;
+                    auto hashed_name = cube_faces_hash(visible_faces);
+                    if (!models_cache.Contains(hashed_name))
+                    {
+                        auto cube = std::make_shared<plaincraft_render_engine::Cube>();
+                        cube->FaceOptimize(visible_faces);
+                        models_cache.Store(hashed_name, std::move(models_factory->CreateModel(std::move(cube), old_model->GetTexture())));
+                    }
+                    new_model = models_cache.Fetch(hashed_name);
+
+                    drawable->SetModel(new_model);
+
+                    // auto drawable = std::dynamic_pointer_cast<plaincraft_render_engine::Cube>();
+                    // if (drawable != nullptr)
+                    // {
+                    //     drawable->FaceOptimize(visible_faces);
+                    // }
+                }
+            }
+        }
     }
 }

@@ -47,6 +47,7 @@ namespace plaincraft_core {
 
         void Store(std::string name, std::shared_ptr<Model> model);
         std::shared_ptr<Model> Fetch(std::string name);
+        bool Contains(std::string name);
         void Remove(std::string name);
     };
 }

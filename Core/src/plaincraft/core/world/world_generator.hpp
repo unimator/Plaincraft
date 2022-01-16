@@ -45,7 +45,7 @@ namespace plaincraft_core
 			Scene& scene,
 			ModelsCache& models_cache);
 
-		Chunk CreateChunk(Vector3d offset);
+		Chunk CreateChunk(I32Vector3d offset);
 		void DisposeChunk(std::unique_ptr<Chunk> chunk);
 	};
 }
