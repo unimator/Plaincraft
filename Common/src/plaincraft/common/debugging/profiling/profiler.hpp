@@ -86,6 +86,8 @@ namespace plaincraft_common
         static void End(ProfileInfo &profile_info);
     };
 
+
+
 #ifndef NDEBUG
 #define MEASURE(name_param, code) \
     {                             \

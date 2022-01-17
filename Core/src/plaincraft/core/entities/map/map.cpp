@@ -94,24 +94,26 @@ namespace plaincraft_core
         {
             row = ChunksRow(map_size);
 
-            current_x = start_x;
+            current_y = start_y;
 
             for (auto &chunk : row)
             {
-                // if (!grid_.empty() && current_x < old_grid_start_x + map_size && current_y < old_grid_start_y)
-                // {
-                //     chunk = std::move(grid_[current_x - old_grid_start_x][current_y - old_grid_start_y]);
-                // }
+                if (!grid_.empty() 
+                    && current_x < old_grid_start_x + static_cast<int32_t>(map_size) && current_x >= old_grid_start_x 
+                    && current_y < old_grid_start_y + static_cast<int32_t>(map_size) && current_y >= old_grid_start_y)
+                {
+                    chunk = std::move(grid_[current_x - old_grid_start_x][current_y - old_grid_start_y]);
+                }
 
                 if (chunk == nullptr)
                 {
                     chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_y)));
                 }
 
-                ++current_x;
+                ++current_y;
             }
 
-            ++current_y;
+            ++current_x;
         }
 
         if (!grid_.empty())
@@ -120,7 +122,10 @@ namespace plaincraft_core
             {
                 for(auto& chunk: row)
                 {
-                    world_generator_.DisposeChunk(std::move(chunk));
+                    if(chunk != nullptr)
+                    {
+                        world_generator_.DisposeChunk(std::move(chunk));
+                    }
                 }
             }
         }

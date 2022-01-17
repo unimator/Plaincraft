@@ -119,5 +119,10 @@ namespace plaincraft_core
 
 			previous_transforms_[entity] = transform;
 		}
+
+		auto l = snprintf(nullptr, 0, "%zd", entities_list_.size());
+		std::vector<char> buf(l + 1);
+		snprintf(&buf[0], l + 1, "%d", entities_list_.size());
+		LOGVALUE("Entities count", std::string(buf.begin(), buf.end()));
 	}
 }

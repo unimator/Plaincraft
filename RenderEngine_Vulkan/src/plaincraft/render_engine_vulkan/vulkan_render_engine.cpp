@@ -52,7 +52,7 @@ namespace plaincraft_render_engine_vulkan
 		  device_(VulkanDevice(instance_, surface_))
 	{
 		auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/text.png");
-		
+
 		texture_image_ = std::make_unique<VulkanTexture>(device_, image);
 		texture_image_view_ = std::make_unique<VulkanImageView>(device_, texture_image_->GetImage(), VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 
@@ -74,12 +74,12 @@ namespace plaincraft_render_engine_vulkan
 			vkDestroyFence(device_.GetDevice(), in_flight_fences_[i], nullptr);
 		}
 
-		if(gui_renderer_ != nullptr)
+		if (gui_renderer_ != nullptr)
 		{
 			gui_renderer_.reset();
 		}
 
-		if(swapchain_ != nullptr)
+		if (swapchain_ != nullptr)
 		{
 			swapchain_.reset(); // swapchain has to be destroyed before surface is released
 		}
@@ -163,7 +163,7 @@ namespace plaincraft_render_engine_vulkan
 							   .AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
 							   .Build();
 
-		if(gui_renderer_ == nullptr) 
+		if (gui_renderer_ == nullptr)
 		{
 			gui_renderer_ = std::make_unique<VulkanGuiRenderer>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass());
 		}
@@ -319,7 +319,7 @@ namespace plaincraft_render_engine_vulkan
 			command_buffer,
 			descriptor_sets_[image_index],
 			alignment_size};
-		
+
 		vulkan_renderer->Render(frame_config);
 		vulkan_renderer->HasRendered();
 

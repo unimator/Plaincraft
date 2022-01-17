@@ -131,12 +131,12 @@ namespace plaincraft_core
 
 				for (auto k = 0; k < Chunk::chunk_size; ++k)
 				{
-					if ((rand() % 100) < 65)
+					if ((rand() % 100) < 35)
 					{
 						continue;
 					}
 
-					auto entity = std::make_shared<Block>(offset + I32Vector3d(i, j, k));
+					auto entity = std::make_shared<Block>(I32Vector3d(i, j, k));
 					auto drawable = std::make_shared<Drawable>();
 					drawable->SetModel(model);
 					entity->SetDrawable(drawable);
@@ -154,11 +154,6 @@ namespace plaincraft_core
 					rigid_body->enableGravity(false);
 					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
 					entity->SetRigidBody(rigid_body);
-
-					// body->SetPosition(Vector3d(i * 1.0f, sin(i * 0.25f) * cos(j * 0.25f), j * 1.0f));
-					// float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-					// float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-					// float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
 					entity->SetColor(color);
 
@@ -178,6 +173,7 @@ namespace plaincraft_core
 	void WorldGenerator::DisposeChunk(std::unique_ptr<Chunk> chunk)
 	{
 		auto &blocks = chunk->GetData();
+		auto entities_deleted = 0;
 		if (!blocks.empty())
 		{
 			for (auto &plane : blocks)
@@ -190,10 +186,12 @@ namespace plaincraft_core
 						{
 							scene_.RemoveEntity(block);
 							physics_world_->destroyRigidBody(block->GetRigidBody());
+							++entities_deleted;
 						}
 					}
 				}
 			}
 		}
+		std::cout << "entities deleted: " << entities_deleted << std::endl;
 	}
 }

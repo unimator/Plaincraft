@@ -40,7 +40,7 @@ namespace plaincraft_core
     class Chunk
     {
     public:
-        static constexpr uint32_t chunk_size = 8;
+        static constexpr uint32_t chunk_size = 4;
         static constexpr uint32_t chunk_height = 8;
 
         static constexpr const char* chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
