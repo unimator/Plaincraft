@@ -96,7 +96,7 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(1.75f, 5.75f, 1.25f);
+		auto player_position = Vector3d(5.75f, 5.75f, 1.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);

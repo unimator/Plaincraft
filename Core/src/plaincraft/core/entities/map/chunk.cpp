@@ -32,17 +32,17 @@ SOFTWARE.
 namespace plaincraft_core
 {
     Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
-        : pos_x_(position_x), pos_y_(position_y), blocks_(std::move(blocks))
+        : pos_x_(position_x), pos_z_(position_y), blocks_(std::move(blocks))
     {
     }
 
     Chunk::Chunk(Chunk &&other) noexcept
         : pos_x_(other.pos_x_),
-          pos_y_(other.pos_y_),
+          pos_z_(other.pos_z_),
           blocks_(std::move(other.blocks_))
     {
         other.pos_x_ = 0;
-        other.pos_y_ = 0;
+        other.pos_z_ = 0;
     }
 
     int32_t Chunk::GetPositionX() const
@@ -50,9 +50,9 @@ namespace plaincraft_core
         return pos_x_;
     }
 
-    int32_t Chunk::GetPositionY() const
+    int32_t Chunk::GetPositionZ() const
     {
-        return pos_y_;
+        return pos_z_;
     }
 
     Chunk::Data &Chunk::GetData()
@@ -60,7 +60,12 @@ namespace plaincraft_core
         return blocks_;
     }
 
-    void Chunk::OrganizeMesh(std::unique_ptr<ModelsFactory>& models_factory, ModelsCache &models_cache)
+    void Chunk::OrganizeMesh(std::unique_ptr<ModelsFactory> &models_factory,
+                             ModelsCache &models_cache,
+                             std::optional<std::reference_wrapper<Chunk>> negative_x_chunk,
+                             std::optional<std::reference_wrapper<Chunk>> positive_x_chunk,
+                             std::optional<std::reference_wrapper<Chunk>> negative_z_chunk,
+                             std::optional<std::reference_wrapper<Chunk>> positive_z_chunk)
     {
         for (auto x = 0; x < chunk_size; ++x)
         {
@@ -77,11 +82,20 @@ namespace plaincraft_core
                     }
 
                     // X axis check
-                    if (x > 0 && blocks_[x - 1][y][z] == nullptr)
+                    if (x == 0 && negative_x_chunk.has_value() && negative_x_chunk.value().get().blocks_[chunk_size - 1][y][z] == nullptr)
                     {
                         visible_faces.insert(Cube::Faces::NegativeX);
                     }
-                    if (x < chunk_size - 1 && blocks_[x + 1][y][z] == nullptr)
+                    else if (x > 0 && blocks_[x - 1][y][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::NegativeX);
+                    }
+
+                    if (x == chunk_size - 1 && positive_x_chunk.has_value() && positive_x_chunk.value().get().blocks_[0][y][z] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::PositiveX);
+                    }
+                    else if (x < chunk_size - 1 && blocks_[x + 1][y][z] == nullptr)
                     {
                         visible_faces.insert(Cube::Faces::PositiveX);
                     }
@@ -97,11 +111,20 @@ namespace plaincraft_core
                     }
 
                     // Z axis check
-                    if (z > 0 && blocks_[x][y][z - 1] == nullptr)
+                    if (z == 0 && negative_z_chunk.has_value() && negative_z_chunk.value().get().blocks_[x][y][chunk_size - 1] == nullptr)
                     {
                         visible_faces.insert(Cube::Faces::NegativeZ);
                     }
-                    if (z < chunk_size - 1 && blocks_[x][y][z + 1] == nullptr)
+                    else if (z > 0 && blocks_[x][y][z - 1] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::NegativeZ);
+                    }
+
+                    if (z == chunk_size - 1 && positive_z_chunk.has_value() && positive_z_chunk.value().get().blocks_[x][y][0] == nullptr)
+                    {
+                        visible_faces.insert(Cube::Faces::PositiveZ);
+                    }
+                    else if (z < chunk_size - 1 && blocks_[x][y][z + 1] == nullptr)
                     {
                         visible_faces.insert(Cube::Faces::PositiveZ);
                     }
@@ -121,19 +144,12 @@ namespace plaincraft_core
                     };
 
                     auto drawable = block->GetDrawable();
-                    if(visible_faces.size() == 0)
+                    if (visible_faces.size() == 0)
                     {
                         drawable->SetModel(nullptr);
                         continue;
                     }
                     auto old_model = drawable->GetModel().lock();
-                    // visible_faces = std::set<Cube::Faces>{
-                    //     Cube::Faces::PositiveX,
-                    //     Cube::Faces::NegativeX,
-                    //     Cube::Faces::PositiveY,
-                    //     Cube::Faces::NegativeY,
-                    //     Cube::Faces::PositiveZ,
-                    //     Cube::Faces::NegativeZ};
 
                     std::shared_ptr<plaincraft_render_engine::Model> new_model;
                     auto hashed_name = cube_faces_hash(visible_faces);
@@ -146,12 +162,6 @@ namespace plaincraft_core
                     new_model = models_cache.Fetch(hashed_name);
 
                     drawable->SetModel(new_model);
-
-                    // auto drawable = std::dynamic_pointer_cast<plaincraft_render_engine::Cube>();
-                    // if (drawable != nullptr)
-                    // {
-                    //     drawable->FaceOptimize(visible_faces);
-                    // }
                 }
             }
         }

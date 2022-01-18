@@ -30,6 +30,8 @@ SOFTWARE.
 #include "../blocks/block.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <array>
+#include <optional>
+#include <functional>
 
 namespace plaincraft_core
 {
@@ -40,29 +42,35 @@ namespace plaincraft_core
     class Chunk
     {
     public:
-        static constexpr uint32_t chunk_size = 4;
+        static constexpr uint32_t chunk_size = 8;
         static constexpr uint32_t chunk_height = 8;
 
-        static constexpr const char* chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
+        static constexpr const char *chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
 
         using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
 
     private:
         Data blocks_;
 
-        int32_t pos_x_, pos_y_;
+        int32_t pos_x_, pos_z_;
         std::shared_ptr<Drawable> mesh_;
 
     public:
-        Chunk(int32_t position_x, int32_t position_y, Data&& blocks);
-        Chunk(Chunk&& other) noexcept;
+        Chunk(int32_t position_x, int32_t position_z, Data &&blocks);
+        Chunk(Chunk &&other) noexcept;
 
-        void OrganizeMesh(std::unique_ptr<ModelsFactory>& models_factory, ModelsCache& models_cache);
+        void OrganizeMesh(
+            std::unique_ptr<ModelsFactory> &models_factory,
+            ModelsCache &models_cache,
+            std::optional<std::reference_wrapper<Chunk>> negative_x_chunk = {},
+            std::optional<std::reference_wrapper<Chunk>> positive_x_chunk = {},
+            std::optional<std::reference_wrapper<Chunk>> negative_z_chunk = {},
+            std::optional<std::reference_wrapper<Chunk>> positive_z_chunk = {});
 
         int32_t GetPositionX() const;
-        int32_t GetPositionY() const;
+        int32_t GetPositionZ() const;
 
-        Data& GetData();
+        Data &GetData();
     };
 }
 

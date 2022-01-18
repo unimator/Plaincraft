@@ -55,7 +55,7 @@ namespace plaincraft_core
 
     private:
         void ReloadGrid();
-        void OptimizeChunks();
+        void OptimizeMap();
     };
 }
 

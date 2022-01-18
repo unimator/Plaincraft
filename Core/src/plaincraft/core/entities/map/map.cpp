@@ -36,7 +36,7 @@ namespace plaincraft_core
           origin_entity_(origin_entity)
     {
         ReloadGrid();
-        OptimizeChunks();
+        OptimizeMap();
     }
 
     void Map::OnLoopTick(float delta_time)
@@ -46,9 +46,9 @@ namespace plaincraft_core
         const auto &lower_chunk = grid_[0][0];
         const auto &higher_chunk = grid_[map_size - 1][map_size - 1];
         int32_t lower_boundary_x = lower_chunk->GetPositionX() * Chunk::chunk_size;
-        int32_t lower_boundary_y = lower_chunk->GetPositionY() * Chunk::chunk_size;
+        int32_t lower_boundary_y = lower_chunk->GetPositionZ() * Chunk::chunk_size;
         int32_t higher_boundary_x = higher_chunk->GetPositionX() * Chunk::chunk_size;
-        int32_t higher_boundary_y = higher_chunk->GetPositionY() * Chunk::chunk_size;
+        int32_t higher_boundary_y = higher_chunk->GetPositionZ() * Chunk::chunk_size;
 
         size_t s = snprintf(nullptr, 0, "(%d, %d)", lower_boundary_x, lower_boundary_y);
         std::vector<char> buffer_lower(s + 1);
@@ -66,7 +66,7 @@ namespace plaincraft_core
         || origin_position.z > static_cast<float>(higher_boundary_y) + Chunk::chunk_size)
         {
             ReloadGrid();
-            OptimizeChunks();
+            OptimizeMap();
         }
     }
 
@@ -75,42 +75,42 @@ namespace plaincraft_core
         auto origin_position = origin_entity_->GetRigidBody()->getTransform().getPosition() / Chunk::chunk_size;
 
         int32_t start_x = static_cast<int32_t>(origin_position.x) - map_size / 2;
-        int32_t start_y = static_cast<int32_t>(origin_position.z) - map_size / 2;
+        int32_t start_z = static_cast<int32_t>(origin_position.z) - map_size / 2;
 
-        int32_t old_grid_start_x, old_grid_start_y;
+        int32_t old_grid_start_x, old_grid_start_z;
 
         if (!grid_.empty())
         {
             old_grid_start_x = grid_[0][0]->GetPositionX();
-            old_grid_start_y = grid_[0][0]->GetPositionY();
+            old_grid_start_z = grid_[0][0]->GetPositionZ();
         }
 
         auto new_grid = ChunksGrid(map_size);
 
         auto current_x = start_x;
-        auto current_y = start_y;
+        auto current_z = start_z;
 
         for (auto &row : new_grid)
         {
             row = ChunksRow(map_size);
 
-            current_y = start_y;
+            current_z = start_z;
 
             for (auto &chunk : row)
             {
                 if (!grid_.empty() 
                     && current_x < old_grid_start_x + static_cast<int32_t>(map_size) && current_x >= old_grid_start_x 
-                    && current_y < old_grid_start_y + static_cast<int32_t>(map_size) && current_y >= old_grid_start_y)
+                    && current_z < old_grid_start_z + static_cast<int32_t>(map_size) && current_z >= old_grid_start_z)
                 {
-                    chunk = std::move(grid_[current_x - old_grid_start_x][current_y - old_grid_start_y]);
+                    chunk = std::move(grid_[current_x - old_grid_start_x][current_z - old_grid_start_z]);
                 }
 
                 if (chunk == nullptr)
                 {
-                    chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_y)));
+                    chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_z)));
                 }
 
-                ++current_y;
+                ++current_z;
             }
 
             ++current_x;
@@ -133,13 +133,44 @@ namespace plaincraft_core
         grid_ = std::move(new_grid);
     }
 
-    void Map::OptimizeChunks()
+    void Map::OptimizeMap()
     {
-        for(auto& row: grid_)
+        for(size_t x = 0; x < map_size; ++x)
         {
-            for(auto& chunk: row)
+            for(size_t z = 0; z < map_size; ++z)
             {
-                chunk->OrganizeMesh(world_generator_.render_engine_->GetModelsFactory(), world_generator_.models_cache_);
+                auto& chunk = grid_[x][z];
+
+                std::optional<std::reference_wrapper<Chunk>> negative_x_chunk;
+                std::optional<std::reference_wrapper<Chunk>> positive_x_chunk;
+                std::optional<std::reference_wrapper<Chunk>> negative_z_chunk;
+                std::optional<std::reference_wrapper<Chunk>> positive_z_chunk;
+
+                if(x > 0)
+                {
+                    negative_x_chunk = *(grid_[x - 1][z]);
+                }
+                if (x < map_size - 1)
+                {
+                    positive_x_chunk = *(grid_[x + 1][z]);
+                }
+
+                if(z > 0)
+                {
+                    negative_z_chunk = *(grid_[x][z - 1]);
+                }
+                if (z < map_size - 1)
+                {
+                    positive_z_chunk = *(grid_[x][z + 1]);
+                }
+
+                chunk->OrganizeMesh(
+                    world_generator_.render_engine_->GetModelsFactory(), 
+                    world_generator_.models_cache_,
+                    negative_x_chunk,
+                    positive_x_chunk,
+                    negative_z_chunk,
+                    positive_z_chunk);
             }
         }
     }
