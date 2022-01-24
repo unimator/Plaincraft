@@ -1,14 +1,14 @@
 [submodule "Dependencies/GLFW"]
 	path = Dependencies/GLFW
 	url = https://github.com/glfw/glfw.git
-[submodule ".\\Dependencies\\glm"]
-	path = .\\Dependencies\\glm
+[submodule "Dependencies/glm"]
+	path = Dependencies/glm
 	url = https://github.com/g-truc/glm.git
-[submodule ".\\Dependencies\\GLEW"]
-	path = .\\Dependencies\\GLEW
+[submodule "Dependencies/GLEW"]
+	path = Dependencies/GLEW
 	url = https://github.com/Perlmint/glew-cmake.git
-[submodule ".\\Dependencies\\ReactPhysics3D"]
-	path = .\\Dependencies\\ReactPhysics3D
+[submodule "Dependencies/ReactPhysics3D"]
+	path = Dependencies/ReactPhysics3D
 	url = https://github.com/unimator/reactphysics3d
 [submodule "Dependencies/imgui"]
 	path = Dependencies/imgui
