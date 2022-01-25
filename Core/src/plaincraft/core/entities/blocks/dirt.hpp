@@ -27,11 +27,11 @@ SOFTWARE.
 #ifndef PLAINCRAFT_BLOCKS_DIRT
 #define PLAINCRAFT_BLOCKS_DIRT
 
-#include "../entity.hpp"
+#include "../game_object.hpp"
 
 namespace plaincraft_core
 {
-    class Dirt : public Entity
+    class Dirt : public GameObject
     {
         
     };

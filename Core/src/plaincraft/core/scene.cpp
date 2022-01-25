@@ -31,8 +31,8 @@ SOFTWARE.
 
 namespace std
 {
-	bool less<std::reference_wrapper<plaincraft_core::Entity>>::operator()(std::reference_wrapper<plaincraft_core::Entity> first_entity,
-																		   std::reference_wrapper<plaincraft_core::Entity> second_entity) const
+	bool less<std::reference_wrapper<plaincraft_core::GameObject>>::operator()(std::reference_wrapper<plaincraft_core::GameObject> first_entity,
+																		   std::reference_wrapper<plaincraft_core::GameObject> second_entity) const
 	{
 		return first_entity.get().GetUniqueId() < second_entity.get().GetUniqueId();
 	}
@@ -52,7 +52,7 @@ namespace plaincraft_core
 		entities_list_.clear();
 	}
 
-	void Scene::AddEntity(std::shared_ptr<Entity> entity_to_add)
+	void Scene::AddGameObject(std::shared_ptr<GameObject> entity_to_add)
 	{
 		entities_list_.push_back(entity_to_add);
 
@@ -69,10 +69,10 @@ namespace plaincraft_core
 		}
 	}
 
-	void Scene::RemoveEntity(std::shared_ptr<Entity> entity_to_remove)
+	void Scene::RemoveGameObject(std::shared_ptr<GameObject> entity_to_remove)
 	{
-		entities_list_.remove_if([&](std::shared_ptr<Entity> const &entity)
-								 { return entity == entity_to_remove; });
+		entities_list_.remove_if([&](std::shared_ptr<GameObject> const &game_object)
+								 { return game_object == entity_to_remove; });
 		auto rigid_body = entity_to_remove->GetRigidBody();
 		if(rigid_body != nullptr)
 		{
@@ -85,10 +85,10 @@ namespace plaincraft_core
 		}
 	}
 
-	std::shared_ptr<Entity> Scene::FindEntityByName(const std::string &name) const
+	std::shared_ptr<GameObject> Scene::FindGameObjectByName(const std::string &name) const
 	{
-		auto predicate = [&](const std::shared_ptr<const Entity> entity)
-		{ return entity->GetName() == name; };
+		auto predicate = [&](const std::shared_ptr<const GameObject> game_object)
+		{ return game_object->GetName() == name; };
 		auto result = std::find_if(begin(entities_list_), end(entities_list_), predicate);
 		if (result != end(entities_list_))
 		{
@@ -99,9 +99,9 @@ namespace plaincraft_core
 
 	void Scene::UpdateFrame(float interpolation_factor)
 	{
-		for (auto entity : entities_list_)
+		for (auto game_object : entities_list_)
 		{
-			const auto rb = entity->GetRigidBody();
+			const auto rb = game_object->GetRigidBody();
 
 			if (rb == nullptr)
 			{
@@ -109,15 +109,15 @@ namespace plaincraft_core
 			}
 
 			auto transform = rb->getTransform();
-			auto previous_transform = previous_transforms_[entity];
+			auto previous_transform = previous_transforms_[game_object];
 			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
 
 			auto position = interpolated_transform.getPosition();
 			auto rotation = interpolated_transform.getOrientation();
-			entity->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			entity->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
 
-			previous_transforms_[entity] = transform;
+			previous_transforms_[game_object] = transform;
 		}
 
 		auto l = snprintf(nullptr, 0, "%zd", entities_list_.size());

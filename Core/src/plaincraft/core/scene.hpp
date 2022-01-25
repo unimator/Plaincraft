@@ -27,16 +27,16 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_SCENE
 #define PLAINCRAFT_CORE_SCENE
 #include "common.hpp"
-#include "entities/entity.hpp"
+#include "entities/game_object.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
 
 namespace std 
 {
 	template<>
-	struct less<std::reference_wrapper<plaincraft_core::Entity>> {
-		bool operator()(std::reference_wrapper<plaincraft_core::Entity> first_entity, 
-			std::reference_wrapper<plaincraft_core::Entity> second_entity) const;
+	struct less<std::reference_wrapper<plaincraft_core::GameObject>> {
+		bool operator()(std::reference_wrapper<plaincraft_core::GameObject> first_entity, 
+			std::reference_wrapper<plaincraft_core::GameObject> second_entity) const;
 	};
 }
 
@@ -47,17 +47,17 @@ namespace plaincraft_core
 	class Scene
 	{
 	private:
-		std::map<std::shared_ptr<Entity>, rp3d::Transform> previous_transforms_;
+		std::map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<RenderEngine> render_engine_;
-		std::list<std::shared_ptr<Entity>> entities_list_;
+		std::list<std::shared_ptr<GameObject>> entities_list_;
 
 	public:
 		Scene(std::shared_ptr<RenderEngine> render_engine);
 		~Scene();
 
-		void AddEntity(std::shared_ptr<Entity> entity_to_add);
-		void RemoveEntity(std::shared_ptr<Entity> entity_to_remove);
-		std::shared_ptr<Entity> FindEntityByName(const std::string& name) const;
+		void AddGameObject(std::shared_ptr<GameObject> entity_to_add);
+		void RemoveGameObject(std::shared_ptr<GameObject> entity_to_remove);
+		std::shared_ptr<GameObject> FindGameObjectByName(const std::string& name) const;
 
 		void UpdateFrame(float interpolation_factor = 0.0f);
 	};

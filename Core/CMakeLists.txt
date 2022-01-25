@@ -33,8 +33,8 @@ PRIVATE
     src/plaincraft/core/entities/player/events/player_events_handler.hpp
     src/plaincraft/core/entities/player/player.cpp
     src/plaincraft/core/entities/player/player.hpp
-    src/plaincraft/core/entities/entity.cpp
-    src/plaincraft/core/entities/entity.hpp
+    src/plaincraft/core/entities/game_object.cpp
+    src/plaincraft/core/entities/game_object.hpp
     src/plaincraft/core/events/loop_events_handler.cpp
     src/plaincraft/core/events/loop_events_handler.hpp
     src/plaincraft/core/models/models_cache.cpp

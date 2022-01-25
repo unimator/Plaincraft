@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 #include "game.hpp"
-#include "entities/entity.hpp"
+#include "entities/game_object.hpp"
 #include "world/world_generator.hpp"
 #include "entities/map/map.hpp"
 #include "utils/conversions.hpp"
@@ -55,9 +55,12 @@ namespace plaincraft_core
 
 	void Game::Initialize()
 	{
-		std::shared_ptr<Entity> player;
+		std::shared_ptr<GameObject> player;
 
-		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(), rp3d::PhysicsWorldDeleter(physics_common_));
+		//physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>();
+		auto physics_world_settings = rp3d::PhysicsWorld::WorldSettings();
+		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(physics_world_settings), rp3d::PhysicsWorldDeleter(physics_common_));
+		//physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
 
 		// auto logger = physics_common_.createDefaultLogger();
 		// uint32_t log_level = static_cast<uint32_t>(static_cast<uint32_t>(rp3d::Logger::Level::Warning)
@@ -83,7 +86,7 @@ namespace plaincraft_core
 
 		WorldGenerator world_generator(physics_common_, physics_world_, render_engine_, scene_, models_cache_);
 
-		player = std::make_shared<Entity>();
+		player = std::make_shared<GameObject>();
 		player->SetName("player");
 
 		const auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/player.png");
@@ -101,24 +104,24 @@ namespace plaincraft_core
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 		auto rigid_body = physics_world_->createRigidBody(transform);
+		
+		rigid_body->setAngularLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
+		//rigid_body->setLinearLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
 		auto capsule_shape = physics_common_.createCapsuleShape(0.5, 0.75);
-		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
+		//auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
 		auto collider = rigid_body->addCollider(capsule_shape, transform);
-		collider->getMaterial().setBounciness(0);
-		collider->getMaterial().setFrictionCoefficient(2.0);
 
 		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
 		rigid_body->setIsFrictionFreezed(true);
-		rigid_body->setIsRotationFreezed(true);
 		rigid_body->setIsBouncingFreezed(true);
 		player->SetRigidBody(rigid_body);
 
-		scene_.AddEntity(player);
+		scene_.AddGameObject(player);
 
 		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
 
 		auto map = std::make_shared<Map>(world_generator, player);
-		scene_.AddEntity(map);
+		scene_.AddGameObject(map);
 		loop_events_handler_.loop_event_trigger.AddSubscription(map.get(), &Map::OnLoopTick);
 	}
 
@@ -165,7 +168,7 @@ namespace plaincraft_core
 				scene_.UpdateFrame();
 			});
 
-			auto player = scene_.FindEntityByName("player");
+			auto player = scene_.FindGameObjectByName("player");
 			if(player != nullptr) 
 			{				
 				auto player_position = player->GetRigidBody()->getTransform().getPosition();

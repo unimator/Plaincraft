@@ -28,7 +28,7 @@ SOFTWARE.
 #include "glm/glm.hpp"
 
 namespace plaincraft_core {
-    CameraOperatorFollow::CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target, float distance_to_target)
+    CameraOperatorFollow::CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target, float distance_to_target)
     : CameraOperator(camera), follow_target_(follow_target), distance_to_target_(distance_to_target) {}
 
     void CameraOperatorFollow::HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time)

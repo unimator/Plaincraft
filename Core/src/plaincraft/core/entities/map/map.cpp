@@ -31,7 +31,7 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    Map::Map(WorldGenerator world_generator, std::shared_ptr<Entity> origin_entity)
+    Map::Map(WorldGenerator world_generator, std::shared_ptr<GameObject> origin_entity)
         : world_generator_(world_generator),
           origin_entity_(origin_entity)
     {

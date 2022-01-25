@@ -47,8 +47,8 @@ namespace plaincraft_render_engine_opengl {
 		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
 		auto model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), Vector3d(scale, scale, scale)) * glm::toMat4(rotation);
-		//glm::mat4 model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
-		//model = glm::toMat4(entity->GetBody()->GetCollider()->GetRotation()) * model;
+		//glm::mat4 model = glm::translate(glm::mat4(1.0f), game_object->GetPosition());
+		//model = glm::toMat4(game_object->GetBody()->GetCollider()->GetRotation()) * model;
 
 		shader_->Use();
 		shader_->SetModelViewProjection(model, view, projection);

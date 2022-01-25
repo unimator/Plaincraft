@@ -37,7 +37,7 @@ namespace plaincraft_runner
     class KeyMappingController : public std::enable_shared_from_this<KeyMappingController>
     {
     private:
-        std::shared_ptr<Entity> player_;
+        std::shared_ptr<GameObject> player_;
         std::shared_ptr<Camera> camera_;
 
         float movement_speed_ = 3.0f;

@@ -27,11 +27,11 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_PLAYER
 #define PLAINCRAFT_CORE_PLAYER
 
-#include "../entity.hpp"
+#include "../game_object.hpp"
 
 namespace plaincraft_core
 {
-    class Player : public Entity 
+    class Player : public GameObject 
     {
         private: 
     };

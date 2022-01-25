@@ -28,13 +28,13 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_MAP
 
 #include "chunk.hpp"
-#include "../entity.hpp"
+#include "../game_object.hpp"
 #include "../../world/world_generator.hpp"
 #include <vector>
 
 namespace plaincraft_core 
 {
-    class Map : public Entity
+    class Map : public GameObject
     {
     public:
         using ChunksRow = std::vector<std::unique_ptr<Chunk>>;
@@ -46,10 +46,10 @@ namespace plaincraft_core
         ChunksGrid grid_;
         WorldGenerator world_generator_;
 
-        std::shared_ptr<Entity> origin_entity_;
+        std::shared_ptr<GameObject> origin_entity_;
 
     public:
-        Map(WorldGenerator world_generator, std::shared_ptr<Entity> origin_entity);
+        Map(WorldGenerator world_generator, std::shared_ptr<GameObject> origin_entity);
         
         void OnLoopTick(float delta_time);
 

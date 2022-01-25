@@ -38,7 +38,7 @@ namespace plaincraft_runner
 
     void KeyMappingController::Setup(Game &game_instance)
     {
-        auto player = game_instance.GetScene().FindEntityByName("player");
+        auto player = game_instance.GetScene().FindGameObjectByName("player");
         player_ = player;
         auto camera = game_instance.GetCamera();
         camera_ = camera;
@@ -72,9 +72,10 @@ namespace plaincraft_runner
             }
             if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
             {
-                if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.00001)
+                if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.0001)
                 {
-                    player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
+                    //player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
+                    player_->GetRigidBody()->applyLocalForceAtCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
                 }
             }
         }

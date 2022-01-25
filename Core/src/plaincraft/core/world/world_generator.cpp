@@ -54,7 +54,7 @@ namespace plaincraft_core
 		auto chunk_data = Chunk::Data();
 		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 
-		std::shared_ptr<Block> entity;
+		std::shared_ptr<Block> game_object;
 
 		float r = static_cast<float>((rand() % 255) / 255.0f);
 		float g = static_cast<float>((rand() % 255) / 255.0f);
@@ -77,10 +77,10 @@ namespace plaincraft_core
 						continue;
 					}
 
-					auto entity = std::make_shared<Block>(I32Vector3d(i, j, k));
+					auto game_object = std::make_shared<Block>(I32Vector3d(i, j, k));
 					auto drawable = std::make_shared<Drawable>();
 					drawable->SetModel(model);
-					entity->SetDrawable(drawable);
+					game_object->SetDrawable(drawable);
 
 					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
 					auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + i * 1.0;
@@ -91,15 +91,16 @@ namespace plaincraft_core
 					rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 					auto rigid_body = physics_world_->createRigidBody(transform);
 					auto collider = rigid_body->addCollider(cube_shape, transform);
+					collider->getMaterial().setFrictionCoefficient(1.0f);
 					rigid_body->setType(rp3d::BodyType::STATIC);
 					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
-					entity->SetRigidBody(rigid_body);
+					game_object->SetRigidBody(rigid_body);
 
-					entity->SetColor(color);
+					game_object->SetColor(color);
 
-					scene_.AddEntity(entity);
+					scene_.AddGameObject(game_object);
 
-					chunk_data[i][j][k] = entity;
+					chunk_data[i][j][k] = game_object;
 				}
 			}
 		}
@@ -124,7 +125,7 @@ namespace plaincraft_core
 					{
 						if (block != nullptr)
 						{
-							scene_.RemoveEntity(block);
+							scene_.RemoveGameObject(block);
 							physics_world_->destroyRigidBody(block->GetRigidBody());
 							++entities_deleted;
 						}

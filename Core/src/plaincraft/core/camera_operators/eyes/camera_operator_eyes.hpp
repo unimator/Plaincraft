@@ -27,7 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_CAMERA_OPERATOR_EYES
 #define PLAINCRAFT_CORE_CAMERA_OPERATOR_EYES
 
-#include "../../entities/entity.hpp"
+#include "../../entities/game_object.hpp"
 #include "../camera_operator.hpp"
 
 namespace plaincraft_core
@@ -37,10 +37,10 @@ namespace plaincraft_core
     class CameraOperatorEyes : public CameraOperator
     {
     private:
-        std::shared_ptr<Entity> follow_target_;
+        std::shared_ptr<GameObject> follow_target_;
 
     public:
-        CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target);
+        CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target);
 
         void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
     };

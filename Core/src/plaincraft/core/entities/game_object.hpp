@@ -24,64 +24,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "entity.hpp"
-#include "../utils/conversions.hpp"
+#ifndef PLAINCRAFT_CORE_GAME_OBJECT
+#define PLAINCRAFT_CORE_GAME_OBJECT
 
-namespace plaincraft_core
-{
-	uint32_t Entity::next_id_ = 0;
+#include "../common.hpp"
+#include <plaincraft_render_engine.hpp>
 
-	Entity::Entity() : drawable_(nullptr)
-	{
-		unique_id_ = next_id_++;
-	}
+
+namespace plaincraft_core {
+	using namespace plaincraft_render_engine;
 	
-	Entity::~Entity()
+	class GameObject
 	{
-	}
+	private:
+		std::shared_ptr<Drawable> drawable_;
+		rp3d::RigidBody* rigid_body_ = nullptr;
+		std::string name_;
 
-	void Entity::SetDrawable(std::shared_ptr<plaincraft_render_engine::Drawable> drawable)
-	{
-		drawable_ = std::move(drawable);
-	}
+		static uint32_t next_id_;
+		uint32_t unique_id_;
 
-	std::shared_ptr<plaincraft_render_engine::Drawable> Entity::GetDrawable() const
-	{
-		return drawable_;
-	}
+	public:
+		GameObject();
+		virtual ~GameObject();
 
-	void Entity::SetColor(Vector3d color)
-	{
-		drawable_->SetColor(color);
-	}
+		void SetDrawable(std::shared_ptr<Drawable> drawable);
+		std::shared_ptr<Drawable> GetDrawable() const;
 
-	Vector3d Entity::GetColor()
-	{
-		return drawable_->GetColor();
-	}
+		void SetColor(Vector3d color);
+		Vector3d GetColor();
 
-	void Entity::SetRigidBody(rp3d::RigidBody *rigid_body)
-	{
-		rigid_body_ = rigid_body;
-	}
+		void SetRigidBody(rp3d::RigidBody* rigid_body);
+		rp3d::RigidBody* GetRigidBody() const;
 
-	rp3d::RigidBody *Entity::GetRigidBody() const
-	{
-		return rigid_body_;
-	}
+		void SetName(std::string name);
+		std::string GetName() const;
 
-	void Entity::SetName(std::string name)
-	{
-		name_ = name;
-	}
-
-	std::string Entity::GetName() const
-	{
-		return name_;
-	}
-
-	uint32_t Entity::GetUniqueId() const
-	{
-		return unique_id_;
-	}
+		uint32_t GetUniqueId() const;
+	};
 }
+
+#endif // PLAINCRAFT_CORE_GAME_OBJECT

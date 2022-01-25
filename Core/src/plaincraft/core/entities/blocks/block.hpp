@@ -27,14 +27,14 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_BLOCK
 #define PLAINCRAFT_CORE_BLOCK
 
-#include "../entity.hpp"
+#include "../game_object.hpp"
 
 namespace plaincraft_core
 {
     class Map;
     class Chunk;
 
-    class Block : public Entity
+    class Block : public GameObject
     {
     friend class Map;
     friend class Chunk;

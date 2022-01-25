@@ -29,7 +29,7 @@ SOFTWARE.
 namespace plaincraft_core {
     using namespace plaincraft_render_engine;
 
-    CameraOperatorEyes::CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<Entity> follow_target)
+    CameraOperatorEyes::CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target)
         : CameraOperator(camera), follow_target_(follow_target)
     { }
 
