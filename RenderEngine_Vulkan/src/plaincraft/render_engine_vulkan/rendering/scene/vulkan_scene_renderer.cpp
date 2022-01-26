@@ -1,4 +1,4 @@
-/* 
+/*
 MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
@@ -31,17 +31,21 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-	VulkanSceneRenderer::VulkanSceneRenderer(const VulkanDevice &device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera)
+	VulkanSceneRenderer::VulkanSceneRenderer(VulkanDevice &device, VkRenderPass render_pass, VkExtent2D extent, size_t images_count, std::shared_ptr<Camera> camera)
 		: SceneRenderer(camera),
 		  device_(device),
 		  render_pass_(render_pass),
 		  extent_(extent),
-		  descriptor_set_layout_(descriptor_set_layout)
+		  images_count_(images_count)
 	{
 		vertex_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\vert.spv");
 		fragment_shader_code_ = read_file_raw("F:\\Projekty\\Plaincraft\\Shaders\\Vulkan\\frag.spv");
 
 		VulkanPipelineConfig pipeline_config{};
+		CreateDescriptorSetLayout();
+		CreateDescriptorPool();
+		CreateUniformBuffers();
+		CreateDescriptors();
 		CreatePipelineLayout();
 		VkViewport viewport{};
 		VkRect2D scissor{};
@@ -55,25 +59,45 @@ namespace plaincraft_render_engine_vulkan
 		vkDestroyPipelineLayout(device_.GetDevice(), pipeline_layout_, nullptr);
 	}
 
-	void VulkanSceneRenderer::Render(VulkanRendererFrameConfig& frame_config)
+	void VulkanSceneRenderer::Render(VulkanRendererFrameConfig &frame_config)
 	{
 		auto command_buffer = frame_config.command_buffer;
-		auto descriptor_set = frame_config.descriptor_set;
+		auto descriptor_set = descriptor_sets_[frame_config.image_index];
 		pipeline_->Bind(command_buffer);
 		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
 		projection[1][1] *= -1;
 		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
+		auto& mvp_uniform_buffer = mvp_uniform_buffers_[frame_config.image_index];
+		auto alignment_size = mvp_uniform_buffer->GetAlignmentSize();
 
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto drawable = drawables_list_[i];
-			uint32_t dynamic_offset = i * frame_config.alignment_size;
+			auto color = drawable->GetColor();
+			const auto scale = drawable->GetScale();
+			const auto position = drawable->GetPosition();
+			const auto rotation = drawable->GetRotation();
+			auto model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), Vector3d(scale, scale, scale)) * glm::toMat4(rotation);
+
+			plaincraft_render_engine::ModelViewProjectionMatrix mvp{
+				model,
+				view,
+				projection,
+				color};
+
+			auto offset = static_cast<uint32_t>(i) * alignment_size;
+			mvp_uniform_buffer->Map(alignment_size, offset);
+			mvp_uniform_buffer->Write(&mvp, alignment_size, 0);
+			mvp_uniform_buffer->Unmap();
+
+			uint32_t dynamic_offset = i * alignment_size;
 			vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1, &descriptor_set, 1, &dynamic_offset);
-			auto model = drawable->GetModel();
-			if(model.expired()) {
+			auto draw_model = drawable->GetModel();
+			if (draw_model.expired())
+			{
 				continue;
 			}
-			auto vulkan_model = std::dynamic_pointer_cast<VulkanModel>(model.lock());
+			auto vulkan_model = std::dynamic_pointer_cast<VulkanModel>(draw_model.lock());
 			vulkan_model->Bind(command_buffer);
 			vulkan_model->Draw(command_buffer);
 			vulkan_model.reset();
@@ -103,10 +127,11 @@ namespace plaincraft_render_engine_vulkan
 		push_constant_range.offset = 0;
 		push_constant_range.size = sizeof(SimplePushConstants);
 
+		auto descriptor_set_layout_value = descriptor_set_layout_->GetDescriptorSetLayout();
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipeline_layout_create_info.setLayoutCount = 1;
-		pipeline_layout_create_info.pSetLayouts = &descriptor_set_layout_;
+		pipeline_layout_create_info.pSetLayouts = &descriptor_set_layout_value;
 		pipeline_layout_create_info.pushConstantRangeCount = 1;
 		pipeline_layout_create_info.pPushConstantRanges = &push_constant_range;
 		pipeline_layout_create_info.pNext = VK_NULL_HANDLE;
@@ -119,7 +144,7 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanSceneRenderer::SetupPipelineConfig(VulkanPipelineConfig &pipeline_config, VkViewport &viewport, VkRect2D &scissor)
 	{
-		pipeline_config.descriptor_set_layout = descriptor_set_layout_;
+		pipeline_config.descriptor_set_layout = descriptor_set_layout_->GetDescriptorSetLayout();
 		pipeline_config.pipeline_layout = pipeline_layout_;
 		pipeline_config.render_pass = render_pass_;
 
@@ -165,91 +190,63 @@ namespace plaincraft_render_engine_vulkan
 	// 	}
 	// }
 
-	// void VulkanSceneRenderer::CreateDescriptorPool()
-	// {
-	// 	auto swapchain_images = swapchain_.GetSwapchainImages();
-	// 	std::array<VkDescriptorPoolSize, 2> pool_sizes{};
-	// 	pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	// 	pool_sizes[0].descriptorCount = static_cast<uint32_t>(swapchain_images.size());
-	// 	pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	// 	pool_sizes[1].descriptorCount = static_cast<uint32_t>(swapchain_images.size());
+	void VulkanSceneRenderer::RecreateEntitiesBuffers()
+	{
+		auto entities_count = drawables_list_.size();
+	}
 
-	// 	VkDescriptorPoolCreateInfo pool_info{};
-	// 	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	// 	pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
-	// 	pool_info.pPoolSizes = pool_sizes.data();
-	// 	pool_info.maxSets = static_cast<uint32_t>(swapchain_images.size());
+	void VulkanSceneRenderer::CreateUniformBuffers()
+	{
+		VkPhysicalDeviceProperties physical_device_properties;
+		vkGetPhysicalDeviceProperties(device_.GetPhysicalDevice(), &physical_device_properties);
+		auto min_ubo_alignment = physical_device_properties.limits.minUniformBufferOffsetAlignment;
 
-	// 	if (vkCreateDescriptorPool(device_.GetDevice(), &pool_info, nullptr, &descriptor_pool_) != VK_SUCCESS)
-	// 	{
-	// 		throw std::runtime_error("Failed to create shader module");
-	// 	}
-	// }
+		mvp_uniform_buffers_.resize(images_count_);
 
-	// void VulkanSceneRenderer::CreateDescriptorSets()
-	// {
-	// 	auto swapchain_images = swapchain_.GetSwapchainImages();
-	// 	std::vector<VkDescriptorSetLayout> layouts(swapchain_images.size(), descriptor_set_layout_);
-	// 	VkDescriptorSetAllocateInfo descriptor_set_allocate_info{};
-	// 	descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	// 	descriptor_set_allocate_info.descriptorPool = descriptor_pool_;
-	// 	descriptor_set_allocate_info.descriptorSetCount = static_cast<uint32_t>(swapchain_images.size());
-	// 	descriptor_set_allocate_info.pSetLayouts = layouts.data();
+		uint32_t instance_count = (10 * 40 * 40 + 1);
 
-	// 	descriptor_sets_.resize(swapchain_images.size());
-	// 	if (vkAllocateDescriptorSets(device_.GetDevice(), &descriptor_set_allocate_info, descriptor_sets_.data()) != VK_SUCCESS)
-	// 	{
-	// 		throw std::runtime_error("Failed to allocate descriptor sets");
-	// 	}
+		for (size_t i = 0; i < images_count_; ++i)
+		{
+			mvp_uniform_buffers_[i] = std::make_unique<VulkanBuffer>(device_, sizeof(ModelViewProjectionMatrix), instance_count, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, min_ubo_alignment);
+		}
+	}
 
-	// 	for (size_t i = 0; i < swapchain_images.size(); ++i)
-	// 	{
-	// 		VkDescriptorBufferInfo descriptor_buffer_info{};
-	// 		descriptor_buffer_info.buffer = uniform_buffers_[i];
-	// 		descriptor_buffer_info.offset = 0;
-	// 		descriptor_buffer_info.range = sizeof(ModelViewProjectionMatrix);
+	void VulkanSceneRenderer::CreateDescriptorSetLayout()
+	{
+		descriptor_set_layout_ = VulkanDescriptorSetLayout::Builder(device_)
+			.AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1)
+			//.AddLayoutBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
+			.Build();
+	}
 
-	// 		VkDescriptorImageInfo descriptor_image_info{};
-	// 		descriptor_image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	// 		descriptor_image_info.imageView = texture_image_view_;
-	// 		descriptor_image_info.sampler = texture_sampler_;
+	void VulkanSceneRenderer::CreateDescriptorPool()
+	{
+		descriptor_pool_ = VulkanDescriptorPool::Builder(device_)
+							   .SetMaxSets(images_count_)
+							   .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1)
+							   //.AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
+							   .Build();
+	}
 
-	// 		std::array<VkWriteDescriptorSet, 2> write_descriptor_sets{};
-	// 		write_descriptor_sets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	// 		write_descriptor_sets[0].dstSet = descriptor_sets_[i];
-	// 		write_descriptor_sets[0].dstBinding = 0;
-	// 		write_descriptor_sets[0].dstArrayElement = 0;
-	// 		write_descriptor_sets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	// 		write_descriptor_sets[0].descriptorCount = 1;
-	// 		write_descriptor_sets[0].pBufferInfo = &descriptor_buffer_info;
-	// 		write_descriptor_sets[0].pImageInfo = nullptr;
-	// 		write_descriptor_sets[0].pTexelBufferView = nullptr;
+	void VulkanSceneRenderer::CreateDescriptors()
+	{
+		descriptor_sets_.resize(images_count_);
+		for (size_t i = 0; i < descriptor_sets_.size(); ++i)
+		{
+			VkDescriptorBufferInfo descriptor_buffer_info{};
+			descriptor_buffer_info.buffer = mvp_uniform_buffers_[i]->GetBuffer();
+			descriptor_buffer_info.offset = 0;
+			descriptor_buffer_info.range = sizeof(ModelViewProjectionMatrix);
 
-	// 		write_descriptor_sets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	// 		write_descriptor_sets[1].dstSet = descriptor_sets_[i];
-	// 		write_descriptor_sets[1].dstBinding = 1;
-	// 		write_descriptor_sets[1].dstArrayElement = 0;
-	// 		write_descriptor_sets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	// 		write_descriptor_sets[1].descriptorCount = 1;
-	// 		write_descriptor_sets[1].pBufferInfo = nullptr;
-	// 		write_descriptor_sets[1].pImageInfo = &descriptor_image_info;
-	// 		write_descriptor_sets[1].pTexelBufferView = nullptr;
+			// VkDescriptorImageInfo descriptor_image_info{};
+			// descriptor_image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			// descriptor_image_info.imageView = texture_image_view_->GetImageView();
+			// descriptor_image_info.sampler = texture_image_->GetSampler();
 
-	// 		vkUpdateDescriptorSets(device_.GetDevice(), static_cast<uint32_t>(write_descriptor_sets.size()), write_descriptor_sets.data(), 0, nullptr);
-	// 	}
-	// }
-
-	// void VulkanSceneRenderer::CreateUniformBuffers()
-	// {
-	// 	VkDeviceSize buffer_size = sizeof(plaincraft_render_engine::ModelViewProjectionMatrix);
-
-	// 	auto swapchain_images = swapchain_.GetSwapchainImages();
-	// 	uniform_buffers_.resize(swapchain_images.size());
-	// 	uniform_buffers_memory_.resize(swapchain_images.size());
-
-	// 	for (size_t i = 0; i < swapchain_images.size(); ++i)
-	// 	{
-	// 		buffer_manager_.CreateBuffer(buffer_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniform_buffers_[i], uniform_buffers_memory_[i]);
-	// 	}
-	// }
+			VulkanDescriptorWriter descriptor_writer(*descriptor_set_layout_, *descriptor_pool_);
+			descriptor_writer.WriteBuffer(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, &descriptor_buffer_info);
+			//descriptor_writer.WriteImage(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, &descriptor_image_info);
+			descriptor_writer.Build(descriptor_sets_[i]);
+		}
+	}
 }

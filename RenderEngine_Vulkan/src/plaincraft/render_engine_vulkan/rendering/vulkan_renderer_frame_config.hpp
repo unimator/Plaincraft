@@ -32,8 +32,7 @@ SOFTWARE.
 namespace plaincraft_render_engine_vulkan {
     struct VulkanRendererFrameConfig {
         VkCommandBuffer& command_buffer;
-        VkDescriptorSet descriptor_set;
-        size_t alignment_size;
+        size_t image_index;
     };
 };
 

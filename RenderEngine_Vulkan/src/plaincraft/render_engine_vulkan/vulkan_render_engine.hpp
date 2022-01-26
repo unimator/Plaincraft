@@ -39,9 +39,6 @@ SOFTWARE.
 #include "memory/vulkan_image.hpp"
 #include "models/vulkan_model.hpp"
 #include "rendering/scene/vulkan_scene_renderer.hpp"
-#include "descriptors/vulkan_descriptor_set_layout.hpp"
-#include "descriptors/vulkan_descriptor_pool.hpp"
-#include "descriptors/vulkan_descriptor_writer.hpp"
 #include "rendering/gui/vulkan_gui_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
@@ -61,11 +58,7 @@ namespace plaincraft_render_engine_vulkan {
 
 		std::vector<VkCommandBuffer> command_buffers_;
 
-		std::vector<std::unique_ptr<VulkanBuffer>> uniform_buffers_;
 
-		std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
-		std::unique_ptr<VulkanDescriptorSetLayout> descriptor_set_layout_;
-		std::vector<VkDescriptorSet> descriptor_sets_;
 
 		std::unique_ptr<VulkanTexture> texture_image_;
 		std::unique_ptr<VulkanImageView> texture_image_view_;
@@ -102,8 +95,6 @@ namespace plaincraft_render_engine_vulkan {
 		void RecreateSwapChain();
 		
 		uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties);
-
-		void CreateDescriptors();
 		
 		void CreateSyncObjects();
 

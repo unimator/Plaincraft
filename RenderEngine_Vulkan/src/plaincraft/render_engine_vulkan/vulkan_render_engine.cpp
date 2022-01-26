@@ -149,19 +149,7 @@ namespace plaincraft_render_engine_vulkan
 			swapchain_ = std::make_unique<Swapchain>(GetVulkanWindow(), device_, surface_, std::move(swapchain_));
 		}
 
-		descriptor_set_layout_ = VulkanDescriptorSetLayout::Builder(device_)
-									 .AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1)
-									 .AddLayoutBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-									 .Build();
-
-		scene_renderer_ = std::make_unique<VulkanSceneRenderer>(device_, swapchain_->GetRenderPass(), swapchain_->GetSwapchainExtent(), descriptor_set_layout_->GetDescriptorSetLayout(), camera_);
-
-		auto images_count = swapchain_->GetSwapchainImages().size();
-		descriptor_pool_ = VulkanDescriptorPool::Builder(device_)
-							   .SetMaxSets(images_count)
-							   .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1)
-							   .AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-							   .Build();
+		scene_renderer_ = std::make_unique<VulkanSceneRenderer>(device_, swapchain_->GetRenderPass(), swapchain_->GetSwapchainExtent(), swapchain_->GetSwapchainImages().size(), camera_);
 
 		if (gui_renderer_ == nullptr)
 		{
@@ -172,49 +160,7 @@ namespace plaincraft_render_engine_vulkan
 			gui_renderer_ = std::make_unique<VulkanGuiRenderer>(instance_, device_, GetVulkanWindow(), swapchain_->GetRenderPass(), std::move(gui_renderer_));
 		}
 
-		CreateUniformBuffers();
-		CreateDescriptors();
 		CreateCommandBuffers();
-	}
-
-	void VulkanRenderEngine::CreateDescriptors()
-	{
-		auto images_count = swapchain_->GetSwapchainImages().size();
-		descriptor_sets_.resize(images_count);
-		for (size_t i = 0; i < descriptor_sets_.size(); ++i)
-		{
-			VkDescriptorBufferInfo descriptor_buffer_info{};
-			descriptor_buffer_info.buffer = uniform_buffers_[i]->GetBuffer();
-			descriptor_buffer_info.offset = 0;
-			descriptor_buffer_info.range = sizeof(ModelViewProjectionMatrix);
-
-			VkDescriptorImageInfo descriptor_image_info{};
-			descriptor_image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			descriptor_image_info.imageView = texture_image_view_->GetImageView();
-			descriptor_image_info.sampler = texture_image_->GetSampler();
-
-			VulkanDescriptorWriter descriptor_writer(*descriptor_set_layout_, *descriptor_pool_);
-			descriptor_writer.WriteBuffer(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, &descriptor_buffer_info);
-			descriptor_writer.WriteImage(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, &descriptor_image_info);
-			descriptor_writer.Build(descriptor_sets_[i]);
-		}
-	}
-
-	void VulkanRenderEngine::CreateUniformBuffers()
-	{
-		VkPhysicalDeviceProperties physical_device_properties;
-		vkGetPhysicalDeviceProperties(device_.GetPhysicalDevice(), &physical_device_properties);
-		auto min_ubo_alignment = physical_device_properties.limits.minUniformBufferOffsetAlignment;
-
-		auto swapchain_images = swapchain_->GetSwapchainImages();
-		uniform_buffers_.resize(swapchain_images.size());
-
-		uint32_t instance_count = (10 * 40 * 40 + 1);
-
-		for (size_t i = 0; i < swapchain_images.size(); ++i)
-		{
-			uniform_buffers_[i] = std::make_unique<VulkanBuffer>(device_, sizeof(ModelViewProjectionMatrix), instance_count, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, min_ubo_alignment);
-		}
 	}
 
 	uint32_t VulkanRenderEngine::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties)
@@ -253,8 +199,6 @@ namespace plaincraft_render_engine_vulkan
 
 		auto command_buffer = GetCommandBuffer(current_frame_);
 
-		// vulkan_renderer->UpdateUniformBuffer(image_index);
-
 		if (images_in_flight_[image_index] != VK_NULL_HANDLE)
 		{
 			vkWaitForFences(device_.GetDevice(), 1, &images_in_flight_[image_index], VK_TRUE, UINT64_MAX);
@@ -286,39 +230,15 @@ namespace plaincraft_render_engine_vulkan
 
 		auto vulkan_renderer = GetVulkanRenderer();
 
-		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)1024 / (float)768, 0.1f, 100.0f);
-		projection[1][1] *= -1;
-		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
-		auto &uniform_buffer = uniform_buffers_[image_index];
-		auto alignment_size = uniform_buffer->GetAlignmentSize();
-
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto drawable = drawables_list_[i];
-
 			scene_renderer_->Batch(drawable);
-			auto color = drawable->GetColor();
-			const auto scale = drawable->GetScale();
-			const auto position = drawable->GetPosition();
-			const auto rotation = drawable->GetRotation();
-			auto model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), Vector3d(scale, scale, scale)) * glm::toMat4(rotation);
-
-			plaincraft_render_engine::ModelViewProjectionMatrix mvp{
-				model,
-				view,
-				projection,
-				color};
-
-			auto offset = static_cast<uint32_t>(i) * alignment_size;
-			uniform_buffer->Map(alignment_size, offset);
-			uniform_buffer->Write(&mvp, alignment_size, 0);
-			uniform_buffer->Unmap();
 		}
 
 		VulkanRendererFrameConfig frame_config{
 			command_buffer,
-			descriptor_sets_[image_index],
-			alignment_size};
+			image_index};
 
 		vulkan_renderer->Render(frame_config);
 		vulkan_renderer->HasRendered();

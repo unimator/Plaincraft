@@ -33,6 +33,9 @@ SOFTWARE.
 #include "../../memory/vulkan_buffer.hpp"
 #include "../../models/vulkan_model.hpp"
 #include "../vulkan_renderer_frame_config.hpp"
+#include "../../descriptors/vulkan_descriptor_set_layout.hpp"
+#include "../../descriptors/vulkan_descriptor_pool.hpp"
+#include "../../descriptors/vulkan_descriptor_writer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -47,9 +50,10 @@ namespace plaincraft_render_engine_vulkan {
 
     class VulkanSceneRenderer : public SceneRenderer {
     private:
-        const VulkanDevice& device_;
+        VulkanDevice& device_;
         VkRenderPass render_pass_;
         VkExtent2D extent_;
+        size_t images_count_;
         
 		std::vector<char> vertex_shader_code_;
 		std::vector<char> fragment_shader_code_;
@@ -57,14 +61,21 @@ namespace plaincraft_render_engine_vulkan {
         std::unique_ptr<VulkanPipeline> pipeline_;
 		VkPipelineLayout pipeline_layout_;
         
-		VkDescriptorSetLayout descriptor_set_layout_;
+		std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
+		std::unique_ptr<VulkanDescriptorSetLayout> descriptor_set_layout_;
+		std::vector<VkDescriptorSet> descriptor_sets_;
+
+        std::vector<std::unique_ptr<VulkanBuffer>> mvp_uniform_buffers_;
+        
+        std::vector<std::unique_ptr<VulkanBuffer>> model_buffers_;
+        std::vector<std::unique_ptr<VulkanBuffer>> view_projection_buffers_;
 		        
         // TODO: get rid of these
 		VkImageView texture_image_view_;
 		VkSampler texture_sampler_;
 
     public:
-        VulkanSceneRenderer(const VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, VkDescriptorSetLayout descriptor_set_layout, std::shared_ptr<Camera> camera);
+        VulkanSceneRenderer(VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, size_t images_count, std::shared_ptr<Camera> camera);
         ~VulkanSceneRenderer() override;
 
         void Render(VulkanRendererFrameConfig& frame_config);
@@ -75,8 +86,14 @@ namespace plaincraft_render_engine_vulkan {
     private:
 		void SetupPipelineConfig(VulkanPipelineConfig& pipeline_config, VkViewport& viewport, VkRect2D& scissor);
 		void CreatePipelineLayout();
+        
+		void CreateUniformBuffers();
 
+        void CreateDescriptorSetLayout();
         void CreateDescriptorPool();
+        void CreateDescriptors();
+
+        void RecreateEntitiesBuffers();
     };
 }
 
