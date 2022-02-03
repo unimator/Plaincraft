@@ -36,7 +36,14 @@ namespace plaincraft_core {
 	
 	class GameObject
 	{
+	public:
+		enum ObjectType {
+			Static = 0,
+			Dynamic = 1
+		};
+
 	private:
+		ObjectType object_type_ = ObjectType::Dynamic;
 		std::shared_ptr<Drawable> drawable_;
 		rp3d::RigidBody* rigid_body_ = nullptr;
 		std::string name_;
@@ -60,6 +67,9 @@ namespace plaincraft_core {
 		void SetName(std::string name);
 		std::string GetName() const;
 
+		void SetObjectType(ObjectType object_type);
+		ObjectType GetObjectType() const;
+		
 		uint32_t GetUniqueId() const;
 	};
 }

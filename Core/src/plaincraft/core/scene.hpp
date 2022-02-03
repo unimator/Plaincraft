@@ -27,6 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_SCENE
 #define PLAINCRAFT_CORE_SCENE
 #include "common.hpp"
+#include "utils/conversions.hpp"
 #include "entities/game_object.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
@@ -47,9 +48,10 @@ namespace plaincraft_core
 	class Scene
 	{
 	private:
-		std::map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
+		std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<RenderEngine> render_engine_;
 		std::list<std::shared_ptr<GameObject>> entities_list_;
+		std::list<std::shared_ptr<GameObject>> dynamic_entities_list_;
 
 	public:
 		Scene(std::shared_ptr<RenderEngine> render_engine);

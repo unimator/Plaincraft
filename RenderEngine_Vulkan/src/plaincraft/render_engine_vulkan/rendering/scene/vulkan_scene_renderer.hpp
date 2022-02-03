@@ -64,10 +64,11 @@ namespace plaincraft_render_engine_vulkan {
 		std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
 		std::unique_ptr<VulkanDescriptorSetLayout> descriptor_set_layout_;
 		std::vector<VkDescriptorSet> descriptor_sets_;
-
-        std::vector<std::unique_ptr<VulkanBuffer>> mvp_uniform_buffers_;
         
         std::vector<std::unique_ptr<VulkanBuffer>> model_buffers_;
+        uint32_t buffers_instance_count_;
+        ModelMatrix* model_memory_ = nullptr;
+
         std::vector<std::unique_ptr<VulkanBuffer>> view_projection_buffers_;
 		        
         // TODO: get rid of these
@@ -79,8 +80,9 @@ namespace plaincraft_render_engine_vulkan {
         ~VulkanSceneRenderer() override;
 
         void Render(VulkanRendererFrameConfig& frame_config);
-        auto GetLayout() const -> VkPipelineLayout { return pipeline_layout_; }
-        
+        VkPipelineLayout GetLayout() const;
+        void Check();
+
         //void UpdateUniformBuffer(uint32_t image_index);
 
     private:

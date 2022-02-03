@@ -36,5 +36,15 @@ namespace plaincraft_render_engine {
 		glm::mat4 projection;
 		glm::vec3 color;
 	};
+
+	struct ViewProjectionMatrix {
+		glm::mat4 view;
+		glm::mat4 projection;
+	};
+
+	struct ModelMatrix {
+		glm::mat4 model;
+		glm::vec3 color;
+	};
 }
 #endif // PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX

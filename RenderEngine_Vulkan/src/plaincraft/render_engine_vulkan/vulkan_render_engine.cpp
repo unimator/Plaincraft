@@ -204,6 +204,8 @@ namespace plaincraft_render_engine_vulkan
 			vkWaitForFences(device_.GetDevice(), 1, &images_in_flight_[image_index], VK_TRUE, UINT64_MAX);
 		}
 
+		//vulkan_renderer->Check();
+
 		VkCommandBufferBeginInfo command_buffer_begin_info{};
 		command_buffer_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		if (vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info) != VK_SUCCESS)
@@ -226,15 +228,17 @@ namespace plaincraft_render_engine_vulkan
 		render_pass_begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
 		render_pass_begin_info.pClearValues = clear_values.data();
 
-		vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
-
 		auto vulkan_renderer = GetVulkanRenderer();
 
-		for (auto i = 0; i < drawables_list_.size(); ++i)
-		{
-			auto drawable = drawables_list_[i];
-			scene_renderer_->Batch(drawable);
-		}
+		MEASURE("batching", {
+			for (auto i = 0; i < drawables_list_.size(); ++i)
+			{
+				auto drawable = drawables_list_[i];
+				scene_renderer_->Batch(drawable);
+			}
+		});
+
+		vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
 		VulkanRendererFrameConfig frame_config{
 			command_buffer,

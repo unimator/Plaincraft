@@ -80,6 +80,16 @@ namespace plaincraft_core
 		return name_;
 	}
 
+	void GameObject::SetObjectType(ObjectType object_type)
+	{
+		object_type_ = object_type;
+	}
+
+	GameObject::ObjectType GameObject::GetObjectType() const
+	{
+		return object_type_;
+	}
+
 	uint32_t GameObject::GetUniqueId() const
 	{
 		return unique_id_;

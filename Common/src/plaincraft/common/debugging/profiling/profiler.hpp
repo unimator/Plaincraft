@@ -35,7 +35,7 @@ SOFTWARE.
 
 namespace plaincraft_common
 {
-    constexpr uint32_t profiling_history_length = 60 * 10;
+    constexpr uint32_t profiling_history_length = 2 * 10;
 
     class Profiler final
     {

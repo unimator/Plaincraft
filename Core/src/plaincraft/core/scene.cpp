@@ -56,8 +56,14 @@ namespace plaincraft_core
 	{
 		entities_list_.push_back(entity_to_add);
 
+		auto object_type = entity_to_add->GetObjectType();
+		if(object_type == GameObject::ObjectType::Dynamic)
+		{
+			dynamic_entities_list_.push_back(entity_to_add);
+		}
+
 		auto rigid_body = entity_to_add->GetRigidBody();
-		if (rigid_body != nullptr)
+		if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
 		{
 			const rp3d::Transform &transform = entity_to_add->GetRigidBody()->getTransform();
 			previous_transforms_.insert({entity_to_add, transform});
@@ -71,10 +77,19 @@ namespace plaincraft_core
 
 	void Scene::RemoveGameObject(std::shared_ptr<GameObject> entity_to_remove)
 	{
-		entities_list_.remove_if([&](std::shared_ptr<GameObject> const &game_object)
-								 { return game_object == entity_to_remove; });
+		auto remove_predicate = [&](std::shared_ptr<GameObject> const &game_object)
+								 { return game_object == entity_to_remove; };
+		
+		entities_list_.remove_if(remove_predicate);
+
+		auto object_type = entity_to_remove->GetObjectType();
+		if(entity_to_remove->GetObjectType() == object_type)
+		{
+			dynamic_entities_list_.remove_if(remove_predicate);
+		}
+
 		auto rigid_body = entity_to_remove->GetRigidBody();
-		if(rigid_body != nullptr)
+		if(rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
 		{
 			previous_transforms_.erase(previous_transforms_.find(entity_to_remove));
 		}
@@ -99,7 +114,7 @@ namespace plaincraft_core
 
 	void Scene::UpdateFrame(float interpolation_factor)
 	{
-		for (auto game_object : entities_list_)
+		for (auto &game_object : dynamic_entities_list_)
 		{
 			const auto rb = game_object->GetRigidBody();
 
@@ -112,17 +127,27 @@ namespace plaincraft_core
 			auto previous_transform = previous_transforms_[game_object];
 			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
 
-			auto position = interpolated_transform.getPosition();
-			auto rotation = interpolated_transform.getOrientation();
-			game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			auto position = FromRP3D(interpolated_transform.getPosition());
+			auto rotation = FromRP3D(interpolated_transform.getOrientation());
+
+			auto drawable = game_object->GetDrawable();
+
+			if(drawable->GetPosition() != position)
+			{
+				game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			}
+
+			if(drawable->GetRotation() != rotation)
+			{
+				game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			}
 
 			previous_transforms_[game_object] = transform;
 		}
 
 		auto l = snprintf(nullptr, 0, "%zd", entities_list_.size());
 		std::vector<char> buf(l + 1);
-		snprintf(&buf[0], l + 1, "%d", entities_list_.size());
+		snprintf(&buf[0], l + 1, "%zd", entities_list_.size());
 		LOGVALUE("Entities count", std::string(buf.begin(), buf.end()));
 	}
 }

@@ -39,22 +39,29 @@ namespace plaincraft_render_engine
 		Vector3d color_;
 		Quaternion rotation_;
 		float scale_ = 1.0f;
+		
+		glm::mat4 model_matrix_;
 
 	public:
 		void SetModel(std::shared_ptr<Model> model);
 		std::weak_ptr<Model> GetModel() const;
 
-		auto SetScale(float scale) -> void { scale_ = scale; }
-		auto GetScale() const -> const float { return scale_; }
+		void SetScale(float scale);
+		float GetScale() const;
 
-		void SetRotation(Quaternion rotation) { rotation_ = rotation; }
-		auto GetRotation() -> Quaternion { return rotation_; }
+		void SetRotation(Quaternion rotation);
+		Quaternion GetRotation() const;
 
 		void SetPosition(Vector3d position);
-		auto GetPosition() -> Vector3d { return position_; }
+		Vector3d GetPosition() const;
 
 		void SetColor(Vector3d color);
-		auto GetColor() -> Vector3d { return color_; }
+		Vector3d GetColor() const;
+
+		glm::mat4 GetModelMatrix() const;
+
+	private:
+		void CalculateModelMatrix();
 	};
 }
 

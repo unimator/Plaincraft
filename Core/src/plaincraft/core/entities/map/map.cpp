@@ -36,7 +36,7 @@ namespace plaincraft_core
           origin_entity_(origin_entity)
     {
         ReloadGrid();
-        OptimizeMap();
+        //OptimizeMap();
     }
 
     void Map::OnLoopTick(float delta_time)
@@ -66,7 +66,7 @@ namespace plaincraft_core
         || origin_position.z > static_cast<float>(higher_boundary_y) + Chunk::chunk_size)
         {
             ReloadGrid();
-            OptimizeMap();
+            //OptimizeMap();
         }
     }
 

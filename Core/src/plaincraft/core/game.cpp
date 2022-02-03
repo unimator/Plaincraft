@@ -155,14 +155,14 @@ namespace plaincraft_core
 
 			last_time = current_time;
 
-			MEASURE("physics",
-					{
-						while (accumulator >= physics_time_step_)
-						{
-							physics_world_->update(physics_time_step_);
-							accumulator -= physics_time_step_;
-						}
-					})
+			// MEASURE("physics",
+			// 		{
+			// 			while (accumulator >= physics_time_step_)
+			// 			{
+			// 				physics_world_->update(physics_time_step_);
+			// 				accumulator -= physics_time_step_;
+			// 			}
+			// 		})
 
 			MEASURE("update scene objects", {
 				scene_.UpdateFrame();

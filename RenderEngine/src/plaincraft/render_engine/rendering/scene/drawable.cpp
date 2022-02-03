@@ -25,22 +25,70 @@ SOFTWARE.
 */
 
 #include "drawable.hpp"
+#include <glm\gtx\quaternion.hpp>
 
-namespace plaincraft_render_engine {
+namespace plaincraft_render_engine
+{
 	void Drawable::SetModel(std::shared_ptr<Model> model)
 	{
 		model_ = std::move(model);
 	}
 
-	std::weak_ptr<Model> Drawable::GetModel() const {
+	std::weak_ptr<Model> Drawable::GetModel() const
+	{
 		return model_;
 	}
 
-	void Drawable::SetPosition(Vector3d position) {
-		position_ = position;
+	void Drawable::SetScale(float scale)
+	{
+		scale_ = scale;
+		CalculateModelMatrix();
 	}
 
-	void Drawable::SetColor(Vector3d color) {
+	float Drawable::GetScale() const
+	{
+		return scale_;
+	}
+
+	void Drawable::SetRotation(Quaternion rotation)
+	{
+		rotation_ = rotation;
+		CalculateModelMatrix();
+	}
+
+	Quaternion Drawable::GetRotation() const
+	{
+		return rotation_;
+	}
+
+	void Drawable::SetPosition(Vector3d position)
+	{
+		position_ = position;
+		CalculateModelMatrix();
+	}
+
+	Vector3d Drawable::GetPosition() const 
+	{
+		return position_;
+	}
+
+	void Drawable::SetColor(Vector3d color)
+	{
 		color_ = color;
+	}
+
+	Vector3d Drawable::GetColor() const
+	{
+		return color_;
+	}
+
+	glm::mat4 Drawable::GetModelMatrix() const
+	{
+		return model_matrix_;
+	}
+
+	void Drawable::CalculateModelMatrix()
+	{
+		model_matrix_ = glm::translate(glm::mat4(1.0f), position_) * glm::scale(glm::mat4(1.0f), Vector3d(scale_, scale_, scale_)) * glm::toMat4(rotation_);
 	}
 }

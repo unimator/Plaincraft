@@ -78,6 +78,7 @@ namespace plaincraft_core
 					}
 
 					auto game_object = std::make_shared<Block>(I32Vector3d(i, j, k));
+					game_object->SetObjectType(GameObject::ObjectType::Static);
 					auto drawable = std::make_shared<Drawable>();
 					drawable->SetModel(model);
 					game_object->SetDrawable(drawable);
@@ -99,6 +100,9 @@ namespace plaincraft_core
 					game_object->SetColor(color);
 
 					scene_.AddGameObject(game_object);
+
+					game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+					game_object->GetDrawable()->SetRotation(Quaternion(orientation.w, orientation.x, orientation.y, orientation.z));
 
 					chunk_data[i][j][k] = game_object;
 				}
