@@ -28,9 +28,8 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_GAME
 
 #include "common.hpp"
-#include "scene.hpp"
+#include "scene/scene.hpp"
 #include "camera_operators/camera_operator.hpp"
-#include "models/models_cache.hpp"
 #include "events/loop_events_handler.hpp"
 #include <plaincraft_render_engine.hpp>
 
@@ -39,7 +38,10 @@ namespace plaincraft_core {
 	private:
 		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::unique_ptr<CameraOperator> camera_operator_;
-		ModelsCache models_cache_;
+		
+		Cache<Model> models_cache_;
+		Cache<Texture> textures_cache_;
+		
 		LoopEventsHandler loop_events_handler_;
 
 		rp3d::PhysicsCommon physics_common_;

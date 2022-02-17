@@ -44,7 +44,7 @@ namespace plaincraft_render_engine_vulkan {
         std::vector<VkDynamicState> dynamic_state_enables;
         VkPipelineDynamicStateCreateInfo dynamic_state_info;
         VkPipelineLayout pipeline_layout = nullptr;
-        VkDescriptorSetLayout descriptor_set_layout = nullptr;
+        std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
         VkRenderPass render_pass = nullptr;
         uint32_t subpass = 0;
     };

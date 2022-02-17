@@ -28,6 +28,7 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_TEXTURE
 
 #include "vulkan_image.hpp"
+#include "vulkan_image_view.hpp"
 #include "../device/vulkan_device.hpp"
 #include "vulkan_buffer.hpp"
 #include <plaincraft_render_engine.hpp>
@@ -37,10 +38,11 @@ namespace plaincraft_render_engine_vulkan
 {
     using namespace plaincraft_render_engine;
 
-    class VulkanTexture : public VulkanImage
+    class VulkanTexture : public Texture, public VulkanImage
     { 
     private:
         VkSampler texture_sampler_;
+        VulkanImageView texture_image_view_;
 
     public:
         VulkanTexture(const VulkanDevice& device, const Image& image);
@@ -50,7 +52,8 @@ namespace plaincraft_render_engine_vulkan
 
         virtual ~VulkanTexture() override;
 
-        auto GetSampler() -> VkSampler { return texture_sampler_; }
+        VkSampler GetSampler() const;
+        const VulkanImageView& GetImageView() const;
 
     private:
         void TransitionImageLayout(VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout);

@@ -35,6 +35,25 @@ namespace plaincraft_core
 	{
 		unique_id_ = next_id_++;
 	}
+
+	
+	GameObject::GameObject(GameObject&& other) noexcept
+		: name_(std::move(other.name_))
+	{
+
+	}
+
+	GameObject& GameObject::operator=(GameObject&& other) noexcept
+	{
+		if(this == &other)
+		{
+			return *this;
+		}
+
+		this->name_ = std::move(other.name_);
+
+		return *this;
+	}
 	
 	GameObject::~GameObject()
 	{

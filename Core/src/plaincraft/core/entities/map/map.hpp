@@ -32,15 +32,19 @@ SOFTWARE.
 #include "../../world/world_generator.hpp"
 #include <vector>
 
-namespace plaincraft_core 
+namespace plaincraft_core
 {
+    class ChunkPhysicsOptimizationStrategy;
+
     class Map : public GameObject
     {
+        friend class ChunkPhysicsOptimizationStrategy;
+
     public:
-        using ChunksRow = std::vector<std::unique_ptr<Chunk>>;
+        using ChunksRow = std::vector<std::shared_ptr<Chunk>>;
         using ChunksGrid = std::vector<ChunksRow>;
 
-        static constexpr uint32_t map_size = 8;
+        static constexpr uint32_t map_size = 3;
 
     private:
         ChunksGrid grid_;
@@ -50,7 +54,7 @@ namespace plaincraft_core
 
     public:
         Map(WorldGenerator world_generator, std::shared_ptr<GameObject> origin_entity);
-        
+
         void OnLoopTick(float delta_time);
 
     private:

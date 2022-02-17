@@ -35,31 +35,37 @@ SOFTWARE.
 #include <cstdint>
 #include <string>
 
-namespace plaincraft_render_engine {
-	class Mesh {
+namespace plaincraft_render_engine
+{
+	class Mesh
+	{
 	protected:
 		Mesh() {}
 		std::vector<Vertex> vertices_;
 		std::vector<uint32_t> indices_;
 
 	public:
-		Mesh(const Mesh& other) = delete;
-		Mesh& operator=(const Mesh& other) = delete;
+		Mesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> indices);
 
-		Mesh(Mesh&& other);
-		Mesh& operator=(Mesh&& other);
+		Mesh(const Mesh &other) = delete;
+		Mesh &operator=(const Mesh &other) = delete;
 
-		virtual ~Mesh() {};
+		Mesh(Mesh &&other);
+		Mesh &operator=(Mesh &&other);
 
-		const std::vector<Vertex>& GetVertices() const {
+		virtual ~Mesh(){};
+
+		const std::vector<Vertex> &GetVertices() const
+		{
 			return vertices_;
 		}
 
-		const std::vector<uint32_t>& GetIndices() const {
+		const std::vector<uint32_t> &GetIndices() const
+		{
 			return indices_;
 		}
 
-		static std::unique_ptr<Mesh> LoadWavefront(const char* data);
+		static std::unique_ptr<Mesh> LoadWavefront(const char *data);
 	};
 }
 

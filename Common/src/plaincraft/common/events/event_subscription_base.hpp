@@ -31,6 +31,7 @@ namespace plaincraft_common
     {
     public:
         virtual void Call(Args... args) = 0;
+        virtual void* GetTarget() = 0;
         virtual ~EventSubscriptionBase() {}
     };
 }

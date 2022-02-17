@@ -58,11 +58,6 @@ namespace plaincraft_render_engine_vulkan {
 
 		std::vector<VkCommandBuffer> command_buffers_;
 
-
-
-		std::unique_ptr<VulkanTexture> texture_image_;
-		std::unique_ptr<VulkanImageView> texture_image_view_;
-
 		std::vector<VkSemaphore> image_available_semaphores_;
 		std::vector<VkSemaphore> render_finished_semaphores_;
 		std::vector<VkFence> in_flight_fences_;

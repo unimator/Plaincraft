@@ -36,6 +36,8 @@ SOFTWARE.
 #include "../../descriptors/vulkan_descriptor_set_layout.hpp"
 #include "../../descriptors/vulkan_descriptor_pool.hpp"
 #include "../../descriptors/vulkan_descriptor_writer.hpp"
+#include "../../memory/vulkan_texture.hpp"
+#include <unordered_map>
 #include <plaincraft_render_engine.hpp>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -55,34 +57,42 @@ namespace plaincraft_render_engine_vulkan {
         VkExtent2D extent_;
         size_t images_count_;
         
-		std::vector<char> vertex_shader_code_;
-		std::vector<char> fragment_shader_code_;
-
         std::unique_ptr<VulkanPipeline> pipeline_;
 		VkPipelineLayout pipeline_layout_;
-        
-		std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
-		std::unique_ptr<VulkanDescriptorSetLayout> descriptor_set_layout_;
-		std::vector<VkDescriptorSet> descriptor_sets_;
-        
+
+        static constexpr uint32_t default_frame_pool_size_ = 256;
+		
+        struct FrameDescriptorSets {
+            VkDescriptorSet mvp_descriptor_set;
+            std::unordered_map<std::shared_ptr<Texture>, VkDescriptorSet> materials_descriptor_set;
+        };
+        std::unique_ptr<VulkanDescriptorPool> descriptor_pool_;
+		std::unique_ptr<VulkanDescriptorSetLayout> mvp_descriptor_set_layout_;
+        std::unique_ptr<VulkanDescriptorSetLayout> material_descriptor_set_layout_;
+        std::vector<FrameDescriptorSets> descriptor_sets_;
+
         std::vector<std::unique_ptr<VulkanBuffer>> model_buffers_;
         uint32_t buffers_instance_count_;
         ModelMatrix* model_memory_ = nullptr;
 
         std::vector<std::unique_ptr<VulkanBuffer>> view_projection_buffers_;
 		        
-        // TODO: get rid of these
-		VkImageView texture_image_view_;
-		VkSampler texture_sampler_;
+        std::vector<std::unique_ptr<VulkanImage>> texture_images_;
+        std::vector<std::unique_ptr<VulkanImageView>> texture_images_views_;
+        std::vector<std::unique_ptr<VulkanTexture>> textures_;
+
+        VulkanRendererFrameConfig* frame_config_ = nullptr;
 
     public:
         VulkanSceneRenderer(VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, size_t images_count, std::shared_ptr<Camera> camera);
         ~VulkanSceneRenderer() override;
 
-        void Render(VulkanRendererFrameConfig& frame_config);
-        VkPipelineLayout GetLayout() const;
-        void Check();
+        void BeginFrame(VulkanRendererFrameConfig& frame_config);
+        void EndFrame();
 
+        void Batch(std::shared_ptr<Drawable> drawable) override;
+        void Render();
+        
         //void UpdateUniformBuffer(uint32_t image_index);
 
     private:
@@ -90,10 +100,14 @@ namespace plaincraft_render_engine_vulkan {
 		void CreatePipelineLayout();
         
 		void CreateUniformBuffers();
+        void CreateImages();
+        void CreateImagesViews();
 
         void CreateDescriptorSetLayout();
         void CreateDescriptorPool();
-        void CreateDescriptors();
+        void CreateBasicDescriptors();
+        
+        VkDescriptorSet CreateMaterialDescriptorSet(VkImageView texture_image_view, VkSampler texture_sampler);
 
         void RecreateEntitiesBuffers();
     };

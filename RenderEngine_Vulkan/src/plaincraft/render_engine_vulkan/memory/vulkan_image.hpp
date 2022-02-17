@@ -68,13 +68,15 @@ namespace plaincraft_render_engine_vulkan
 
         void CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
 
-        auto GetImage() -> VkImage { return image_; }
-        auto GetImageMemory() -> VkDeviceMemory { return image_memory_; }
-        auto GetWidth() -> uint32_t { return width_; }
-        auto GetHeight() -> uint32_t { return height_; }
+        VkImage GetImage() const;
+        VkDeviceMemory GetImageMemory() const;
+        uint32_t GetWidth() const;
+        uint32_t GetHeight() const;
+        VkFormat GetFormat() const;
 
-    protected:
+    private:
         void CreateImage();
+        void CreateImageView();
     };
 }
 

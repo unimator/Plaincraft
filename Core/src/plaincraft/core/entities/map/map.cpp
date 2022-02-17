@@ -36,7 +36,7 @@ namespace plaincraft_core
           origin_entity_(origin_entity)
     {
         ReloadGrid();
-        //OptimizeMap();
+        OptimizeMap();
     }
 
     void Map::OnLoopTick(float delta_time)
@@ -66,7 +66,7 @@ namespace plaincraft_core
         || origin_position.z > static_cast<float>(higher_boundary_y) + Chunk::chunk_size)
         {
             ReloadGrid();
-            //OptimizeMap();
+            OptimizeMap();
         }
     }
 
@@ -107,7 +107,9 @@ namespace plaincraft_core
 
                 if (chunk == nullptr)
                 {
-                    chunk = std::make_unique<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_z)));
+                    chunk = std::make_shared<Chunk>(world_generator_.CreateChunk(I32Vector3d(current_x, 0, current_z)));
+                    chunk->SetDrawable(std::make_shared<Drawable>());
+                    world_generator_.scene_.AddGameObject(chunk);
                 }
 
                 ++current_z;
@@ -124,7 +126,7 @@ namespace plaincraft_core
                 {
                     if(chunk != nullptr)
                     {
-                        world_generator_.DisposeChunk(std::move(chunk));
+                        world_generator_.DisposeChunk(chunk);
                     }
                 }
             }
@@ -167,6 +169,7 @@ namespace plaincraft_core
                 chunk->OrganizeMesh(
                     world_generator_.render_engine_->GetModelsFactory(), 
                     world_generator_.models_cache_,
+                    world_generator_.textures_cache_,
                     negative_x_chunk,
                     positive_x_chunk,
                     negative_z_chunk,

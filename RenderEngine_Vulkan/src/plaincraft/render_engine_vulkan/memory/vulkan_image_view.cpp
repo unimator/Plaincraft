@@ -60,6 +60,11 @@ namespace plaincraft_render_engine_vulkan
         vkDestroyImageView(device.GetDevice(), image_view_, nullptr);
     }
 
+    VkImageView VulkanImageView::GetImageView() const
+    {
+        return image_view_;
+    }
+
     void VulkanImageView::CreateImageView(VkImage image)
     {
         auto device = device_.get().GetDevice();

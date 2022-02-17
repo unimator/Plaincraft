@@ -44,6 +44,7 @@ namespace plaincraft_render_engine_vulkan
         descriptor_set_layout_binding.descriptorType = descriptor_type;
         descriptor_set_layout_binding.descriptorCount = descriptor_count;
         descriptor_set_layout_binding.stageFlags = shader_stage_flags;
+        descriptor_set_layout_binding.pImmutableSamplers = nullptr;
         layout_bindings_[binding] = descriptor_set_layout_binding;
         return *this;
     }

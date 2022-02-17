@@ -28,7 +28,6 @@ SOFTWARE.
 #include "../utils/conversions.hpp"
 #include <plaincraft_common.hpp>
 #include <plaincraft_render_engine.hpp>
-#include <plaincraft_render_engine_opengl.hpp>
 #include <cmath>
 #include <random>
 
@@ -38,18 +37,20 @@ namespace plaincraft_core
 								   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
 								   std::shared_ptr<RenderEngine> render_engine,
 								   Scene &scene,
-								   ModelsCache &models_cache)
+								   Cache<Model> &models_cache,
+								   Cache<Texture> &textures_cache)
 		: physics_common_(physics_common),
 		  physics_world_(physics_world),
 		  render_engine_(render_engine),
 		  scene_(scene),
-		  models_cache_(models_cache)
+		  models_cache_(models_cache),
+		  textures_cache_(textures_cache)
 	{
 	}
 
 	Chunk WorldGenerator::CreateChunk(I32Vector3d offset)
 	{
-		const auto model = models_cache_.Fetch("cube_half");
+		//const auto model = models_cache_.Fetch("cube_half");
 
 		auto chunk_data = Chunk::Data();
 		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
@@ -60,12 +61,13 @@ namespace plaincraft_core
 		float g = static_cast<float>((rand() % 255) / 255.0f);
 		float b = static_cast<float>((rand() % 255) / 255.0f);
 		auto color = glm::vec3(r, g, b);
+		srand(12345);
 
 		for (auto i = 0; i < Chunk::chunk_size; ++i)
 		{
 			for (auto j = 0; j < Chunk::chunk_height; ++j)
 			{
-				if (j > 2)
+				if (j > 3)
 				{
 					continue;
 				}
@@ -80,8 +82,8 @@ namespace plaincraft_core
 					auto game_object = std::make_shared<Block>(I32Vector3d(i, j, k));
 					game_object->SetObjectType(GameObject::ObjectType::Static);
 					auto drawable = std::make_shared<Drawable>();
-					drawable->SetModel(model);
-					game_object->SetDrawable(drawable);
+					//drawable->SetModel(model);
+					//game_object->SetDrawable(drawable);
 
 					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
 					auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + i * 1.0;
@@ -97,12 +99,12 @@ namespace plaincraft_core
 					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
 					game_object->SetRigidBody(rigid_body);
 
-					game_object->SetColor(color);
+					//game_object->SetColor(color);
 
 					scene_.AddGameObject(game_object);
 
-					game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-					game_object->GetDrawable()->SetRotation(Quaternion(orientation.w, orientation.x, orientation.y, orientation.z));
+					// game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+					// game_object->GetDrawable()->SetRotation(Quaternion(orientation.w, orientation.x, orientation.y, orientation.z));
 
 					chunk_data[i][j][k] = game_object;
 				}
@@ -115,7 +117,7 @@ namespace plaincraft_core
 		return Chunk(position_x, position_z, std::move(chunk_data));
 	}
 
-	void WorldGenerator::DisposeChunk(std::unique_ptr<Chunk> chunk)
+	void WorldGenerator::DisposeChunk(std::shared_ptr<Chunk> chunk)
 	{
 		auto &blocks = chunk->GetData();
 		auto entities_deleted = 0;
@@ -137,5 +139,6 @@ namespace plaincraft_core
 				}
 			}
 		}
+		scene_.RemoveGameObject(chunk);
 	}
 }

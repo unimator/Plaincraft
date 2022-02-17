@@ -30,7 +30,7 @@ SOFTWARE.
 #include "../src/plaincraft/core/events/loop_events_handler.hpp"
 #include "../src/plaincraft/core/utils/conversions.hpp"
 
-#include "../src/plaincraft/core/scene.hpp"
+#include "../src/plaincraft/core/scene/scene.hpp"
 #include "../src/plaincraft/core/game.hpp"
 
 #endif // PLAINCRAFT_CORE_PLAINCRAFT_CORE

@@ -38,6 +38,5 @@ namespace plaincraft_render_engine_vulkan {
         VulkanModelsFactory(const VulkanDevice& device);
 
         std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh) override;
-        std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) override;
     };
 }

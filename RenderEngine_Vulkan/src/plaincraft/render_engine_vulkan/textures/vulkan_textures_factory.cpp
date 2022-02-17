@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "opengl_texture.hpp"
+#include "vulkan_textures_factory.hpp"
+#include "../memory/vulkan_texture.hpp"
 
-namespace plaincraft_render_engine_opengl {
-	OpenGLTexture::OpenGLTexture() : texture_id_(0) { }
+namespace plaincraft_render_engine_vulkan
+{
+	VulkanTexturesFactory::VulkanTexturesFactory(const VulkanDevice &device)
+		: device_(device)
+	{
+	}
 
-	void OpenGLTexture::UseTexture() const {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture_id_);
+	std::unique_ptr<Texture> VulkanTexturesFactory::LoadFromImage(const Image &image)
+	{
+		return std::make_unique<VulkanTexture>(device_, image);
 	}
 }

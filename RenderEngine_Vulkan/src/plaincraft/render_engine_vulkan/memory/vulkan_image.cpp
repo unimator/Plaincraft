@@ -47,7 +47,7 @@ namespace plaincraft_render_engine_vulkan
         CreateImage();
     }
 
-    VulkanImage::VulkanImage(VulkanImage&& other)
+    VulkanImage::VulkanImage(VulkanImage &&other)
         : device_(other.device_),
           width_(other.width_),
           height_(other.height_),
@@ -61,9 +61,10 @@ namespace plaincraft_render_engine_vulkan
         other.image_memory_ = VK_NULL_HANDLE;
     }
 
-    VulkanImage& VulkanImage::operator=(VulkanImage&& other)
+    VulkanImage &VulkanImage::operator=(VulkanImage &&other)
     {
-        if(this == &other){
+        if (this == &other)
+        {
             return *this;
         }
 
@@ -82,41 +83,72 @@ namespace plaincraft_render_engine_vulkan
         other.height_ = 0;
         other.image_tiling_ = VK_IMAGE_TILING_OPTIMAL;
         other.memory_property_flags_ = 0;
+
+        return *this;
     }
 
     VulkanImage::~VulkanImage()
     {
-        auto& device = device_.get();
+        auto &device = device_.get();
         vkDestroyImage(device.GetDevice(), image_, nullptr);
-        vkFreeMemory(device.GetDevice(), image_memory_, nullptr);
+
+        // if(image_memory_ != VK_NULL_HANDLE)
+        // {
+        //     vkFreeMemory(device.GetDevice(), image_memory_, nullptr);
+        // }
+    }
+
+    VkImage VulkanImage::GetImage() const
+    {
+        return image_;
+    }
+
+    VkDeviceMemory VulkanImage::GetImageMemory() const
+    {
+        return image_memory_;
+    }
+
+    uint32_t VulkanImage::GetWidth() const
+    {
+        return width_;
+    }
+
+    uint32_t VulkanImage::GetHeight() const
+    {
+        return height_;
+    }
+
+    VkFormat VulkanImage::GetFormat() const
+    {
+        return format_;
     }
 
     void VulkanImage::CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
     {
-        auto& device = device_.get();
+        auto &device = device_.get();
         auto command_buffer = device.BeginSingleTimeCommands();
 
-		VkBufferImageCopy image_copy_region{};
-		image_copy_region.bufferOffset = 0;
-		image_copy_region.bufferRowLength = 0;
-		image_copy_region.bufferImageHeight = 0;
+        VkBufferImageCopy image_copy_region{};
+        image_copy_region.bufferOffset = 0;
+        image_copy_region.bufferRowLength = 0;
+        image_copy_region.bufferImageHeight = 0;
 
-		image_copy_region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		image_copy_region.imageSubresource.mipLevel = 0;
-		image_copy_region.imageSubresource.baseArrayLayer = 0;
-		image_copy_region.imageSubresource.layerCount = 1;
+        image_copy_region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        image_copy_region.imageSubresource.mipLevel = 0;
+        image_copy_region.imageSubresource.baseArrayLayer = 0;
+        image_copy_region.imageSubresource.layerCount = 1;
 
-		image_copy_region.imageOffset = {0, 0, 0};
-		image_copy_region.imageExtent = {width, height, 1};
+        image_copy_region.imageOffset = {0, 0, 0};
+        image_copy_region.imageExtent = {width, height, 1};
 
-		vkCmdCopyBufferToImage(command_buffer, buffer, image_, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &image_copy_region);
+        vkCmdCopyBufferToImage(command_buffer, buffer, image_, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &image_copy_region);
 
-		device.EndSingleTimeCommands(command_buffer);
+        device.EndSingleTimeCommands(command_buffer);
     }
 
     void VulkanImage::CreateImage()
     {
-        auto& device = device_.get();
+        auto &device = device_.get();
 
         VkImageCreateInfo image_create_info{};
         image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

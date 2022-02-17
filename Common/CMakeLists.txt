@@ -13,6 +13,11 @@ PRIVATE
     include/lib/stb_image.h
     include/lib/tiny_obj_loader.h
     include/plaincraft_common.hpp
+    src/plaincraft/common/caching/cache.hpp
+    src/plaincraft/common/debugging/logging/logger.cpp
+    src/plaincraft/common/debugging/logging/logger.hpp
+    src/plaincraft/common/debugging/profiling/profiler.cpp
+    src/plaincraft/common/debugging/profiling/profiler.hpp
     src/plaincraft/common/events/event_listener.hpp
     src/plaincraft/common/events/event_publisher.hpp
     src/plaincraft/common/events/event_subscription_base.hpp
@@ -20,10 +25,6 @@ PRIVATE
     src/plaincraft/common/events/event_trigger_base.hpp
     src/plaincraft/common/events/event_trigger.hpp
     src/plaincraft/common/exceptions/not_implemented_exception.hpp
-    src/plaincraft/common/debugging/logging/logger.cpp
-    src/plaincraft/common/debugging/logging/logger.hpp
-    src/plaincraft/common/debugging/profiling/profiler.cpp
-    src/plaincraft/common/debugging/profiling/profiler.hpp
     src/plaincraft/common/utils/file_utils.cpp
     src/plaincraft/common/utils/file_utils.hpp
     src/plaincraft/common/utils/fixed_list.hpp

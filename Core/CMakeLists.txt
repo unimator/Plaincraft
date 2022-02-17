@@ -37,16 +37,17 @@ PRIVATE
     src/plaincraft/core/entities/game_object.hpp
     src/plaincraft/core/events/loop_events_handler.cpp
     src/plaincraft/core/events/loop_events_handler.hpp
-    src/plaincraft/core/models/models_cache.cpp
-    src/plaincraft/core/models/models_cache.hpp
+    src/plaincraft/core/scene/events/scene_events_handler.hpp
+    src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.cpp
+    src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.hpp
+    src/plaincraft/core/scene/scene.cpp
+    src/plaincraft/core/scene/scene.hpp
     src/plaincraft/core/utils/conversions.cpp
     src/plaincraft/core/utils/conversions.hpp
     src/plaincraft/core/world/world_generator.cpp
     src/plaincraft/core/world/world_generator.hpp
     src/plaincraft/core/game.cpp
     src/plaincraft/core/game.hpp
-    src/plaincraft/core/scene.cpp
-    src/plaincraft/core/scene.hpp
     
 )
 
@@ -54,4 +55,4 @@ target_include_directories(${TARGET_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}
 
 target_link_libraries(${TARGET_NAME} 
                         PUBLIC "Common" "RenderEngine" 
-                        PRIVATE "RenderEngine_OpenGL" "RenderEngine_Vulkan" "reactphysics3d")
+                        PRIVATE "RenderEngine_Vulkan" "reactphysics3d")

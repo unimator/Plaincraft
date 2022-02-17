@@ -57,6 +57,17 @@ namespace plaincraft_common
             auto subscription = std::make_unique<EventSubscription<T, Args...>>(target, callback);
             subscriptions_.push_back(std::move(subscription));
         }
+
+        template<class T>
+        void RemoveSubscription(T* target)
+        {
+            auto predicate = [&](std::unique_ptr<EventSubscriptionBase<Args...>> &subscription_base)
+            {
+                return subscription_base->GetTarget() == target;
+            };
+            auto subscription_it = std::find_if(subscriptions_.begin(), subscriptions_.end(), predicate);
+            subscriptions_.erase(subscription_it);
+        }
     };
 }
 

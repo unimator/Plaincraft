@@ -60,6 +60,7 @@ namespace plaincraft_core
 		//physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>();
 		auto physics_world_settings = rp3d::PhysicsWorld::WorldSettings();
 		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(physics_world_settings), rp3d::PhysicsWorldDeleter(physics_common_));
+		physics_world_->setIsDebugRenderingEnabled(false);
 		//physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
 
 		// auto logger = physics_common_.createDefaultLogger();
@@ -70,36 +71,38 @@ namespace plaincraft_core
 		// physics_common_.setLogger(logger);
 
 		auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube_half.obj");
-		auto cube_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(cube_model_obj.data())));
+		std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_model_obj.data()));
 		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
 		models_cache_.Store("cube_half", std::move(cube_model));
 
 		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/sphere_half.obj");
-		auto sphere_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(sphere_model_obj.data())));
+		std::shared_ptr<Mesh> sphere_mesh = std::move(Mesh::LoadWavefront(sphere_model_obj.data()));
 		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
 		models_cache_.Store("sphere_half", std::move(sphere_model));
 
 		auto capsule_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/capsule_half.obj");
-		auto capsule_mesh = std::shared_ptr<Mesh>(std::move(Mesh::LoadWavefront(capsule_model_obj.data())));
+		std::shared_ptr<Mesh> capsule_mesh = std::move(Mesh::LoadWavefront(capsule_model_obj.data()));
 		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
 		models_cache_.Store("capsule_half", std::move(capsule_model));
 
-		WorldGenerator world_generator(physics_common_, physics_world_, render_engine_, scene_, models_cache_);
+		auto minecraft_texture_image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/minecraft-textures.png");
+		auto minecraft_texture = render_engine_->GetTexturesFactory()->LoadFromImage(minecraft_texture_image);
+		textures_cache_.Store("minecraft-texture", std::move(minecraft_texture));
+
+		WorldGenerator world_generator(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
 
 		player = std::make_shared<GameObject>();
 		player->SetName("player");
 
-		const auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/player.png");
-		std::shared_ptr<Texture> player_texture = std::move(render_engine_->GetTexturesFactory()->LoadFromImage(image));
-
 		auto player_model = models_cache_.Fetch("capsule_half");
 		auto drawable = std::make_shared<Drawable>();
 		drawable->SetModel(player_model);
+		drawable->SetTexture(textures_cache_.Fetch("minecraft-texture"));
 		drawable->SetScale(0.75f);
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(5.75f, 5.75f, 1.25f);
+		auto player_position = Vector3d(0.25f, 5.75f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
@@ -114,15 +117,42 @@ namespace plaincraft_core
 		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
 		rigid_body->setIsFrictionFreezed(true);
 		rigid_body->setIsBouncingFreezed(true);
+		rigid_body->setType(rp3d::BodyType::STATIC);
+		rigid_body->setType(rp3d::BodyType::DYNAMIC);
 		player->SetRigidBody(rigid_body);
 
 		scene_.AddGameObject(player);
 
 		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
 
+		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+		// auto game_object = std::make_shared<Block>(I32Vector3d(0, 0, 0));
+		// auto drawable2 = std::make_shared<Drawable>();
+		// drawable2->SetModel(models_cache_.Fetch("cube_half"));
+		// drawable2->SetTexture(textures_cache_.Fetch("minecraft-texture"));
+		// game_object->SetDrawable(drawable2);
+		// auto x = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
+		// auto y = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
+		// auto z = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
+		// auto position = Vector3d(x, y, z);
+		// auto orientation2 = rp3d::Quaternion::identity();
+		// rp3d::Transform transform2(rp3d::Vector3(0.0, 0.0, 0.0), orientation2);
+		// auto rigid_body2 = physics_world_->createRigidBody(transform2);
+		// auto collider2 = rigid_body2->addCollider(cube_shape, transform2);
+		// collider2->getMaterial().setFrictionCoefficient(1.0f);
+		// rigid_body2->setType(rp3d::BodyType::STATIC);
+		// rigid_body2->setTransform(rp3d::Transform(FromGlm(position), orientation2));
+		// game_object->SetRigidBody(rigid_body2);
+
+		//game_object->SetColor(color);
+
+		// scene_.AddGameObject(game_object);
+
 		auto map = std::make_shared<Map>(world_generator, player);
 		scene_.AddGameObject(map);
+		
 		loop_events_handler_.loop_event_trigger.AddSubscription(map.get(), &Map::OnLoopTick);
+		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
 	}
 
 	void Game::Run()
@@ -155,17 +185,17 @@ namespace plaincraft_core
 
 			last_time = current_time;
 
-			// MEASURE("physics",
-			// 		{
-			// 			while (accumulator >= physics_time_step_)
-			// 			{
-			// 				physics_world_->update(physics_time_step_);
-			// 				accumulator -= physics_time_step_;
-			// 			}
-			// 		})
+			MEASURE("physics",
+					{
+						while (accumulator >= physics_time_step_)
+						{
+							physics_world_->update(physics_time_step_);
+							accumulator -= physics_time_step_;
+						}
+					})
 
 			MEASURE("update scene objects", {
-				scene_.UpdateFrame();
+				//scene_.UpdateFrame();
 			});
 
 			auto player = scene_.FindGameObjectByName("player");

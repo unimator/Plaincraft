@@ -27,18 +27,20 @@ SOFTWARE.
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
-
 #include "mesh.hpp"
+
+#include <glm/gtx/hash.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
 
-
-namespace std {
-    template<>
-    struct hash<plaincraft_render_engine::Vertex> {
-        size_t operator()(plaincraft_render_engine::Vertex const& vertex) const {
+namespace std
+{
+    template <>
+    struct hash<plaincraft_render_engine::Vertex>
+    {
+        size_t operator()(plaincraft_render_engine::Vertex const &vertex) const
+        {
             size_t seed = 0;
             plaincraft_common::hash_combine(seed, vertex.position, vertex.normal, vertex.color, vertex.text_coordinates);
             return seed;
@@ -46,19 +48,20 @@ namespace std {
     };
 }
 
-namespace plaincraft_render_engine {
-
-    Mesh::Mesh(Mesh&& other)
-    :
-        vertices_(std::move(other.vertices_)),
-        indices_(std::move(other.indices_))
+namespace plaincraft_render_engine
+{
+    Mesh::Mesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> indices)
+        : vertices_(std::move(vertices)), indices_(std::move(indices))
     {
-
     }
 
-    Mesh& Mesh::operator=(Mesh&& other)
+    Mesh::Mesh(Mesh &&other) : vertices_(std::move(other.vertices_)), indices_(std::move(other.indices_))
     {
-        if(&other == this)
+    }
+
+    Mesh &Mesh::operator=(Mesh &&other)
+    {
+        if (&other == this)
         {
             return *this;
         }
@@ -69,7 +72,7 @@ namespace plaincraft_render_engine {
         return *this;
     }
 
-    std::unique_ptr<Mesh> Mesh::LoadWavefront(const char* data) 
+    std::unique_ptr<Mesh> Mesh::LoadWavefront(const char *data)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -78,7 +81,8 @@ namespace plaincraft_render_engine {
 
         std::stringstream data_stream(data);
 
-        if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, &data_stream)) {
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, &data_stream))
+        {
             throw std::runtime_error(warning + error);
         }
 
@@ -88,13 +92,13 @@ namespace plaincraft_render_engine {
 
         std::unordered_map<Vertex, uint32_t> unique_vertices{};
 
-        for(const auto& shape : shapes)
+        for (const auto &shape : shapes)
         {
-            for(const auto& index : shape.mesh.indices)
+            for (const auto &index : shape.mesh.indices)
             {
                 Vertex vertex{};
 
-                if(index.vertex_index >= 0)
+                if (index.vertex_index >= 0)
                 {
                     vertex.position = {
                         attrib.vertices[3 * index.vertex_index + 0],
@@ -109,7 +113,7 @@ namespace plaincraft_render_engine {
                     };
                 }
 
-                if(index.normal_index >= 0)
+                if (index.normal_index >= 0)
                 {
                     vertex.normal = {
                         attrib.normals[3 * index.normal_index + 0],
@@ -118,7 +122,7 @@ namespace plaincraft_render_engine {
                     };
                 }
 
-                if(index.texcoord_index >= 0)
+                if (index.texcoord_index >= 0)
                 {
                     vertex.text_coordinates = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
@@ -126,7 +130,8 @@ namespace plaincraft_render_engine {
                     };
                 }
 
-                if(unique_vertices.count(vertex) == 0) {
+                if (unique_vertices.count(vertex) == 0)
+                {
                     unique_vertices[vertex] = static_cast<uint32_t>(mesh.vertices_.size());
                     mesh.vertices_.push_back(vertex);
                 }

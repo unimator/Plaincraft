@@ -8,4 +8,4 @@ if ( MSVC )
     target_compile_options(${TARGET_NAME} PRIVATE "/W4")
 endif()
 
-target_link_libraries(${TARGET_NAME} PRIVATE "Core" "RenderEngine_Vulkan" "RenderEngine_OpenGL")
+target_link_libraries(${TARGET_NAME} PRIVATE "Core" "RenderEngine_Vulkan")

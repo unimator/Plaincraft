@@ -55,6 +55,12 @@ namespace plaincraft_core {
 		GameObject();
 		virtual ~GameObject();
 
+		GameObject(const GameObject& other) = delete;
+		GameObject& operator=(const GameObject& other) = delete;
+
+		GameObject(GameObject&& other) noexcept;
+		GameObject& operator=(GameObject&& other) noexcept;
+
 		void SetDrawable(std::shared_ptr<Drawable> drawable);
 		std::shared_ptr<Drawable> GetDrawable() const;
 

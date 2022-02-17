@@ -34,9 +34,7 @@ namespace plaincraft_render_engine {
 	class Texture
 	{
 	public:
-		virtual void UseTexture() const = 0;
-
-		~Texture() {}
+		virtual ~Texture() {}
 	};
 }
 

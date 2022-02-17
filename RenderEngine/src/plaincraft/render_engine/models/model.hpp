@@ -35,12 +35,10 @@ namespace plaincraft_render_engine {
 	{
 	private:
 		std::shared_ptr<Mesh const> mesh_;
-		std::shared_ptr<Texture const> texture_;
 
 	public:
 		Model();
 		Model(std::shared_ptr<Mesh const> mesh);
-		Model(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture);
 
 		Model(const Model& other) = delete;
 		Model& operator=(const Model& other) = delete;
@@ -51,7 +49,6 @@ namespace plaincraft_render_engine {
 		virtual ~Model() { }
 
 		std::shared_ptr<Mesh const> GetMesh();
-		std::shared_ptr<Texture const> GetTexture();
 	};
 }
 

@@ -31,8 +31,9 @@ SOFTWARE.
 
 namespace std
 {
-	bool less<std::reference_wrapper<plaincraft_core::GameObject>>::operator()(std::reference_wrapper<plaincraft_core::GameObject> first_entity,
-																		   std::reference_wrapper<plaincraft_core::GameObject> second_entity) const
+	bool less<std::reference_wrapper<plaincraft_core::GameObject>>::operator()(
+		std::reference_wrapper<plaincraft_core::GameObject> first_entity,
+		std::reference_wrapper<plaincraft_core::GameObject> second_entity) const
 	{
 		return first_entity.get().GetUniqueId() < second_entity.get().GetUniqueId();
 	}
@@ -43,60 +44,65 @@ namespace plaincraft_core
 	using namespace plaincraft_render_engine;
 
 	Scene::Scene(std::shared_ptr<RenderEngine> render_engine)
-		: render_engine_(render_engine)
+		: render_engine_(render_engine),
+		  active_objects_optimizer_(ActiveObjectsOptimizer(
+			  game_objects_list_,
+			  static_game_objects_list_,
+			  dynamic_game_objects_list_,
+			  scene_events_handler_))
 	{
 	}
 
 	Scene::~Scene()
 	{
-		entities_list_.clear();
+		game_objects_list_.clear();
 	}
 
-	void Scene::AddGameObject(std::shared_ptr<GameObject> entity_to_add)
+	void Scene::AddGameObject(std::shared_ptr<GameObject> game_object_to_add)
 	{
-		entities_list_.push_back(entity_to_add);
+		game_objects_list_.push_back(game_object_to_add);
 
-		auto object_type = entity_to_add->GetObjectType();
-		if(object_type == GameObject::ObjectType::Dynamic)
+		auto object_type = game_object_to_add->GetObjectType();
+		if (object_type == GameObject::ObjectType::Dynamic)
 		{
-			dynamic_entities_list_.push_back(entity_to_add);
+			dynamic_game_objects_list_.push_back(game_object_to_add);
 		}
 
-		auto rigid_body = entity_to_add->GetRigidBody();
+		auto rigid_body = game_object_to_add->GetRigidBody();
 		if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
 		{
-			const rp3d::Transform &transform = entity_to_add->GetRigidBody()->getTransform();
-			previous_transforms_.insert({entity_to_add, transform});
+			const rp3d::Transform &transform = game_object_to_add->GetRigidBody()->getTransform();
+			previous_transforms_.insert({game_object_to_add, transform});
 		}
 
-		if (entity_to_add->GetDrawable() != nullptr)
+		if (game_object_to_add->GetDrawable() != nullptr)
 		{
-			render_engine_->AddDrawable(entity_to_add->GetDrawable());
+			render_engine_->AddDrawable(game_object_to_add->GetDrawable());
 		}
 	}
 
-	void Scene::RemoveGameObject(std::shared_ptr<GameObject> entity_to_remove)
+	void Scene::RemoveGameObject(std::shared_ptr<GameObject> game_object_to_remove)
 	{
 		auto remove_predicate = [&](std::shared_ptr<GameObject> const &game_object)
-								 { return game_object == entity_to_remove; };
-		
-		entities_list_.remove_if(remove_predicate);
+		{ return game_object == game_object_to_remove; };
 
-		auto object_type = entity_to_remove->GetObjectType();
-		if(entity_to_remove->GetObjectType() == object_type)
+		game_objects_list_.remove_if(remove_predicate);
+
+		auto object_type = game_object_to_remove->GetObjectType();
+		if (game_object_to_remove->GetObjectType() == object_type)
 		{
-			dynamic_entities_list_.remove_if(remove_predicate);
+			dynamic_game_objects_list_.remove_if(remove_predicate);
 		}
 
-		auto rigid_body = entity_to_remove->GetRigidBody();
-		if(rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
+		auto rigid_body = game_object_to_remove->GetRigidBody();
+		if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
 		{
-			previous_transforms_.erase(previous_transforms_.find(entity_to_remove));
+			previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
 		}
 
-		if(entity_to_remove->GetDrawable() != nullptr)
+		if (game_object_to_remove->GetDrawable() != nullptr)
 		{
-			render_engine_->RemoveDrawable(entity_to_remove->GetDrawable());
+			render_engine_->RemoveDrawable(game_object_to_remove->GetDrawable());
 		}
 	}
 
@@ -104,8 +110,8 @@ namespace plaincraft_core
 	{
 		auto predicate = [&](const std::shared_ptr<const GameObject> game_object)
 		{ return game_object->GetName() == name; };
-		auto result = std::find_if(begin(entities_list_), end(entities_list_), predicate);
-		if (result != end(entities_list_))
+		auto result = std::find_if(begin(game_objects_list_), end(game_objects_list_), predicate);
+		if (result != end(game_objects_list_))
 		{
 			return *result;
 		}
@@ -114,7 +120,7 @@ namespace plaincraft_core
 
 	void Scene::UpdateFrame(float interpolation_factor)
 	{
-		for (auto &game_object : dynamic_entities_list_)
+		for (auto &game_object : game_objects_list_)
 		{
 			const auto rb = game_object->GetRigidBody();
 
@@ -132,12 +138,17 @@ namespace plaincraft_core
 
 			auto drawable = game_object->GetDrawable();
 
-			if(drawable->GetPosition() != position)
+			if (drawable == nullptr)
+			{
+				continue;
+			}
+
+			if (drawable->GetPosition() != position)
 			{
 				game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
 			}
 
-			if(drawable->GetRotation() != rotation)
+			if (drawable->GetRotation() != rotation)
 			{
 				game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
 			}
@@ -145,9 +156,16 @@ namespace plaincraft_core
 			previous_transforms_[game_object] = transform;
 		}
 
-		auto l = snprintf(nullptr, 0, "%zd", entities_list_.size());
+		active_objects_optimizer_.Optimize();
+
+		auto l = snprintf(nullptr, 0, "%zd", game_objects_list_.size());
 		std::vector<char> buf(l + 1);
-		snprintf(&buf[0], l + 1, "%zd", entities_list_.size());
+		snprintf(&buf[0], l + 1, "%zd", game_objects_list_.size());
 		LOGVALUE("Entities count", std::string(buf.begin(), buf.end()));
+	}
+
+	SceneEventsHandler &Scene::GetSceneEventsHandler()
+	{
+		return scene_events_handler_;
 	}
 }

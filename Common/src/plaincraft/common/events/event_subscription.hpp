@@ -31,11 +31,16 @@ SOFTWARE.
 
 namespace plaincraft_common {
 
+    template<class... Args>
+    class EventTrigger;
+
     template<class T, class... Args>
     class EventSubscription : public EventSubscriptionBase<Args...> {
     private:
         T* target_;
         void (T::*callback_)(Args...);
+
+        friend class EventTrigger<Args>;
     
     public:
         EventSubscription(T* target, void (T::*callback)(Args...)) 
@@ -43,6 +48,10 @@ namespace plaincraft_common {
         
         void Call(Args... args) final {
             (target_->*callback_)(args...);
+        }
+
+        void* GetTarget() final {
+            return target_;
         }
     };
 }

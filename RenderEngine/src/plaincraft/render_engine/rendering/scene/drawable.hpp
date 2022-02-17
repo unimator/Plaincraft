@@ -35,6 +35,7 @@ namespace plaincraft_render_engine
 	{
 	private:
 		std::weak_ptr<Model> model_;
+		std::weak_ptr<Texture> texture_;
 		Vector3d position_;
 		Vector3d color_;
 		Quaternion rotation_;
@@ -45,6 +46,9 @@ namespace plaincraft_render_engine
 	public:
 		void SetModel(std::shared_ptr<Model> model);
 		std::weak_ptr<Model> GetModel() const;
+
+		void SetTexture(std::shared_ptr<Texture> texture);
+		std::weak_ptr<Texture> GetTexture() const;
 
 		void SetScale(float scale);
 		float GetScale() const;

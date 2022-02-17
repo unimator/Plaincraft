@@ -31,12 +31,22 @@ namespace plaincraft_render_engine
 {
 	void Drawable::SetModel(std::shared_ptr<Model> model)
 	{
-		model_ = std::move(model);
+		model_ = model;
 	}
 
 	std::weak_ptr<Model> Drawable::GetModel() const
 	{
 		return model_;
+	}
+
+	void Drawable::SetTexture(std::shared_ptr<Texture> texture)
+	{
+		texture_ = texture;
+	}
+
+	std::weak_ptr<Texture> Drawable::GetTexture() const
+	{
+		return texture_;
 	}
 
 	void Drawable::SetScale(float scale)

@@ -30,7 +30,7 @@ SOFTWARE.
 #include <fstream>
 
 namespace plaincraft_common {
-	DLLEXPORT_PLAINCRAFT_COMMON std::string read_file(const std::string& path) {
+	std::string read_file(const std::string& path) {
 		std::string line;
 		std::stringstream result;
 
@@ -46,7 +46,7 @@ namespace plaincraft_common {
 		return result.str();
 	}
 
-	DLLEXPORT_PLAINCRAFT_COMMON std::vector<char> read_file_raw(const std::string& path) {
+	std::vector<char> read_file_raw(const std::string& path) {
 		std::ifstream file(path, std::ios::ate | std::ios::binary);
 
 		if (!file.is_open()) {

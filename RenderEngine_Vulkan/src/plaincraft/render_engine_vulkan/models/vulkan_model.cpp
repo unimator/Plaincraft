@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include "vulkan_model.hpp"
+#include "../memory/vulkan_texture.hpp"
 #include <cstring>
 
 namespace plaincraft_render_engine_vulkan

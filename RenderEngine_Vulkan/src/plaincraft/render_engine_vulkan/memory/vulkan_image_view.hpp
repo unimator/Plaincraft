@@ -51,7 +51,7 @@ namespace plaincraft_render_engine_vulkan {
 
         ~VulkanImageView();
 
-        auto GetImageView() -> VkImageView { return image_view_; }
+        VkImageView GetImageView() const;
 
     private:
         void CreateImageView(VkImage image);

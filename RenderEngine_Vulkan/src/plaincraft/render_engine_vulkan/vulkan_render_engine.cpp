@@ -27,7 +27,7 @@ SOFTWARE.
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "vulkan_render_engine.hpp"
-#include "texture/vulkan_textures_factory.hpp"
+#include "textures/vulkan_textures_factory.hpp"
 #include "shader/vulkan_shader.hpp"
 #include "rendering/scene/vertex_utils.hpp"
 #include "window/vulkan_window.hpp"
@@ -53,16 +53,13 @@ namespace plaincraft_render_engine_vulkan
 	{
 		auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/text.png");
 
-		texture_image_ = std::make_unique<VulkanTexture>(device_, image);
-		texture_image_view_ = std::make_unique<VulkanImageView>(device_, texture_image_->GetImage(), VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-
 		models_factory_ = std::make_unique<VulkanModelsFactory>(VulkanModelsFactory(device_));
 
 		RecreateSwapChain();
 
 		CreateSyncObjects();
 
-		textures_factory_ = std::make_shared<VulkanTexturesFactory>(VulkanTexturesFactory());
+		textures_factory_ = std::make_shared<VulkanTexturesFactory>(device_);
 	}
 
 	VulkanRenderEngine::~VulkanRenderEngine()
@@ -204,8 +201,6 @@ namespace plaincraft_render_engine_vulkan
 			vkWaitForFences(device_.GetDevice(), 1, &images_in_flight_[image_index], VK_TRUE, UINT64_MAX);
 		}
 
-		//vulkan_renderer->Check();
-
 		VkCommandBufferBeginInfo command_buffer_begin_info{};
 		command_buffer_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		if (vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info) != VK_SUCCESS)
@@ -230,21 +225,22 @@ namespace plaincraft_render_engine_vulkan
 
 		auto vulkan_renderer = GetVulkanRenderer();
 
-		MEASURE("batching", {
-			for (auto i = 0; i < drawables_list_.size(); ++i)
-			{
-				auto drawable = drawables_list_[i];
-				scene_renderer_->Batch(drawable);
-			}
-		});
-
-		vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
-
 		VulkanRendererFrameConfig frame_config{
 			command_buffer,
 			image_index};
+		
+		vulkan_renderer->BeginFrame(frame_config);
 
-		vulkan_renderer->Render(frame_config);
+		for (auto i = 0; i < drawables_list_.size(); ++i)
+		{
+			auto drawable = drawables_list_[i];
+			scene_renderer_->Batch(drawable);
+		}
+
+		vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+		vulkan_renderer->Render();
+		vulkan_renderer->EndFrame();
 		vulkan_renderer->HasRendered();
 
 		gui_renderer_->Render(frame_config);

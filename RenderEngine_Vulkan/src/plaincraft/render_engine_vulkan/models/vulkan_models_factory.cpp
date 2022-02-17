@@ -27,19 +27,15 @@ SOFTWARE.
 #include "vulkan_models_factory.hpp"
 #include "vulkan_model.hpp"
 
-namespace plaincraft_render_engine_vulkan {
-    VulkanModelsFactory::VulkanModelsFactory(const VulkanDevice& device)
-    : device_(device)
-    { }
+namespace plaincraft_render_engine_vulkan
+{
+    VulkanModelsFactory::VulkanModelsFactory(const VulkanDevice &device)
+        : device_(device)
+    {
+    }
 
     std::unique_ptr<Model> VulkanModelsFactory::CreateModel(std::shared_ptr<Mesh const> mesh)
     {
-        auto result = std::make_unique<VulkanModel>(VulkanModel(device_, mesh));
-        return result;
-    }
-
-    std::unique_ptr<Model> VulkanModelsFactory::CreateModel(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture)
-    {
-        return CreateModel(mesh);
+        return std::make_unique<VulkanModel>(VulkanModel(device_, mesh));
     }
 }

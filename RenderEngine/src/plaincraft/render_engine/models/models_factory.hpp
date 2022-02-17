@@ -34,7 +34,6 @@ namespace plaincraft_render_engine {
     class ModelsFactory {
         public:
             virtual std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh) = 0;
-            virtual std::unique_ptr<Model> CreateModel(std::shared_ptr<Mesh const> mesh, std::shared_ptr<Texture const> texture) = 0;
     };
 }
 

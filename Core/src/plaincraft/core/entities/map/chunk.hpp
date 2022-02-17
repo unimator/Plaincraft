@@ -39,7 +39,7 @@ namespace plaincraft_core
 
     class ModelsCache;
 
-    class Chunk
+    class Chunk : public GameObject
     {
     public:
         static constexpr uint32_t chunk_size = 16;
@@ -57,11 +57,17 @@ namespace plaincraft_core
 
     public:
         Chunk(int32_t position_x, int32_t position_z, Data &&blocks);
+
+        Chunk(const Chunk& other) = delete;
+        Chunk& operator=(const Chunk& other) = delete;
+
         Chunk(Chunk &&other) noexcept;
+        Chunk& operator=(Chunk&& other) noexcept;
 
         void OrganizeMesh(
             std::unique_ptr<ModelsFactory> &models_factory,
-            ModelsCache &models_cache,
+            Cache<Model> &models_cache,
+            Cache<Texture> &textures_cache,
             std::optional<std::reference_wrapper<Chunk>> negative_x_chunk = {},
             std::optional<std::reference_wrapper<Chunk>> positive_x_chunk = {},
             std::optional<std::reference_wrapper<Chunk>> negative_z_chunk = {},

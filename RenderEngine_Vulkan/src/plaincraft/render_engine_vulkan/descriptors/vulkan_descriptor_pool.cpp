@@ -92,7 +92,8 @@ namespace plaincraft_render_engine_vulkan
         descriptor_set_allocate_info.pSetLayouts = &descriptor_set_layout;
         descriptor_set_allocate_info.descriptorSetCount = 1;
 
-        if (vkAllocateDescriptorSets(device_.GetDevice(), &descriptor_set_allocate_info, &descriptor_set) != VK_SUCCESS)
+        auto result = vkAllocateDescriptorSets(device_.GetDevice(), &descriptor_set_allocate_info, &descriptor_set);
+        if (result != VK_SUCCESS)
         {
             return false;
         }

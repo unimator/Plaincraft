@@ -24,27 +24,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef PLAINCRAFT_COMMON_CACHE
+#define PLAINCRAFT_COMMON_CACHE
 
-#include "models_cache.hpp"
+#include <string>
+#include <map>
+#include <memory>
 
-namespace plaincraft_core {
-    void ModelsCache::Store(std::string name, std::shared_ptr<Model> model)
+namespace plaincraft_core
+{
+    template <typename TCacheObject, typename TKey = std::string>
+    class Cache
     {
-        models_[name] = std::move(model);
-    }
+    private:
+        std::map<TKey, std::shared_ptr<TCacheObject>> data_;
 
-    std::shared_ptr<Model> ModelsCache::Fetch(std::string name)
-    {
-        return models_[name];
-    }
+    public:
+        Cache() {}
 
-    bool ModelsCache::Contains(std::string name)
-    {
-        return models_.contains(name);
-    }
+        Cache(const Cache& other) = delete;
+        Cache& operator=(const Cache& other) = delete;
 
-    void ModelsCache::Remove(std::string name)
-    {
-        models_.erase(name);
-    }
+        void Store(TKey key, std::shared_ptr<TCacheObject> value)
+        {
+            data_[key] = value;
+        }
+
+        std::shared_ptr<TCacheObject> Fetch(TKey key)
+        {
+            return data_[key];
+        }
+
+        bool Contains(TKey key)
+        {
+            return data_.contains(key);
+        }
+
+        void Remove(TKey key)
+        {
+            data_.erase(key);
+        }
+    };
 }
+
+#endif // PLAINCRAFT_COMMON_CACHE

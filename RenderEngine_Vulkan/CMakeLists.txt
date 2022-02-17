@@ -49,10 +49,8 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.hpp
     src/plaincraft/render_engine_vulkan/swapchain/vulkan_swapchain.cpp
     src/plaincraft/render_engine_vulkan/swapchain/vulkan_swapchain.hpp
-    src/plaincraft/render_engine_vulkan/texture/vulkan_texture.cpp
-    src/plaincraft/render_engine_vulkan/texture/vulkan_texture.hpp
-    src/plaincraft/render_engine_vulkan/texture/vulkan_textures_factory.cpp
-    src/plaincraft/render_engine_vulkan/texture/vulkan_textures_factory.hpp
+    src/plaincraft/render_engine_vulkan/textures/vulkan_textures_factory.cpp
+    src/plaincraft/render_engine_vulkan/textures/vulkan_textures_factory.hpp
     src/plaincraft/render_engine_vulkan/utils/device_extensions.hpp
     src/plaincraft/render_engine_vulkan/utils/queue_family.cpp
     src/plaincraft/render_engine_vulkan/utils/queue_family.hpp

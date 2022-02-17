@@ -44,7 +44,8 @@ namespace plaincraft_render_engine {
 
 		virtual ~SceneRenderer();
 
-		void Batch(std::shared_ptr<Drawable> drawable);
+		virtual void Render() = 0;
+		virtual void Batch(std::shared_ptr<Drawable> drawable);
 		void HasRendered();
 	};
 }
