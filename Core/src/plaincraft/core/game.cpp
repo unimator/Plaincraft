@@ -89,8 +89,6 @@ namespace plaincraft_core
 		auto minecraft_texture = render_engine_->GetTexturesFactory()->LoadFromImage(minecraft_texture_image);
 		textures_cache_.Store("minecraft-texture", std::move(minecraft_texture));
 
-		WorldGenerator world_generator(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
-
 		player = std::make_shared<GameObject>();
 		player->SetName("player");
 
@@ -148,10 +146,14 @@ namespace plaincraft_core
 
 		// scene_.AddGameObject(game_object);
 
-		auto map = std::make_shared<Map>(world_generator, player);
+		auto map = std::make_shared<Map>();
 		scene_.AddGameObject(map);
+
+		auto world_generator = std::make_unique<WorldGenerator>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
+		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
+		world_updater_ = std::make_shared<WorldUpdater>(std::move(world_optimizer), std::move(world_generator), scene_, map, player);
 		
-		loop_events_handler_.loop_event_trigger.AddSubscription(map.get(), &Map::OnLoopTick);
+		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldUpdater::OnLoopFrameTick);
 		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
 	}
 

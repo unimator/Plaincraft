@@ -24,52 +24,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_CHUNK
-#define PLAINCRAFT_CORE_CHUNK
+#ifndef PLAINCRAFT_CORE_WORLD_OPTIMIZER
+#define PLAINCRAFT_CORE_WORLD_OPTIMIZER
 
-#include "../blocks/block.hpp"
+#include "../entities/map/map.hpp"
+#include "../entities/map/chunk.hpp"
+#include <optional>
+#include <functional>
+#include <plaincraft_common.hpp>
 #include <plaincraft_render_engine.hpp>
-#include <array>
 
 namespace plaincraft_core
 {
     using namespace plaincraft_render_engine;
 
-    class ModelsCache;
-    class WorldOptimizer;
-
-    class Chunk : public GameObject
+    class WorldOptimizer
     {
-        friend class WorldOptimizer;
+        std::shared_ptr<Map> map_;
+        Cache<Model> &models_cache_;
+        Cache<Texture> &textures_cache_;
+        std::shared_ptr<ModelsFactory> models_factory_;
 
     public:
-        static constexpr uint32_t chunk_size = 16;
-        static constexpr uint32_t chunk_height = 8;
+        WorldOptimizer(std::shared_ptr<Map> map,
+                       Cache<Model> &models_cache,
+                       Cache<Texture> &textures_cache,
+                       std::shared_ptr<ModelsFactory> models_factory);
 
-        static constexpr const char *chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
-
-        using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
+        void OptimizeMap();
 
     private:
-        Data blocks_;
-
-        int32_t pos_x_, pos_z_;
-        std::shared_ptr<Drawable> mesh_;
-
-    public:
-        Chunk(int32_t position_x, int32_t position_z, Data &&blocks);
-
-        Chunk(const Chunk &other) = delete;
-        Chunk &operator=(const Chunk &other) = delete;
-
-        Chunk(Chunk &&other) noexcept;
-        Chunk &operator=(Chunk &&other) noexcept;
-
-        int32_t GetPositionX() const;
-        int32_t GetPositionZ() const;
-
-        Data &GetData();
+        void OptimizeChunk(Chunk &chunk,
+                           std::optional<std::reference_wrapper<Chunk>> negative_x_chunk = {},
+                           std::optional<std::reference_wrapper<Chunk>> positive_x_chunk = {},
+                           std::optional<std::reference_wrapper<Chunk>> negative_z_chunk = {},
+                           std::optional<std::reference_wrapper<Chunk>> positive_z_chunk = {});
     };
 }
 
-#endif // PLAINCRAFT_CORE_CHUNK
+#endif // PLAINCRAFT_CORE_WORLD_OPTIMIZER

@@ -27,18 +27,19 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_MAP
 #define PLAINCRAFT_CORE_MAP
 
-#include "chunk.hpp"
 #include "../game_object.hpp"
-#include "../../world/world_generator.hpp"
+#include "chunk.hpp"
 #include <vector>
 
 namespace plaincraft_core
 {
-    class ChunkPhysicsOptimizationStrategy;
+    class WorldUpdater;
+    class WorldOptimizer;
 
     class Map : public GameObject
     {
-        friend class ChunkPhysicsOptimizationStrategy;
+        friend class WorldUpdater;
+        friend class WorldOptimizer;
 
     public:
         using ChunksRow = std::vector<std::shared_ptr<Chunk>>;
@@ -48,18 +49,6 @@ namespace plaincraft_core
 
     private:
         ChunksGrid grid_;
-        WorldGenerator world_generator_;
-
-        std::shared_ptr<GameObject> origin_entity_;
-
-    public:
-        Map(WorldGenerator world_generator, std::shared_ptr<GameObject> origin_entity);
-
-        void OnLoopTick(float delta_time);
-
-    private:
-        void ReloadGrid();
-        void OptimizeMap();
     };
 }
 

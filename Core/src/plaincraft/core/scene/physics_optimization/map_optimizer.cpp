@@ -24,54 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "chunk.hpp"
-#include <iostream>
-#include <set>
+#include "map_optimizer.hpp"
 
 namespace plaincraft_core
 {
-    Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
-        : pos_x_(position_x), pos_z_(position_y), blocks_(std::move(blocks))
+    MapOptimizer::MapOptimizer(std::shared_ptr<Map> map,
+                               std::list<std::shared_ptr<GameObject>> &static_game_objects_list,
+                               std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list)
+        : map_(map),
+          static_game_objects_list_(static_game_objects_list),
+          dynamic_game_objects_list_(dynamic_game_objects_list)
     {
-        auto size = std::snprintf(nullptr, 0, "Chunk_%d_%d", position_x, position_y) + 1;
-        std::vector<char> buffer(size);
-        std::snprintf(buffer.data(), size, "Chunk_%d_%d", position_x, position_y);
-        SetName(std::string(buffer.begin(), buffer.end()));
     }
 
-    Chunk::Chunk(Chunk &&other) noexcept
-        : GameObject(std::move(other)), pos_x_(other.pos_x_), pos_z_(other.pos_z_), blocks_(std::move(other.blocks_))
+    void MapOptimizer::Optimize()
     {
-        other.pos_x_ = 0;
-        other.pos_z_ = 0;
-    }
-
-    Chunk &Chunk::operator=(Chunk &&other) noexcept
-    {
-        if (this == &other)
+        for (auto &dynamic_game_object : dynamic_game_objects_list_)
         {
-            return *this;
+            OptimizeForGameObject(*dynamic_game_object);
         }
-
-        this->pos_x_ = other.pos_x_;
-        this->pos_z_ = other.pos_z_;
-        this->blocks_ = std::move(other.blocks_);
-
-        return *this;
     }
 
-    int32_t Chunk::GetPositionX() const
+    void MapOptimizer::OptimizeForGameObject(GameObject &game_object)
     {
-        return pos_x_;
-    }
-
-    int32_t Chunk::GetPositionZ() const
-    {
-        return pos_z_;
-    }
-
-    Chunk::Data &Chunk::GetData()
-    {
-        return blocks_;
     }
 }

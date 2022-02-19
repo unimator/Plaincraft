@@ -45,11 +45,10 @@ namespace plaincraft_core
 
 	Scene::Scene(std::shared_ptr<RenderEngine> render_engine)
 		: render_engine_(render_engine),
-		  active_objects_optimizer_(ActiveObjectsOptimizer(
+		  active_objects_optimizer_(
 			  game_objects_list_,
 			  static_game_objects_list_,
-			  dynamic_game_objects_list_,
-			  scene_events_handler_))
+			  dynamic_game_objects_list_)
 	{
 	}
 
@@ -156,7 +155,7 @@ namespace plaincraft_core
 			previous_transforms_[game_object] = transform;
 		}
 
-		active_objects_optimizer_.Optimize();
+		// active_objects_optimizer_.Optimize();
 
 		auto l = snprintf(nullptr, 0, "%zd", game_objects_list_.size());
 		std::vector<char> buf(l + 1);

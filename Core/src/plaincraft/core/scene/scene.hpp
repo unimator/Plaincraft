@@ -26,6 +26,12 @@ SOFTWARE.
 
 #ifndef PLAINCRAFT_CORE_SCENE
 #define PLAINCRAFT_CORE_SCENE
+
+namespace plaincraft_core 
+{
+	class Scene;
+}
+
 #include "../common.hpp"
 #include "../utils/conversions.hpp"
 #include "../entities/game_object.hpp"

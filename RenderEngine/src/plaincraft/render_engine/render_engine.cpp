@@ -81,6 +81,21 @@ namespace plaincraft_render_engine
 		glfwGetCursorPos(window_->GetInstance(), cursor_position_x, cursor_position_y);
 	}
 
+	std::shared_ptr<TexturesFactory> RenderEngine::GetTexturesFactory()
+	{
+		return textures_factory_;
+	}
+
+	std::shared_ptr<TexturesRepository> RenderEngine::GetTexturesRepository()
+	{
+		return textures_repository_;
+	}
+
+	std::shared_ptr<ModelsFactory> RenderEngine::GetModelsFactory()
+	{
+		return models_factory_;
+	}
+
 	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable_to_add)
 	{
 		drawables_list_.push_back(drawable_to_add);

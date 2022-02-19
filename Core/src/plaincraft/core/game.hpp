@@ -31,6 +31,8 @@ SOFTWARE.
 #include "scene/scene.hpp"
 #include "camera_operators/camera_operator.hpp"
 #include "events/loop_events_handler.hpp"
+#include "world/world_generator.hpp"
+#include "world/world_updater.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
@@ -49,6 +51,7 @@ namespace plaincraft_core {
 		float physics_time_step_ = 1.0f / 60.0f;
 
 		Scene scene_;
+		std::shared_ptr<WorldUpdater> world_updater_;
 
 	public:
 		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);

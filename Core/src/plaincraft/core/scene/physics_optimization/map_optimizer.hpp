@@ -24,36 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
+#ifndef PLAINCRAFT_CORE_MAP_OPTIMIZER
+#define PLAINCRAFT_CORE_MAP_OPTIMIZER
 
-#include "../common.hpp"
-#include "../scene/scene.hpp"
-#include "../entities/map/chunk.hpp"
+namespace plaincraft_core 
+{
+    class MapOptimizer;
+}
+
+#include "../../entities/game_object.hpp"
+#include "../../entities/map/map.hpp"
+#include <list>
+#include <memory>
 
 namespace plaincraft_core
 {
-	class WorldGenerator
-	{
-	public:
-		rp3d::PhysicsCommon &physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		std::shared_ptr<RenderEngine> render_engine_;
-		Scene &scene_;
-		Cache<Model> &models_cache_;
-		Cache<Texture> &textures_cache_;
+    class MapOptimizer final
+    {
+    private:
+        std::list<std::shared_ptr<GameObject>> &static_game_objects_list_;
+        std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list_;
 
-	public:
-		WorldGenerator(rp3d::PhysicsCommon &physics_common,
-					   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
-					   std::shared_ptr<RenderEngine> render_engine,
-					   Scene &scene,
-					   Cache<Model> &models_cache,
-					   Cache<Texture> &textures_cache);
+        std::shared_ptr<Map> map_;
 
-		Chunk CreateChunk(I32Vector3d offset);
-		void DisposeChunk(std::shared_ptr<Chunk> chunk);
-	};
+    public:
+        MapOptimizer(
+            std::shared_ptr<Map> map,
+            std::list<std::shared_ptr<GameObject>> &static_game_objects_list,
+            std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list);
+
+        void Optimize();
+
+    private:
+        void OptimizeForGameObject(GameObject &game_object);
+    };
 }
 
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR
+#endif // PLAINCRAFT_CORE_MAP_OPTIMIZER

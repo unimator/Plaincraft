@@ -31,20 +31,17 @@ namespace plaincraft_core
     ActiveObjectsOptimizer::ActiveObjectsOptimizer(
         std::list<std::shared_ptr<GameObject>> &game_objects_list,
         std::list<std::shared_ptr<GameObject>> &static_game_objects_list,
-        std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list,
-        SceneEventsHandler &scene_events_handler)
+        std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list)
         : game_objects_list_(game_objects_list),
           static_game_objects_list_(static_game_objects_list),
-          dynamic_game_objects_list_(dynamic_game_objects_list),
-          scene_events_handler_(scene_events_handler)
+          dynamic_game_objects_list_(dynamic_game_objects_list)//,
+          //map_optimizer_(FindMap(game_objects_list), static_game_objects_list, dynamic_game_objects_list)
     {
         Initialize();
     }
 
     ActiveObjectsOptimizer::~ActiveObjectsOptimizer()
     {
-        scene_events_handler_.on_add_object_event_trigger.RemoveSubscription(this);
-        scene_events_handler_.on_remove_object_event_trigger.RemoveSubscription(this);
     }
 
     void ActiveObjectsOptimizer::Optimize()
@@ -56,47 +53,19 @@ namespace plaincraft_core
                 static_entity->GetRigidBody()->setIsSleeping(true);
             }
         }
-
-        MapOptimize();
     }
 
     void ActiveObjectsOptimizer::Initialize()
     {
-        scene_events_handler_.on_add_object_event_trigger.AddSubscription(this, &ActiveObjectsOptimizer::OnAddGameObjectToScene);
-        scene_events_handler_.on_remove_object_event_trigger.AddSubscription(this, &ActiveObjectsOptimizer::OnRemoveGameObjectFromScene);
     }
 
-    void ActiveObjectsOptimizer::OnAddGameObjectToScene(std::shared_ptr<GameObject> added_game_object)
+    static std::shared_ptr<Map> FindMap(std::list<std::shared_ptr<GameObject>> &game_objects_list)
     {
-        if (added_game_object->GetObjectType() == GameObject::ObjectType::Static)
+        auto predicate = [&game_objects_list](std::shared_ptr<GameObject> &current)
         {
-            static_game_objects_list_.push_back(added_game_object);
-        }
-        else if (added_game_object->GetObjectType() == GameObject::ObjectType::Dynamic)
-        {
-            dynamic_game_objects_list_.push_back(added_game_object);
-        }
-    }
-
-    void ActiveObjectsOptimizer::OnRemoveGameObjectFromScene(std::shared_ptr<GameObject> removed_game_object)
-    {
-        auto predicate = [&](std::shared_ptr<GameObject> game_object)
-        {
-            return game_object == removed_game_object;
+            return std::dynamic_pointer_cast<Map>(current) != nullptr;
         };
-        if (removed_game_object->GetObjectType() == GameObject::ObjectType::Static)
-        {
-            auto game_object_it = std::find_if(static_game_objects_list_.begin(), static_game_objects_list_.end(), predicate);
-            static_game_objects_list_.erase(game_object_it);
-        }
-        else if (removed_game_object->GetObjectType() == GameObject::ObjectType::Dynamic)
-        {
-            auto game_object_it = std::find_if(dynamic_game_objects_list_.begin(), dynamic_game_objects_list_.end(), predicate);
-            dynamic_game_objects_list_.erase(game_object_it);
-        }
-    }
-
-    void ActiveObjectsOptimizer::MapOptimize()
-    {
+        auto map_it = std::find_if(game_objects_list.begin(), game_objects_list.end(), predicate);
+        return std::dynamic_pointer_cast<Map>(*map_it);
     }
 }

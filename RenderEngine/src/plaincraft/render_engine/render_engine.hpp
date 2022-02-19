@@ -48,8 +48,7 @@ namespace plaincraft_render_engine {
 
 		std::shared_ptr<TexturesRepository> textures_repository_;
 		std::shared_ptr<TexturesFactory> textures_factory_;
-
-		std::unique_ptr<ModelsFactory> models_factory_;
+		std::shared_ptr<ModelsFactory> models_factory_;
 
 	public:
 		virtual ~RenderEngine();
@@ -61,13 +60,12 @@ namespace plaincraft_render_engine {
 		void RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove);
 
 		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
-		auto GetTexturesFactory() const -> std::shared_ptr<TexturesFactory> { return textures_factory_; }
-		auto GetTexturesRepository() const -> std::shared_ptr<TexturesRepository> { return textures_repository_; }
+		std::shared_ptr<TexturesFactory> GetTexturesFactory();
+		std::shared_ptr<TexturesRepository> GetTexturesRepository();
+		std::shared_ptr<ModelsFactory> GetModelsFactory();
 
 		virtual void RenderFrame() = 0;
 
-		auto GetModelsFactory() -> std::unique_ptr<ModelsFactory>& { return models_factory_; }
-		
 	protected:
 		RenderEngine(std::shared_ptr<Window> window);
 

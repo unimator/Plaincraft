@@ -40,12 +40,18 @@ PRIVATE
     src/plaincraft/core/scene/events/scene_events_handler.hpp
     src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.cpp
     src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.hpp
+    src/plaincraft/core/scene/physics_optimization/map_optimizer.cpp
+    src/plaincraft/core/scene/physics_optimization/map_optimizer.hpp
     src/plaincraft/core/scene/scene.cpp
     src/plaincraft/core/scene/scene.hpp
     src/plaincraft/core/utils/conversions.cpp
     src/plaincraft/core/utils/conversions.hpp
     src/plaincraft/core/world/world_generator.cpp
     src/plaincraft/core/world/world_generator.hpp
+    src/plaincraft/core/world/world_optimizer.cpp
+    src/plaincraft/core/world/world_optimizer.hpp
+    src/plaincraft/core/world/world_updater.cpp
+    src/plaincraft/core/world/world_updater.hpp
     src/plaincraft/core/game.cpp
     src/plaincraft/core/game.hpp
     

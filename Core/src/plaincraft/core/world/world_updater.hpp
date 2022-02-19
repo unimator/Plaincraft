@@ -24,36 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
+#ifndef PLAINCRAFT_CORE_WORLD_UPDATER
+#define PLAINCRAFT_CORE_WORLD_UPDATER
 
-#include "../common.hpp"
+#include "../entities/map/map.hpp"
+#include "../entities/game_object.hpp"
 #include "../scene/scene.hpp"
-#include "../entities/map/chunk.hpp"
+#include "./world_optimizer.hpp"
+#include "./world_generator.hpp"
 
 namespace plaincraft_core
 {
-	class WorldGenerator
-	{
-	public:
-		rp3d::PhysicsCommon &physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
-		std::shared_ptr<RenderEngine> render_engine_;
-		Scene &scene_;
-		Cache<Model> &models_cache_;
-		Cache<Texture> &textures_cache_;
+    class WorldUpdater final
+    {
+        Scene &scene_;
+        std::shared_ptr<Map> map_;
+        std::shared_ptr<GameObject> origin_entity_;
 
-	public:
-		WorldGenerator(rp3d::PhysicsCommon &physics_common,
-					   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
-					   std::shared_ptr<RenderEngine> render_engine,
-					   Scene &scene,
-					   Cache<Model> &models_cache,
-					   Cache<Texture> &textures_cache);
+        std::unique_ptr<WorldOptimizer> world_optimizer_;
+        std::unique_ptr<WorldGenerator> world_generator_;
 
-		Chunk CreateChunk(I32Vector3d offset);
-		void DisposeChunk(std::shared_ptr<Chunk> chunk);
-	};
+    public:
+        WorldUpdater(std::unique_ptr<WorldOptimizer> world_optimizer,
+                     std::unique_ptr<WorldGenerator> world_generator,
+                     Scene &scene,
+                     std::shared_ptr<Map> map,
+                     std::shared_ptr<GameObject> origin_entity);
+
+        void OnLoopFrameTick(float delta_time);
+
+    private:
+        void ReloadGrid();
+    };
 }
 
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR
+#endif // PLAINCRAFT_CORE_WORLD_UPDATER

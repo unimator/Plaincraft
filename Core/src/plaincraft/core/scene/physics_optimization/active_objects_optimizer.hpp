@@ -27,8 +27,15 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_ACTIVE_OBJECTS_OPTIMIZER
 #define PLAINCRAFT_CORE_ACTIVE_OBJECTS_OPTIMIZER
 
+namespace plaincraft_core 
+{
+    class ActiveObjectsOptimizer;
+}
+
 #include "../../entities/game_object.hpp"
 #include "../events/scene_events_handler.hpp"
+#include "../../entities/map/map.hpp"
+//#include "./map_optimizer.hpp"
 #include <list>
 #include <memory>
 
@@ -40,16 +47,14 @@ namespace plaincraft_core
         std::list<std::shared_ptr<GameObject>> &game_objects_list_;
         std::list<std::shared_ptr<GameObject>> &static_game_objects_list_;
         std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list_;
-        SceneEventsHandler& scene_events_handler_;
 
-        std::list<std::shared_ptr<GameObject>> map_game_objects_list_;
+        //MapOptimizer map_optimizer_;
 
     public:
         ActiveObjectsOptimizer(
             std::list<std::shared_ptr<GameObject>> &game_objects_list,
             std::list<std::shared_ptr<GameObject>> &static_game_objects_list,
-            std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list,
-            SceneEventsHandler& scene_events_handler);
+            std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list);
 
         ~ActiveObjectsOptimizer();
 
@@ -58,10 +63,7 @@ namespace plaincraft_core
     private:
         void Initialize();
 
-        void OnAddGameObjectToScene(std::shared_ptr<GameObject> added_game_object);
-        void OnRemoveGameObjectFromScene(std::shared_ptr<GameObject> removed_game_object);
-
-        void MapOptimize();
+        static std::shared_ptr<Map> FindMap(std::list<std::shared_ptr<GameObject>> &game_objects_list);
     };
 }
 
