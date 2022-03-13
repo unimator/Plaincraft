@@ -32,6 +32,7 @@ SOFTWARE.
 #include "../scene/scene.hpp"
 #include "./world_optimizer.hpp"
 #include "./world_generator.hpp"
+#include <future>
 
 namespace plaincraft_core
 {
@@ -43,6 +44,8 @@ namespace plaincraft_core
 
         std::unique_ptr<WorldOptimizer> world_optimizer_;
         std::unique_ptr<WorldGenerator> world_generator_;
+        
+        std::vector<std::future<void>> chunk_generation_futures_;
 
     public:
         WorldUpdater(std::unique_ptr<WorldOptimizer> world_optimizer,

@@ -24,40 +24,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_MAP_OPTIMIZER
-#define PLAINCRAFT_CORE_MAP_OPTIMIZER
+#ifndef PLAINCRAFT_CORE_ACTIVE_OBJECTS_OPTIMIZER
+#define PLAINCRAFT_CORE_ACTIVE_OBJECTS_OPTIMIZER
 
 namespace plaincraft_core 
 {
-    class MapOptimizer;
+    class ActiveObjectsOptimizer;
 }
 
-#include "../../entities/game_object.hpp"
-#include "../../entities/map/map.hpp"
+#include "../entities/game_object.hpp"
+#include "../scene/events/scene_events_handler.hpp"
+#include "../entities/map/map.hpp"
+#include "map_optimizer.hpp"
 #include <list>
 #include <memory>
 
 namespace plaincraft_core
 {
-    class MapOptimizer final
+    class ActiveObjectsOptimizer
     {
     private:
+        std::list<std::shared_ptr<GameObject>> &game_objects_list_;
         std::list<std::shared_ptr<GameObject>> &static_game_objects_list_;
         std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list_;
 
-        std::shared_ptr<Map> map_;
+        MapOptimizer map_optimizer_;
 
     public:
-        MapOptimizer(
-            std::shared_ptr<Map> map,
+        ActiveObjectsOptimizer(
+            std::list<std::shared_ptr<GameObject>> &game_objects_list,
             std::list<std::shared_ptr<GameObject>> &static_game_objects_list,
             std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list);
 
-        void Optimize();
+        ~ActiveObjectsOptimizer();
+
+        void OnLoopFrameTick(float delta_time);
 
     private:
-        void OptimizeForGameObject(GameObject &game_object);
+        void Initialize();
+
+        static std::shared_ptr<Map> FindMap(std::list<std::shared_ptr<GameObject>> &game_objects_list);
     };
 }
 
-#endif // PLAINCRAFT_CORE_MAP_OPTIMIZER
+#endif // PLAINCRAFT_CORE_ACTIVE_OBJECTS_OPTIMIZER

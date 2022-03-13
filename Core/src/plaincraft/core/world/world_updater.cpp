@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 #include "./world_updater.hpp"
+#include <thread>
+#include <mutex>
 
 namespace plaincraft_core
 {
@@ -47,24 +49,14 @@ namespace plaincraft_core
     {
         auto origin_position = origin_entity_->GetRigidBody()->getTransform().getPosition();
 
-        const auto &lower_chunk = map_->grid_[0][0];
-        const auto &higher_chunk = map_->grid_[Map::map_size - 1][Map::map_size - 1];
+        const auto &lower_chunk = map_->grid_[Map::render_radius - 1][Map::render_radius - 1];
+        const auto &higher_chunk = map_->grid_[Map::render_radius][Map::render_radius];
         int32_t lower_boundary_x = lower_chunk->GetPositionX() * Chunk::chunk_size;
-        int32_t lower_boundary_y = lower_chunk->GetPositionZ() * Chunk::chunk_size;
+        int32_t lower_boundary_z = lower_chunk->GetPositionZ() * Chunk::chunk_size;
         int32_t higher_boundary_x = higher_chunk->GetPositionX() * Chunk::chunk_size;
-        int32_t higher_boundary_y = higher_chunk->GetPositionZ() * Chunk::chunk_size;
+        int32_t higher_boundary_z = higher_chunk->GetPositionZ() * Chunk::chunk_size;
 
-        size_t s = snprintf(nullptr, 0, "(%d, %d)", lower_boundary_x, lower_boundary_y);
-        std::vector<char> buffer_lower(s + 1);
-        snprintf(&buffer_lower[0], buffer_lower.size(), "(%d, %d)", lower_boundary_x, lower_boundary_y);
-        Logger::LogValue("lower boundaries", std::string(buffer_lower.begin(), buffer_lower.end()));
-
-        s = snprintf(nullptr, 0, "(%d, %d)", higher_boundary_x, higher_boundary_y);
-        std::vector<char> buffer_higher(s + 1);
-        snprintf(&buffer_higher[0], buffer_higher.size(), "(%d, %d)", higher_boundary_x, higher_boundary_y);
-        Logger::LogValue("higher boundaries", std::string(buffer_higher.begin(), buffer_higher.end()));
-
-        if (origin_position.x < static_cast<float>(lower_boundary_x) || origin_position.z < static_cast<float>(lower_boundary_y) || origin_position.x > static_cast<float>(higher_boundary_x) + Chunk::chunk_size || origin_position.z > static_cast<float>(higher_boundary_y) + Chunk::chunk_size)
+        if (origin_position.x < static_cast<float>(lower_boundary_x) || origin_position.z < static_cast<float>(lower_boundary_z) || origin_position.x > static_cast<float>(higher_boundary_x) + Chunk::chunk_size || origin_position.z > static_cast<float>(higher_boundary_z) + Chunk::chunk_size)
         {
             ReloadGrid();
             world_optimizer_->OptimizeMap();
@@ -75,37 +67,64 @@ namespace plaincraft_core
     {
         auto origin_position = origin_entity_->GetRigidBody()->getTransform().getPosition() / Chunk::chunk_size;
 
-        int32_t start_x = static_cast<int32_t>(origin_position.x) - Map::map_size / 2;
-        int32_t start_z = static_cast<int32_t>(origin_position.z) - Map::map_size / 2;
+        int32_t start_x = static_cast<int32_t>(origin_position.x) - Map::render_radius;
+        int32_t start_z = static_cast<int32_t>(origin_position.z) - Map::render_radius;
 
         int32_t old_grid_start_x, old_grid_start_z;
-        auto current_grid = map_->grid_;
+        auto &current_grid = map_->grid_;
 
-        if (!current_grid.empty())
+        if (map_->is_initialized_)
         {
             old_grid_start_x = current_grid[0][0]->GetPositionX();
             old_grid_start_z = current_grid[0][0]->GetPositionZ();
         }
 
-        auto new_grid = Map::ChunksGrid(Map::map_size);
-
         auto current_x = start_x;
         auto current_z = start_z;
 
+        std::mutex chunk_mutex;
+
+        auto regenerate_chunk = [&](std::shared_ptr<Chunk> &current_chunk, int32_t position_x, int32_t position_z) -> void
+        {
+            //std::lock_guard<std::mutex> guard(chunk_mutex);
+            if (map_->is_initialized_ && position_x < old_grid_start_x + static_cast<int32_t>(Map::render_diameter) && position_x >= old_grid_start_x && position_z < old_grid_start_z + static_cast<int32_t>(Map::render_diameter) && position_z >= old_grid_start_z)
+            {
+                current_chunk = std::move(current_grid[position_x - old_grid_start_x][position_z - old_grid_start_z]);
+            }
+            else
+            {
+                if (current_chunk != nullptr)
+                {
+                    world_generator_->DisposeChunk(current_chunk);
+                }
+                current_chunk = std::make_shared<Chunk>(world_generator_->CreateChunk(I32Vector3d(current_x, 0, current_z)));
+                current_chunk->SetDrawable(std::make_shared<Drawable>());
+                scene_.AddGameObject(current_chunk);
+            }
+        };
+
+        chunk_generation_futures_.clear();
+        Map::ChunksGrid new_grid;
+        new_grid = Map::ChunksGrid(Map::render_diameter);
         for (auto &row : new_grid)
         {
-            row = Map::ChunksRow(Map::map_size);
+            row = Map::ChunksRow(Map::render_diameter);
+        }
 
+        for (auto &row : new_grid)
+        {
             current_z = start_z;
 
             for (auto &chunk : row)
             {
-                if (!current_grid.empty() && current_x < old_grid_start_x + static_cast<int32_t>(Map::map_size) && current_x >= old_grid_start_x && current_z < old_grid_start_z + static_cast<int32_t>(Map::map_size) && current_z >= old_grid_start_z)
+                // chunk_generation_futures_.push_back(std::async(std::launch::async, regenerate_chunk, std::reference_wrapper<std::shared_ptr<Chunk>>(chunk), current_x, current_z));
+                // regenerate_chunk(std::reference_wrapper<std::shared_ptr<Chunk>>(chunk), current_x, current_z);
+
+                if (map_->is_initialized_ && current_x < old_grid_start_x + static_cast<int32_t>(Map::render_diameter) && current_x >= old_grid_start_x && current_z < old_grid_start_z + static_cast<int32_t>(Map::render_diameter) && current_z >= old_grid_start_z)
                 {
                     chunk = std::move(current_grid[current_x - old_grid_start_x][current_z - old_grid_start_z]);
                 }
-
-                if (chunk == nullptr)
+                else
                 {
                     chunk = std::make_shared<Chunk>(world_generator_->CreateChunk(I32Vector3d(current_x, 0, current_z)));
                     chunk->SetDrawable(std::make_shared<Drawable>());
@@ -118,20 +137,24 @@ namespace plaincraft_core
             ++current_x;
         }
 
-        if (!current_grid.empty())
+        for(auto &row: current_grid)
         {
-            for (auto &row : current_grid)
+            for (auto &chunk : row)
             {
-                for (auto &chunk : row)
+                if(chunk != nullptr)
                 {
-                    if (chunk != nullptr)
-                    {
-                        world_generator_->DisposeChunk(chunk);
-                    }
+                    world_generator_->DisposeChunk(chunk);
                 }
             }
         }
 
-        map_->grid_ = std::move(new_grid);
+        map_->grid_ = new_grid;
+
+        for (auto &future : chunk_generation_futures_)
+        {
+            future.wait();
+        }
+
+        map_->is_initialized_ = true;
     }
 }

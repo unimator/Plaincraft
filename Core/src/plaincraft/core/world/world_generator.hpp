@@ -30,6 +30,7 @@ SOFTWARE.
 #include "../common.hpp"
 #include "../scene/scene.hpp"
 #include "../entities/map/chunk.hpp"
+#include <stack>
 
 namespace plaincraft_core
 {
@@ -42,6 +43,7 @@ namespace plaincraft_core
 		Scene &scene_;
 		Cache<Model> &models_cache_;
 		Cache<Texture> &textures_cache_;
+		std::stack<rp3d::RigidBody*> free_rigid_bodies_;
 
 	public:
 		WorldGenerator(rp3d::PhysicsCommon &physics_common,

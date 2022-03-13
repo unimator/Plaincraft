@@ -29,6 +29,6 @@ void main() {
     float lightIntensity = max(dot(normalWorldSpace, DIRECTION_TO_LIGHT), 0);
     lightIntensity = max(lightIntensity, AMBIENT);
 
-    fragColor = inColor * lightIntensity;
+    fragColor = model_matrix.color * lightIntensity;
     fragTextCoord = textMapping;
 }

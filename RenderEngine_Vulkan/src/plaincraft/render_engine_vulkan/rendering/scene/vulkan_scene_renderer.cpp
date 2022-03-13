@@ -115,7 +115,7 @@ namespace plaincraft_render_engine_vulkan
 
 		auto &descriptor_set = descriptor_sets_[frame_config.image_index];
 
-		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)extent_.width / (float)extent_.height, 0.1f, 1000.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera_->fov), (float)extent_.width / (float)extent_.height, 0.1f, 2500.0f);
 		projection[1][1] *= -1;
 		glm::mat4 view = glm::lookAt(camera_->position, camera_->position + camera_->direction, camera_->up);
 

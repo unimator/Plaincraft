@@ -34,8 +34,8 @@ namespace plaincraft_core
         std::list<std::shared_ptr<GameObject>> &dynamic_game_objects_list)
         : game_objects_list_(game_objects_list),
           static_game_objects_list_(static_game_objects_list),
-          dynamic_game_objects_list_(dynamic_game_objects_list)//,
-          //map_optimizer_(FindMap(game_objects_list), static_game_objects_list, dynamic_game_objects_list)
+          dynamic_game_objects_list_(dynamic_game_objects_list),
+          map_optimizer_(FindMap(game_objects_list), static_game_objects_list, dynamic_game_objects_list)
     {
         Initialize();
     }
@@ -44,7 +44,7 @@ namespace plaincraft_core
     {
     }
 
-    void ActiveObjectsOptimizer::Optimize()
+    void ActiveObjectsOptimizer::OnLoopFrameTick(float delta_time)
     {
         for (auto &static_entity : static_game_objects_list_)
         {
@@ -59,7 +59,7 @@ namespace plaincraft_core
     {
     }
 
-    static std::shared_ptr<Map> FindMap(std::list<std::shared_ptr<GameObject>> &game_objects_list)
+    std::shared_ptr<Map> ActiveObjectsOptimizer::FindMap(std::list<std::shared_ptr<GameObject>> &game_objects_list)
     {
         auto predicate = [&game_objects_list](std::shared_ptr<GameObject> &current)
         {

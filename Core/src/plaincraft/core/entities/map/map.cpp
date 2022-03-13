@@ -31,5 +31,12 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-
+    Map::Map()
+    {
+        grid_ = Map::ChunksGrid(Map::render_diameter);
+        for (auto &row : grid_)
+        {
+            row = Map::ChunksRow(Map::render_diameter);
+        }
+    }
 }

@@ -40,9 +40,9 @@ namespace plaincraft_core
     {
         auto &current_grid = map_->grid_;
 
-        for (size_t x = 0; x < Map::map_size; ++x)
+        for (size_t x = 0; x < Map::render_diameter; ++x)
         {
-            for (size_t z = 0; z < Map::map_size; ++z)
+            for (size_t z = 0; z < Map::render_diameter; ++z)
             {
                 auto &chunk = current_grid[x][z];
 
@@ -55,7 +55,7 @@ namespace plaincraft_core
                 {
                     negative_x_chunk = *(current_grid[x - 1][z]);
                 }
-                if (x < Map::map_size - 1)
+                if (x < Map::render_diameter - 1)
                 {
                     positive_x_chunk = *(current_grid[x + 1][z]);
                 }
@@ -64,7 +64,7 @@ namespace plaincraft_core
                 {
                     negative_z_chunk = *(current_grid[x][z - 1]);
                 }
-                if (z < Map::map_size - 1)
+                if (z < Map::render_diameter - 1)
                 {
                     positive_z_chunk = *(current_grid[x][z + 1]);
                 }
@@ -86,6 +86,11 @@ namespace plaincraft_core
     {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
+
+        float r = static_cast<float>((rand() % 255) / 255.0f);
+		float g = static_cast<float>((rand() % 255) / 255.0f);
+		float b = static_cast<float>((rand() % 255) / 255.0f);
+		auto color = glm::vec3(r, g, b);
 
         for (auto x = 0; x < Chunk::chunk_size; ++x)
         {
@@ -185,7 +190,7 @@ namespace plaincraft_core
         auto drawable_position_x = Chunk::chunk_size * static_cast<float>(chunk.pos_x_);
         auto drawable_position_z = Chunk::chunk_size * static_cast<float>(chunk.pos_z_);
         chunk.GetDrawable()->SetPosition(Vector3d(drawable_position_x, 0, drawable_position_z));
-        chunk.GetDrawable()->SetColor(Vector3d(0.3, 0.1, 0.7));
+        chunk.GetDrawable()->SetColor(color);
 
         models_cache_.Store(chunk.GetName(), std::move(models_factory_->CreateModel(mesh)));
         auto model = models_cache_.Fetch(chunk.GetName());

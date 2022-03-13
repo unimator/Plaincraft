@@ -29,11 +29,12 @@ SOFTWARE.
 #include "world/world_generator.hpp"
 #include "entities/map/map.hpp"
 #include "utils/conversions.hpp"
-//#include "camera_operators/eyes/camera_operator_eyes.hpp"
+#include "camera_operators/eyes/camera_operator_eyes.hpp"
 #include "camera_operators/follow/camera_operator_follow.hpp"
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <random>
 
 namespace plaincraft_core
 {
@@ -42,6 +43,7 @@ namespace plaincraft_core
 		  scene_(Scene(render_engine_))
 	{
 		Initialize();
+		srand(23432523);
 	}
 
 	Game::~Game()
@@ -57,11 +59,11 @@ namespace plaincraft_core
 	{
 		std::shared_ptr<GameObject> player;
 
-		//physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>();
+		// physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>();
 		auto physics_world_settings = rp3d::PhysicsWorld::WorldSettings();
 		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(physics_world_settings), rp3d::PhysicsWorldDeleter(physics_common_));
 		physics_world_->setIsDebugRenderingEnabled(false);
-		//physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
+		// physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
 
 		// auto logger = physics_common_.createDefaultLogger();
 		// uint32_t log_level = static_cast<uint32_t>(static_cast<uint32_t>(rp3d::Logger::Level::Warning)
@@ -100,28 +102,27 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.25f, 5.75f, 0.25f);
+		auto player_position = Vector3d(0.25f, 85.75f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
 		auto rigid_body = physics_world_->createRigidBody(transform);
-		
+
 		rigid_body->setAngularLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
-		//rigid_body->setLinearLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
+		// rigid_body->setLinearLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
 		auto capsule_shape = physics_common_.createCapsuleShape(0.5, 0.75);
-		//auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
+		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
 		auto collider = rigid_body->addCollider(capsule_shape, transform);
 
 		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
 		rigid_body->setIsFrictionFreezed(true);
 		rigid_body->setIsBouncingFreezed(true);
-		rigid_body->setType(rp3d::BodyType::STATIC);
-		rigid_body->setType(rp3d::BodyType::DYNAMIC);
 		player->SetRigidBody(rigid_body);
 
 		scene_.AddGameObject(player);
 
-		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+		//camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
 		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 		// auto game_object = std::make_shared<Block>(I32Vector3d(0, 0, 0));
@@ -142,7 +143,7 @@ namespace plaincraft_core
 		// rigid_body2->setTransform(rp3d::Transform(FromGlm(position), orientation2));
 		// game_object->SetRigidBody(rigid_body2);
 
-		//game_object->SetColor(color);
+		// game_object->SetColor(color);
 
 		// scene_.AddGameObject(game_object);
 
@@ -151,10 +152,16 @@ namespace plaincraft_core
 
 		auto world_generator = std::make_unique<WorldGenerator>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
-		world_updater_ = std::make_shared<WorldUpdater>(std::move(world_optimizer), std::move(world_generator), scene_, map, player);
-		
-		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldUpdater::OnLoopFrameTick);
+		world_updater_ = std::make_unique<WorldUpdater>(std::move(world_optimizer), std::move(world_generator), scene_, map, player);
+
+		active_objects_optimizer_ = std::make_unique<ActiveObjectsOptimizer>(
+			scene_.GetGameObjectsList(),
+			scene_.GetStaticGameObjectsList(),
+			scene_.GetDynamicGameOjectsList());
+
 		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
+		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldUpdater::OnLoopFrameTick);
+		//loop_events_handler_.loop_event_trigger.AddSubscription(active_objects_optimizer_.get(), &ActiveObjectsOptimizer::OnLoopFrameTick);
 	}
 
 	void Game::Run()
@@ -197,14 +204,14 @@ namespace plaincraft_core
 					})
 
 			MEASURE("update scene objects", {
-				//scene_.UpdateFrame();
-			});
+												// scene_.UpdateFrame();
+											});
 
 			auto player = scene_.FindGameObjectByName("player");
-			if(player != nullptr) 
-			{				
+			if (player != nullptr)
+			{
 				auto player_position = player->GetRigidBody()->getTransform().getPosition();
-				const char* format = "(%f, %f, %f)";
+				const char *format = "(%f, %f, %f)";
 				size_t size = std::snprintf(nullptr, 0, format, player_position.x, player_position.y, player_position.z);
 				std::vector<char> buffer(size + 1);
 				std::snprintf(&buffer[0], buffer.size(), format, player_position.x, player_position.y, player_position.z);

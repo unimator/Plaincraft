@@ -41,11 +41,19 @@ namespace plaincraft_core
         friend class WorldUpdater;
         friend class WorldOptimizer;
 
-    public:
+    private:
         using ChunksRow = std::vector<std::shared_ptr<Chunk>>;
         using ChunksGrid = std::vector<ChunksRow>;
 
-        static constexpr uint32_t map_size = 3;
+        bool is_initialized_ = false;
+
+    public:
+
+        static constexpr uint32_t render_radius = 4;
+        static constexpr uint32_t render_diameter = render_radius * 2;
+        static constexpr uint32_t simulation_radius = 3;
+
+        Map();
 
     private:
         ChunksGrid grid_;

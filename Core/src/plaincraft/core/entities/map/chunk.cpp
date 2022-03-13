@@ -33,10 +33,7 @@ namespace plaincraft_core
     Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
         : pos_x_(position_x), pos_z_(position_y), blocks_(std::move(blocks))
     {
-        auto size = std::snprintf(nullptr, 0, "Chunk_%d_%d", position_x, position_y) + 1;
-        std::vector<char> buffer(size);
-        std::snprintf(buffer.data(), size, "Chunk_%d_%d", position_x, position_y);
-        SetName(std::string(buffer.begin(), buffer.end()));
+        InitializeName();
     }
 
     Chunk::Chunk(Chunk &&other) noexcept
@@ -73,5 +70,13 @@ namespace plaincraft_core
     Chunk::Data &Chunk::GetData()
     {
         return blocks_;
+    }
+
+    void Chunk::InitializeName()
+    {
+        auto size = std::snprintf(nullptr, 0, chunk_model_name_template, pos_x_, pos_z_) + 1;
+        std::vector<char> buffer(size);
+        std::snprintf(buffer.data(), size, chunk_model_name_template, pos_x_, pos_z_);
+        SetName(std::string(buffer.begin(), buffer.end()));
     }
 }

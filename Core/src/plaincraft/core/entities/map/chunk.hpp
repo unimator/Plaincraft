@@ -46,7 +46,7 @@ namespace plaincraft_core
         static constexpr uint32_t chunk_size = 16;
         static constexpr uint32_t chunk_height = 8;
 
-        static constexpr const char *chunk_model_name_template = "chunk_block_faces_%d%d%d%d%d%d";
+        static constexpr const char *chunk_model_name_template = "Chunk_%d_%d";
 
         using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
 
@@ -69,6 +69,9 @@ namespace plaincraft_core
         int32_t GetPositionZ() const;
 
         Data &GetData();
+
+    private:
+        void InitializeName();
     };
 }
 

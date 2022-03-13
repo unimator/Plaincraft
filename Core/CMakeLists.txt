@@ -37,11 +37,11 @@ PRIVATE
     src/plaincraft/core/entities/game_object.hpp
     src/plaincraft/core/events/loop_events_handler.cpp
     src/plaincraft/core/events/loop_events_handler.hpp
+    src/plaincraft/core/physics_optimization/active_objects_optimizer.cpp
+    src/plaincraft/core/physics_optimization/active_objects_optimizer.hpp
+    src/plaincraft/core/physics_optimization/map_optimizer.cpp
+    src/plaincraft/core/physics_optimization/map_optimizer.hpp
     src/plaincraft/core/scene/events/scene_events_handler.hpp
-    src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.cpp
-    src/plaincraft/core/scene/physics_optimization/active_objects_optimizer.hpp
-    src/plaincraft/core/scene/physics_optimization/map_optimizer.cpp
-    src/plaincraft/core/scene/physics_optimization/map_optimizer.hpp
     src/plaincraft/core/scene/scene.cpp
     src/plaincraft/core/scene/scene.hpp
     src/plaincraft/core/utils/conversions.cpp

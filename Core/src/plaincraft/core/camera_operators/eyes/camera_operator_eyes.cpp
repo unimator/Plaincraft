@@ -36,7 +36,7 @@ namespace plaincraft_core {
     void CameraOperatorEyes::HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time)
     {
         const float camera_movement_speed = 0.05f;
-        const float camera_sensitivity = 0.1f;
+        const float camera_sensitivity = 4.5f;
 
         delta_horiz *= camera_sensitivity * delta_time;
         delta_vert *= camera_sensitivity * delta_time;
@@ -58,5 +58,6 @@ namespace plaincraft_core {
         camera_->direction = glm::normalize(camera_->direction);
 
         camera_->position = follow_target_->GetDrawable()->GetPosition();
+        camera_->position.y += 0.5;
     }
 }

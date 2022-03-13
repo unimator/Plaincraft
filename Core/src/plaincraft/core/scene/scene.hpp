@@ -36,7 +36,6 @@ namespace plaincraft_core
 #include "../utils/conversions.hpp"
 #include "../entities/game_object.hpp"
 #include "./events/scene_events_handler.hpp"
-#include "./physics_optimization/active_objects_optimizer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
 
@@ -58,13 +57,12 @@ namespace plaincraft_core
 	private:
 		std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<RenderEngine> render_engine_;
-		std::list<std::shared_ptr<GameObject>> game_objects_list_;
-		std::list<std::shared_ptr<GameObject>> static_game_objects_list_;
-		std::list<std::shared_ptr<GameObject>> dynamic_game_objects_list_;
+		mutable std::list<std::shared_ptr<GameObject>> game_objects_list_;
+		mutable std::list<std::shared_ptr<GameObject>> static_game_objects_list_;
+		mutable std::list<std::shared_ptr<GameObject>> dynamic_game_objects_list_;
 
 		SceneEventsHandler scene_events_handler_;
 
-		ActiveObjectsOptimizer active_objects_optimizer_;
 
 	public:
 		Scene(std::shared_ptr<RenderEngine> render_engine);
@@ -72,11 +70,16 @@ namespace plaincraft_core
 
 		void AddGameObject(std::shared_ptr<GameObject> game_object_to_add);
 		void RemoveGameObject(std::shared_ptr<GameObject> game_object_to_remove);
+		void RemoveGameObjects(std::vector<std::shared_ptr<GameObject>> &game_objects_to_remove);
+		
 		std::shared_ptr<GameObject> FindGameObjectByName(const std::string& name) const;
-
-		void UpdateFrame(float interpolation_factor = 0.0f);
+		std::list<std::shared_ptr<GameObject>> &GetGameObjectsList() const;
+		std::list<std::shared_ptr<GameObject>> &GetStaticGameObjectsList() const;
+		std::list<std::shared_ptr<GameObject>> &GetDynamicGameOjectsList() const;
 
 		SceneEventsHandler& GetSceneEventsHandler();
+		
+		void UpdateFrame(float interpolation_factor = 0.0f);
 
 	private:
 	};

@@ -44,11 +44,7 @@ namespace plaincraft_core
 	using namespace plaincraft_render_engine;
 
 	Scene::Scene(std::shared_ptr<RenderEngine> render_engine)
-		: render_engine_(render_engine),
-		  active_objects_optimizer_(
-			  game_objects_list_,
-			  static_game_objects_list_,
-			  dynamic_game_objects_list_)
+		: render_engine_(render_engine)
 	{
 	}
 
@@ -65,6 +61,10 @@ namespace plaincraft_core
 		if (object_type == GameObject::ObjectType::Dynamic)
 		{
 			dynamic_game_objects_list_.push_back(game_object_to_add);
+		}
+		else if (object_type == GameObject::ObjectType::Static)
+		{
+			static_game_objects_list_.push_back(game_object_to_add);
 		}
 
 		auto rigid_body = game_object_to_add->GetRigidBody();
@@ -88,9 +88,13 @@ namespace plaincraft_core
 		game_objects_list_.remove_if(remove_predicate);
 
 		auto object_type = game_object_to_remove->GetObjectType();
-		if (game_object_to_remove->GetObjectType() == object_type)
+		if (object_type == GameObject::ObjectType::Dynamic)
 		{
 			dynamic_game_objects_list_.remove_if(remove_predicate);
+		}
+		else if (object_type == GameObject::ObjectType::Static)
+		{
+			static_game_objects_list_.remove_if(remove_predicate);
 		}
 
 		auto rigid_body = game_object_to_remove->GetRigidBody();
@@ -102,6 +106,37 @@ namespace plaincraft_core
 		if (game_object_to_remove->GetDrawable() != nullptr)
 		{
 			render_engine_->RemoveDrawable(game_object_to_remove->GetDrawable());
+		}
+	}
+
+	void Scene::RemoveGameObjects(std::vector<std::shared_ptr<GameObject>> &game_objects_to_remove)
+	{
+		std::unordered_map<std::shared_ptr<GameObject>, bool> game_objects_to_remove_presence_map;
+		std::transform(game_objects_to_remove.begin(),
+					   game_objects_to_remove.end(),
+					   std::inserter(game_objects_to_remove_presence_map, game_objects_to_remove_presence_map.begin()),
+					   [](const std::shared_ptr<GameObject> &game_object_to_remove)
+					   { return std::make_pair(game_object_to_remove, true); });
+		auto remove_predicate = [&](std::shared_ptr<GameObject> const &game_object)
+		{ return game_objects_to_remove_presence_map.contains(game_object); };
+
+		game_objects_list_.remove_if(remove_predicate);
+		dynamic_game_objects_list_.remove_if(remove_predicate);
+		static_game_objects_list_.remove_if(remove_predicate);
+
+		for (auto &game_object_to_remove : game_objects_to_remove)
+		{
+			auto object_type = game_object_to_remove->GetObjectType();
+			auto rigid_body = game_object_to_remove->GetRigidBody();
+			if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
+			{
+				previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
+			}
+
+			if (game_object_to_remove->GetDrawable() != nullptr)
+			{
+				render_engine_->RemoveDrawable(game_object_to_remove->GetDrawable());
+			}
 		}
 	}
 
@@ -117,9 +152,24 @@ namespace plaincraft_core
 		return nullptr;
 	}
 
+	std::list<std::shared_ptr<GameObject>> &Scene::GetGameObjectsList() const
+	{
+		return game_objects_list_;
+	}
+
+	std::list<std::shared_ptr<GameObject>> &Scene::GetStaticGameObjectsList() const
+	{
+		return static_game_objects_list_;
+	}
+
+	std::list<std::shared_ptr<GameObject>> &Scene::GetDynamicGameOjectsList() const
+	{
+		return dynamic_game_objects_list_;
+	}
+
 	void Scene::UpdateFrame(float interpolation_factor)
 	{
-		for (auto &game_object : game_objects_list_)
+		for (auto &game_object : dynamic_game_objects_list_)
 		{
 			const auto rb = game_object->GetRigidBody();
 
@@ -154,8 +204,6 @@ namespace plaincraft_core
 
 			previous_transforms_[game_object] = transform;
 		}
-
-		// active_objects_optimizer_.Optimize();
 
 		auto l = snprintf(nullptr, 0, "%zd", game_objects_list_.size());
 		std::vector<char> buf(l + 1);

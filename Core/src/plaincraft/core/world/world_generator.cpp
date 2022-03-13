@@ -29,7 +29,6 @@ SOFTWARE.
 #include <plaincraft_common.hpp>
 #include <plaincraft_render_engine.hpp>
 #include <cmath>
-#include <random>
 
 namespace plaincraft_core
 {
@@ -50,18 +49,12 @@ namespace plaincraft_core
 
 	Chunk WorldGenerator::CreateChunk(I32Vector3d offset)
 	{
-		//const auto model = models_cache_.Fetch("cube_half");
+		// const auto model = models_cache_.Fetch("cube_half");
 
 		auto chunk_data = Chunk::Data();
 		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 
 		std::shared_ptr<Block> game_object;
-
-		float r = static_cast<float>((rand() % 255) / 255.0f);
-		float g = static_cast<float>((rand() % 255) / 255.0f);
-		float b = static_cast<float>((rand() % 255) / 255.0f);
-		auto color = glm::vec3(r, g, b);
-		srand(12345);
 
 		for (auto i = 0; i < Chunk::chunk_size; ++i)
 		{
@@ -82,8 +75,8 @@ namespace plaincraft_core
 					auto game_object = std::make_shared<Block>(I32Vector3d(i, j, k));
 					game_object->SetObjectType(GameObject::ObjectType::Static);
 					auto drawable = std::make_shared<Drawable>();
-					//drawable->SetModel(model);
-					//game_object->SetDrawable(drawable);
+					// drawable->SetModel(model);
+					// game_object->SetDrawable(drawable);
 
 					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
 					auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + i * 1.0;
@@ -98,8 +91,9 @@ namespace plaincraft_core
 					rigid_body->setType(rp3d::BodyType::STATIC);
 					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
 					game_object->SetRigidBody(rigid_body);
+					rigid_body->setIsSleeping(true);
 
-					//game_object->SetColor(color);
+					// game_object->SetColor(color);
 
 					scene_.AddGameObject(game_object);
 
@@ -120,7 +114,7 @@ namespace plaincraft_core
 	void WorldGenerator::DisposeChunk(std::shared_ptr<Chunk> chunk)
 	{
 		auto &blocks = chunk->GetData();
-		auto entities_deleted = 0;
+		std::vector<std::shared_ptr<GameObject>> game_objects_to_remove;
 		if (!blocks.empty())
 		{
 			for (auto &plane : blocks)
@@ -131,14 +125,16 @@ namespace plaincraft_core
 					{
 						if (block != nullptr)
 						{
-							scene_.RemoveGameObject(block);
-							physics_world_->destroyRigidBody(block->GetRigidBody());
-							++entities_deleted;
+							game_objects_to_remove.push_back(block);
+							block->GetRigidBody()->setIsActive(false);
+							free_rigid_bodies_.push(block->GetRigidBody());
+							//physics_world_->destroyRigidBody(block->GetRigidBody());
 						}
 					}
 				}
 			}
 		}
-		scene_.RemoveGameObject(chunk);
+		game_objects_to_remove.push_back(chunk);
+		scene_.RemoveGameObjects(game_objects_to_remove);
 	}
 }
