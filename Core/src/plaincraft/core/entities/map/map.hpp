@@ -33,12 +33,12 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    class WorldUpdater;
+    class WorldGenerator;
     class WorldOptimizer;
 
     class Map : public GameObject
     {
-        friend class WorldUpdater;
+        friend class WorldGenerator;
         friend class WorldOptimizer;
 
     private:
@@ -51,7 +51,7 @@ namespace plaincraft_core
 
         static constexpr uint32_t render_radius = 4;
         static constexpr uint32_t render_diameter = render_radius * 2;
-        static constexpr uint32_t simulation_radius = 3;
+        static constexpr uint32_t simulation_radius = 2;
 
         Map();
 

@@ -134,6 +134,7 @@ namespace plaincraft_render_engine_vulkan
 		// view_projection_buffer->Flush(sizeof(ViewProjectionMatrix), 0);
 
 		std::unordered_map<std::shared_ptr<Texture>, std::vector<std::reference_wrapper<Drawable>>> drawables_grouped;
+
 		for(auto &drawable : drawables_list_)
 		{
 			auto texture = drawable->GetTexture();
@@ -166,6 +167,12 @@ namespace plaincraft_render_engine_vulkan
 		for(auto material_group : drawables_grouped)
 		{
 			auto mvp_descriptor_set = descriptor_set.mvp_descriptor_set;
+
+			if(material_group.first == nullptr)
+			{
+				continue;
+			}
+
 			auto material_descriptor_set = descriptor_set.materials_descriptor_set[material_group.first];
 			std::vector<VkDescriptorSet> descriptor_sets = {mvp_descriptor_set, material_descriptor_set};
 						

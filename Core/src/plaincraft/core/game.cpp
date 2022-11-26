@@ -63,6 +63,7 @@ namespace plaincraft_core
 		auto physics_world_settings = rp3d::PhysicsWorld::WorldSettings();
 		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(physics_world_settings), rp3d::PhysicsWorldDeleter(physics_common_));
 		physics_world_->setIsDebugRenderingEnabled(false);
+		// physics_world_->setGravity(rp3d::Vector3(0, 0, 0));
 		// physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
 
 		// auto logger = physics_common_.createDefaultLogger();
@@ -102,7 +103,7 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.25f, 85.75f, 0.25f);
+		auto player_position = Vector3d(0.25f, 8.75f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
@@ -113,6 +114,7 @@ namespace plaincraft_core
 		auto capsule_shape = physics_common_.createCapsuleShape(0.5, 0.75);
 		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
 		auto collider = rigid_body->addCollider(capsule_shape, transform);
+		collider->getMaterial().setFrictionCoefficient(1.0f);
 
 		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
 		rigid_body->setIsFrictionFreezed(true);
@@ -150,9 +152,9 @@ namespace plaincraft_core
 		auto map = std::make_shared<Map>();
 		scene_.AddGameObject(map);
 
-		auto world_generator = std::make_unique<WorldGenerator>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
+		auto chunk_builder = std::make_unique<ChunkBuilder>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
-		world_updater_ = std::make_unique<WorldUpdater>(std::move(world_optimizer), std::move(world_generator), scene_, map, player);
+		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
 		active_objects_optimizer_ = std::make_unique<ActiveObjectsOptimizer>(
 			scene_.GetGameObjectsList(),
@@ -160,7 +162,7 @@ namespace plaincraft_core
 			scene_.GetDynamicGameOjectsList());
 
 		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
-		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldUpdater::OnLoopFrameTick);
+		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
 		//loop_events_handler_.loop_event_trigger.AddSubscription(active_objects_optimizer_.get(), &ActiveObjectsOptimizer::OnLoopFrameTick);
 	}
 

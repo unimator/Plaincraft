@@ -24,36 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
-#define PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#include "./vulkan_diagnostic_widget_logger.hpp"
+#include <imgui.h>
+#include <plaincraft_common.hpp>
 
-#include <plaincraft_core.hpp>
-#include <memory>
-
-using namespace plaincraft_core;
-
-namespace plaincraft_runner
+namespace plaincraft_render_engine_vulkan
 {
-    class KeyMappingController : public std::enable_shared_from_this<KeyMappingController>
+    using namespace plaincraft_common;
+
+    void VulkanDiagnosticWidgetLogger::Render()
     {
-    private:
-        std::shared_ptr<GameObject> player_;
-        std::shared_ptr<Camera> camera_;
+        auto& log_values = Logger::GetValues();
+        ImGui::BeginTable("LogValues", 2, ImGuiTabBarFlags_None, {0, 0});
+        {
+            for(auto &[key, value] : log_values)
+            {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text(key.c_str());
+                ImGui::TableNextColumn();
+                ImGui::Text(value.c_str());
 
-        float movement_speed_ = 6.0f;
-        float maximum_speed_ = 6.0f;
-
-        bool forward_ = false, backward_ = false, left_ = false, right_ = false;
-
-    public:
-        static std::shared_ptr<KeyMappingController> CreateInstance();
-
-        void Setup(Game &game_instance);
-
-    private:
-        void OnKeyPressed(int key, int scancode, int action, int mods);
-        void OnLoopTick(float delta_time);
-    };
+            }
+        }
+        ImGui::EndTable();
+    }
 }
-
-#endif // PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER

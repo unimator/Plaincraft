@@ -36,60 +36,14 @@ namespace plaincraft_core
     {
     }
 
-    void WorldOptimizer::OptimizeMap()
-    {
-        auto &current_grid = map_->grid_;
-
-        for (size_t x = 0; x < Map::render_diameter; ++x)
-        {
-            for (size_t z = 0; z < Map::render_diameter; ++z)
-            {
-                auto &chunk = current_grid[x][z];
-
-                std::optional<std::reference_wrapper<Chunk>> negative_x_chunk;
-                std::optional<std::reference_wrapper<Chunk>> positive_x_chunk;
-                std::optional<std::reference_wrapper<Chunk>> negative_z_chunk;
-                std::optional<std::reference_wrapper<Chunk>> positive_z_chunk;
-
-                if (x > 0)
-                {
-                    negative_x_chunk = *(current_grid[x - 1][z]);
-                }
-                if (x < Map::render_diameter - 1)
-                {
-                    positive_x_chunk = *(current_grid[x + 1][z]);
-                }
-
-                if (z > 0)
-                {
-                    negative_z_chunk = *(current_grid[x][z - 1]);
-                }
-                if (z < Map::render_diameter - 1)
-                {
-                    positive_z_chunk = *(current_grid[x][z + 1]);
-                }
-
-                OptimizeChunk(*chunk,
-                              negative_x_chunk,
-                              positive_x_chunk,
-                              negative_z_chunk,
-                              positive_z_chunk);
-            }
-        }
-    }
-
-    void WorldOptimizer::OptimizeChunk(Chunk &chunk,
-                                       std::optional<std::reference_wrapper<Chunk>> negative_x_chunk,
-                                       std::optional<std::reference_wrapper<Chunk>> positive_x_chunk,
-                                       std::optional<std::reference_wrapper<Chunk>> negative_z_chunk,
-                                       std::optional<std::reference_wrapper<Chunk>> positive_z_chunk)
+    void WorldOptimizer::OptimizeChunk(Chunk &chunk)
     {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
 
-        float r = static_cast<float>((rand() % 255) / 255.0f);
-		float g = static_cast<float>((rand() % 255) / 255.0f);
-		float b = static_cast<float>((rand() % 255) / 255.0f);
+        float r = static_cast<float>(1.f);
+		float g = static_cast<float>(1.f);
+		float b = static_cast<float>(1.f);
 		auto color = glm::vec3(r, g, b);
 
         for (auto x = 0; x < Chunk::chunk_size; ++x)
@@ -110,9 +64,7 @@ namespace plaincraft_core
                     auto txt_v_factor = 16.0f / 544.0f;
 
                     // X axis check
-                    if (x == 0 && negative_x_chunk.has_value() &&
-                            negative_x_chunk.value().get().blocks_[Chunk::chunk_size - 1][y][z] == nullptr ||
-                        x > 0 && chunk.blocks_[x - 1][y][z] == nullptr)
+                    if (x > 0 && chunk.blocks_[x - 1][y][z] == nullptr)
                     {
                         vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
                         vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
@@ -120,9 +72,7 @@ namespace plaincraft_core
                         vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
                     }
 
-                    if (x == Chunk::chunk_size - 1 && positive_x_chunk.has_value() &&
-                            positive_x_chunk.value().get().blocks_[0][y][z] == nullptr ||
-                        x < Chunk::chunk_size - 1 && chunk.blocks_[x + 1][y][z] == nullptr)
+                    if (x < Chunk::chunk_size - 1 && chunk.blocks_[x + 1][y][z] == nullptr)
                     {
                         vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
                         vertices.push_back({{x + 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
@@ -147,9 +97,7 @@ namespace plaincraft_core
                     }
 
                     // Z axis check
-                    if ((z == 0 && negative_z_chunk.has_value() &&
-                         negative_z_chunk.value().get().blocks_[x][y][Chunk::chunk_size - 1] == nullptr) ||
-                        (z > 0 && chunk.blocks_[x][y][z - 1] == nullptr) || true)
+                    if (z > 0 && chunk.blocks_[x][y][z - 1] == nullptr)
                     {
                         vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
                         vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
@@ -157,9 +105,7 @@ namespace plaincraft_core
                         vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
                     }
 
-                    if ((z == Chunk::chunk_size - 1 && positive_z_chunk.has_value() &&
-                         positive_z_chunk.value().get().blocks_[x][y][0] == nullptr) ||
-                        (z < Chunk::chunk_size - 1 && chunk.blocks_[x][y][z + 1] == nullptr) || true)
+                    if (z < Chunk::chunk_size - 1 && chunk.blocks_[x][y][z + 1] == nullptr)
                     {
                         vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
                         vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});

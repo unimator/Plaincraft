@@ -233,7 +233,7 @@ namespace plaincraft_render_engine_vulkan
 
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
-			auto drawable = drawables_list_[i];
+			auto& drawable = drawables_list_[i];
 			scene_renderer_->Batch(drawable);
 		}
 

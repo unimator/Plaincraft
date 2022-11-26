@@ -24,41 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_UPDATER
-#define PLAINCRAFT_CORE_WORLD_UPDATER
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_LOGGER
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_LOGGER
 
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
-#include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./world_generator.hpp"
-#include <future>
+#include "./vulkan_diagnostic_widget_section.hpp"
 
-namespace plaincraft_core
+namespace plaincraft_render_engine_vulkan 
 {
-    class WorldUpdater final
+    class VulkanDiagnosticWidgetLogger : public VulkanDiagnosticWidgetSection
     {
-        Scene &scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
-
-        std::unique_ptr<WorldOptimizer> world_optimizer_;
-        std::unique_ptr<WorldGenerator> world_generator_;
-        
-        std::vector<std::future<void>> chunk_generation_futures_;
-
-    public:
-        WorldUpdater(std::unique_ptr<WorldOptimizer> world_optimizer,
-                     std::unique_ptr<WorldGenerator> world_generator,
-                     Scene &scene,
-                     std::shared_ptr<Map> map,
-                     std::shared_ptr<GameObject> origin_entity);
-
-        void OnLoopFrameTick(float delta_time);
-
-    private:
-        void ReloadGrid();
+        public:
+            void Render() override;
     };
 }
 
-#endif // PLAINCRAFT_CORE_WORLD_UPDATER
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_LOGGER

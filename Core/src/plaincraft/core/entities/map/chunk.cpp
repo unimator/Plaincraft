@@ -30,8 +30,8 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    Chunk::Chunk(int32_t position_x, int32_t position_y, Data &&blocks)
-        : pos_x_(position_x), pos_z_(position_y), blocks_(std::move(blocks))
+    Chunk::Chunk(int32_t position_x, int32_t position_y)
+        : pos_x_(position_x), pos_z_(position_y)
     {
         InitializeName();
     }

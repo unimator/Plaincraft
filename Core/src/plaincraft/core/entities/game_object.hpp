@@ -47,6 +47,7 @@ namespace plaincraft_core {
 		std::shared_ptr<Drawable> drawable_;
 		rp3d::RigidBody* rigid_body_ = nullptr;
 		std::string name_;
+		bool is_active_;
 
 		static uint32_t next_id_;
 		uint32_t unique_id_;
@@ -75,7 +76,10 @@ namespace plaincraft_core {
 
 		void SetObjectType(ObjectType object_type);
 		ObjectType GetObjectType() const;
-		
+
+		void SetIsActive(bool is_active);
+		bool GetIsActive() const;
+
 		uint32_t GetUniqueId() const;
 	};
 }

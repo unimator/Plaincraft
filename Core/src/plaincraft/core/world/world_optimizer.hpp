@@ -51,14 +51,7 @@ namespace plaincraft_core
                        Cache<Texture> &textures_cache,
                        std::shared_ptr<ModelsFactory> models_factory);
 
-        void OptimizeMap();
-
-    private:
-        void OptimizeChunk(Chunk &chunk,
-                           std::optional<std::reference_wrapper<Chunk>> negative_x_chunk = {},
-                           std::optional<std::reference_wrapper<Chunk>> positive_x_chunk = {},
-                           std::optional<std::reference_wrapper<Chunk>> negative_z_chunk = {},
-                           std::optional<std::reference_wrapper<Chunk>> positive_z_chunk = {});
+        void OptimizeChunk(Chunk &chunk);
     };
 }
 

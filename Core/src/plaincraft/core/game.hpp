@@ -32,7 +32,7 @@ SOFTWARE.
 #include "camera_operators/camera_operator.hpp"
 #include "events/loop_events_handler.hpp"
 #include "world/world_generator.hpp"
-#include "world/world_updater.hpp"
+#include "world/chunks/chunk_builder.hpp"
 #include "physics_optimization/active_objects_optimizer.hpp"
 #include <plaincraft_render_engine.hpp>
 
@@ -53,7 +53,7 @@ namespace plaincraft_core {
 
 		Scene scene_;
 		
-		std::unique_ptr<WorldUpdater> world_updater_;
+		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
 
 	public:

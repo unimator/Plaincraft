@@ -46,15 +46,16 @@ PRIVATE
     src/plaincraft/core/scene/scene.hpp
     src/plaincraft/core/utils/conversions.cpp
     src/plaincraft/core/utils/conversions.hpp
+    src/plaincraft/core/world/chunks/chunk_builder.cpp
+    src/plaincraft/core/world/chunks/chunk_builder.hpp
+    src/plaincraft/core/world/chunks/chunks_processor.cpp
+    src/plaincraft/core/world/chunks/chunks_processor.hpp
     src/plaincraft/core/world/world_generator.cpp
     src/plaincraft/core/world/world_generator.hpp
     src/plaincraft/core/world/world_optimizer.cpp
     src/plaincraft/core/world/world_optimizer.hpp
-    src/plaincraft/core/world/world_updater.cpp
-    src/plaincraft/core/world/world_updater.hpp
     src/plaincraft/core/game.cpp
     src/plaincraft/core/game.hpp
-    
 )
 
 target_include_directories(${TARGET_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")

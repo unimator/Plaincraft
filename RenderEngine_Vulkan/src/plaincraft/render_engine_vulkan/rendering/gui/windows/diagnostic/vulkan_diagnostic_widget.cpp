@@ -30,14 +30,13 @@ SOFTWARE.
 #include <chrono>
 #include <vector>
 #include <string>
-#include <plaincraft_common.hpp>
 
 namespace plaincraft_render_engine_vulkan
 {
-    using namespace plaincraft_common;
-
     VulkanDiagnosticWidget::VulkanDiagnosticWidget()
     {
+        sections_.push_back(std::make_unique<VulkanDiagnosticWidgetProfiling>(std::move(VulkanDiagnosticWidgetProfiling())));
+        sections_.push_back(std::make_unique<VulkanDiagnosticWidgetLogger>(std::move(VulkanDiagnosticWidgetLogger())));
     }
 
     void VulkanDiagnosticWidget::Draw()
@@ -64,67 +63,11 @@ namespace plaincraft_render_engine_vulkan
             return;
         }
 
-        RenderProfiling();
-        RenderLogValues();
+        for(auto& section : sections_)
+        {
+            section->Render();
+        }
 
         ImGui::End();
-    }
-
-    void VulkanDiagnosticWidget::RenderProfiling()
-    {
-        auto profiler = Profiler::GetInstance();
-        auto &descriptions = profiler.GetDescriptions();
-
-        ImGui::BeginTable("Diagnostics", 3, ImGuiTableFlags_None, {0, 0});
-        for (auto &[name, description] : descriptions)
-        {
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text(name.c_str());
-
-            std::vector<float> plot_values;
-            auto values = description.GetValues();
-            float avarage_time = 0.0f;
-
-            for (auto it = values.begin();
-                 it != values.end();
-                 ++it)
-            {
-                auto value = (*it).count();
-                plot_values.push_back(value);
-                avarage_time += value;
-            }
-
-            avarage_time /= plot_values.size();
-            const char *format = "Avg: %f ms";
-            size_t size = std::snprintf(nullptr, 0, format, avarage_time);
-            std::vector<char> buffer(size + 1);
-            std::snprintf(&buffer[0], buffer.size(), format, avarage_time);
-
-            ImGui::TableNextColumn();
-            ImVec2 plot_size = {500.0f, 0.0f};
-            ImGui::PlotLines("time", plot_values.data(), plot_values.size(), 0, nullptr, FLT_MAX, FLT_MAX, plot_size);
-            ImGui::TableNextColumn();
-            ImGui::Text(buffer.data());
-        }
-        ImGui::EndTable();
-    }
-
-    void VulkanDiagnosticWidget::RenderLogValues()
-    {
-        auto& log_values = Logger::GetValues();
-        ImGui::BeginTable("LogValues", 2, ImGuiTabBarFlags_None, {0, 0});
-        {
-            for(auto &[key, value] : log_values)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text(key.c_str());
-                ImGui::TableNextColumn();
-                ImGui::Text(value.c_str());
-
-            }
-        }
-        ImGui::EndTable();
     }
 }

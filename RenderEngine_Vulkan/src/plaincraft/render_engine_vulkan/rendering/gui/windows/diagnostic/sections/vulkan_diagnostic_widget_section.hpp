@@ -24,36 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
-#define PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_SECTION
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_SECTION
 
-#include <plaincraft_core.hpp>
-#include <memory>
-
-using namespace plaincraft_core;
-
-namespace plaincraft_runner
+namespace plaincraft_render_engine_vulkan 
 {
-    class KeyMappingController : public std::enable_shared_from_this<KeyMappingController>
+    class VulkanDiagnosticWidgetSection
     {
-    private:
-        std::shared_ptr<GameObject> player_;
-        std::shared_ptr<Camera> camera_;
-
-        float movement_speed_ = 6.0f;
-        float maximum_speed_ = 6.0f;
-
-        bool forward_ = false, backward_ = false, left_ = false, right_ = false;
-
-    public:
-        static std::shared_ptr<KeyMappingController> CreateInstance();
-
-        void Setup(Game &game_instance);
-
-    private:
-        void OnKeyPressed(int key, int scancode, int action, int mods);
-        void OnLoopTick(float delta_time);
+        public:
+            virtual void Render() = 0;
     };
 }
 
-#endif // PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_SECTION

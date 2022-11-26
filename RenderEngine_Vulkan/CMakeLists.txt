@@ -32,6 +32,12 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline_config.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.hpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.hpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.cpp
+    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.hpp
     src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.cpp
     src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.hpp
     src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_renderer.cpp

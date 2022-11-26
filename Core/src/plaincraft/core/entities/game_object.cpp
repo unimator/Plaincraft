@@ -109,6 +109,16 @@ namespace plaincraft_core
 		return object_type_;
 	}
 
+	void GameObject::SetIsActive(bool is_active)
+	{
+		is_active_ = is_active;
+	}
+
+	bool GameObject::GetIsActive() const
+	{
+		return is_active_;
+	}
+
 	uint32_t GameObject::GetUniqueId() const
 	{
 		return unique_id_;

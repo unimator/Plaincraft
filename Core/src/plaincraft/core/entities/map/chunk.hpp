@@ -37,18 +37,23 @@ namespace plaincraft_core
 
     class ModelsCache;
     class WorldOptimizer;
+    class ChunkBuilder;
 
     class Chunk : public GameObject
     {
         friend class WorldOptimizer;
+        friend class ChunkBuilder;
+        friend class ChunksProcessor;
 
     public:
-        static constexpr uint32_t chunk_size = 16;
+        static constexpr uint32_t chunk_size = 4;
         static constexpr uint32_t chunk_height = 8;
 
         static constexpr const char *chunk_model_name_template = "Chunk_%d_%d";
 
         using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
+
+        bool initialized_ = false;
 
     private:
         Data blocks_;
@@ -57,7 +62,7 @@ namespace plaincraft_core
         std::shared_ptr<Drawable> mesh_;
 
     public:
-        Chunk(int32_t position_x, int32_t position_z, Data &&blocks);
+        Chunk(int32_t position_x, int32_t position_z);
 
         Chunk(const Chunk &other) = delete;
         Chunk &operator=(const Chunk &other) = delete;

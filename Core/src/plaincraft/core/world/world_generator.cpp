@@ -24,117 +24,105 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "world_generator.hpp"
-#include "../utils/conversions.hpp"
-#include <plaincraft_common.hpp>
-#include <plaincraft_render_engine.hpp>
+#include "./world_generator.hpp"
+#include <thread>
+#include <algorithm>
 #include <cmath>
 
 namespace plaincraft_core
 {
-	WorldGenerator::WorldGenerator(rp3d::PhysicsCommon &physics_common,
-								   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
-								   std::shared_ptr<RenderEngine> render_engine,
-								   Scene &scene,
-								   Cache<Model> &models_cache,
-								   Cache<Texture> &textures_cache)
-		: physics_common_(physics_common),
-		  physics_world_(physics_world),
-		  render_engine_(render_engine),
-		  scene_(scene),
-		  models_cache_(models_cache),
-		  textures_cache_(textures_cache)
-	{
-	}
+    WorldGenerator::WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
+                                   std::unique_ptr<ChunkBuilder> world_generator,
+                                   Scene &scene,
+                                   std::shared_ptr<Map> map,
+                                   std::shared_ptr<GameObject> origin_entity)
+        : scene_(scene),
+          map_(map),
+          origin_entity_(origin_entity),
+          chunks_processor_(std::move(world_generator), std::move(world_optimizer), scene, ChunksProcessor::Metric(origin_entity))
+    {
+        ReloadGrid();
+        chunks_processor_.Process(INT32_MAX);
+    }
 
-	Chunk WorldGenerator::CreateChunk(I32Vector3d offset)
-	{
-		// const auto model = models_cache_.Fetch("cube_half");
+    void WorldGenerator::OnLoopFrameTick(float delta_time)
+    {
+        auto origin_position = origin_entity_->GetRigidBody()->getTransform().getPosition();
 
-		auto chunk_data = Chunk::Data();
-		auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+        const auto &lower_chunk = map_->grid_[Map::render_radius - 1][Map::render_radius - 1];
+        const auto &higher_chunk = map_->grid_[Map::render_radius][Map::render_radius];
+        int32_t lower_boundary_x = lower_chunk->GetPositionX() * Chunk::chunk_size;
+        int32_t lower_boundary_z = lower_chunk->GetPositionZ() * Chunk::chunk_size;
+        int32_t higher_boundary_x = (higher_chunk->GetPositionX() + 1) * Chunk::chunk_size;
+        int32_t higher_boundary_z = (higher_chunk->GetPositionZ() + 1) * Chunk::chunk_size;
 
-		std::shared_ptr<Block> game_object;
+        if (origin_position.x < static_cast<float>(lower_boundary_x) || origin_position.z < static_cast<float>(lower_boundary_z) || origin_position.x > static_cast<float>(higher_boundary_x) || origin_position.z > static_cast<float>(higher_boundary_z))
+        {
+            ReloadGrid();
+        }
 
-		for (auto i = 0; i < Chunk::chunk_size; ++i)
-		{
-			for (auto j = 0; j < Chunk::chunk_height; ++j)
-			{
-				if (j > 3)
-				{
-					continue;
-				}
+        chunks_processor_.Process(10);
+    }
 
-				for (auto k = 0; k < Chunk::chunk_size; ++k)
-				{
-					if ((rand() % 100) < 35)
-					{
-						continue;
-					}
+    void WorldGenerator::ReloadGrid()
+    {
+        auto origin_position = origin_entity_->GetRigidBody()->getTransform().getPosition() / Chunk::chunk_size;
 
-					auto game_object = std::make_shared<Block>(I32Vector3d(i, j, k));
-					game_object->SetObjectType(GameObject::ObjectType::Static);
-					auto drawable = std::make_shared<Drawable>();
-					// drawable->SetModel(model);
-					// game_object->SetDrawable(drawable);
+        int32_t start_x = static_cast<int32_t>(origin_position.x) - Map::render_radius;
+        int32_t start_z = static_cast<int32_t>(origin_position.z) - Map::render_radius;
 
-					// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
-					auto x = static_cast<int32_t>(Chunk::chunk_size) * offset.x + i * 1.0;
-					auto y = static_cast<int32_t>(Chunk::chunk_size) * offset.y + j * 1.0;
-					auto z = static_cast<int32_t>(Chunk::chunk_size) * offset.z + k * 1.0;
-					auto position = Vector3d(x, y, z);
-					auto orientation = rp3d::Quaternion::identity();
-					rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-					auto rigid_body = physics_world_->createRigidBody(transform);
-					auto collider = rigid_body->addCollider(cube_shape, transform);
-					collider->getMaterial().setFrictionCoefficient(1.0f);
-					rigid_body->setType(rp3d::BodyType::STATIC);
-					rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
-					game_object->SetRigidBody(rigid_body);
-					rigid_body->setIsSleeping(true);
+        int32_t old_grid_start_x, old_grid_start_z;
+        auto &current_grid = map_->grid_;
 
-					// game_object->SetColor(color);
+        if (map_->is_initialized_)
+        {
+            old_grid_start_x = current_grid[0][0]->GetPositionX();
+            old_grid_start_z = current_grid[0][0]->GetPositionZ();
+        }
 
-					scene_.AddGameObject(game_object);
+        auto current_x = start_x;
+        auto current_z = start_z;
 
-					// game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-					// game_object->GetDrawable()->SetRotation(Quaternion(orientation.w, orientation.x, orientation.y, orientation.z));
+        Map::ChunksGrid new_grid;
+        new_grid = Map::ChunksGrid(Map::render_diameter);
+        for (auto &row : new_grid)
+        {
+            row = Map::ChunksRow(Map::render_diameter);
+        }
 
-					chunk_data[i][j][k] = game_object;
-				}
-			}
-		}
+        for (auto &row : new_grid)
+        {
+            current_z = start_z;
 
-		auto position_x = static_cast<int32_t>(offset.x);
-		auto position_z = static_cast<int32_t>(offset.z);
+            for (auto &chunk : row)
+            {
+                // Try to reuse chunk from the old grid
+                if (map_->is_initialized_ && current_x < old_grid_start_x + static_cast<int32_t>(Map::render_diameter) && current_x >= old_grid_start_x && current_z < old_grid_start_z + static_cast<int32_t>(Map::render_diameter) && current_z >= old_grid_start_z)
+                {
+                    chunk = std::move(current_grid[current_x - old_grid_start_x][current_z - old_grid_start_z]);
+                }
+                else
+                {
+                    chunk = chunks_processor_.RequestChunk(current_x, current_z);
+                }
+                ++current_z;
+            }
 
-		return Chunk(position_x, position_z, std::move(chunk_data));
-	}
+            ++current_x;
+        }
 
-	void WorldGenerator::DisposeChunk(std::shared_ptr<Chunk> chunk)
-	{
-		auto &blocks = chunk->GetData();
-		std::vector<std::shared_ptr<GameObject>> game_objects_to_remove;
-		if (!blocks.empty())
-		{
-			for (auto &plane : blocks)
-			{
-				for (auto &row : plane)
-				{
-					for (auto &block : row)
-					{
-						if (block != nullptr)
-						{
-							game_objects_to_remove.push_back(block);
-							block->GetRigidBody()->setIsActive(false);
-							free_rigid_bodies_.push(block->GetRigidBody());
-							//physics_world_->destroyRigidBody(block->GetRigidBody());
-						}
-					}
-				}
-			}
-		}
-		game_objects_to_remove.push_back(chunk);
-		scene_.RemoveGameObjects(game_objects_to_remove);
-	}
+        for (auto &row : current_grid)
+        {
+            for (auto &chunk : row)
+            {
+                if (chunk != nullptr)
+                {
+                    chunks_processor_.RejectChunk(chunk);
+                }
+            }
+        }
+
+        map_->grid_ = std::move(new_grid);
+        map_->is_initialized_ = true;
+    }
 }
