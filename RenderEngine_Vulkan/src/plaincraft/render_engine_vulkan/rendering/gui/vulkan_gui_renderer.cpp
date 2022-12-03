@@ -52,7 +52,7 @@ namespace plaincraft_render_engine_vulkan
     Initialize(render_pass);
     UploadFonts();
 
-    widgets_.push_back(std::make_unique<VulkanDiagnosticWidget>());
+    debug_widgets_.push_back(std::make_unique<VulkanDiagnosticWidget>());
   }
 
   VulkanGuiRenderer::~VulkanGuiRenderer()
@@ -67,21 +67,26 @@ namespace plaincraft_render_engine_vulkan
     }
   }
 
-  void VulkanGuiRenderer::Render(VulkanRendererFrameConfig frame_config)
+  void VulkanGuiRenderer::SetDebugWidgetsVisibility(bool are_debug_widgets_visible)
+  {
+    are_debug_widgets_visible_ = are_debug_widgets_visible;
+  }
+
+  void VulkanGuiRenderer::Render(VulkanRendererFrameConfig vulkan_renderer_frame_config)
   {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    for(auto& widget : widgets_)
+    for(auto& widget : debug_widgets_)
     {
-      widget->Draw();
+      widget->Draw(vulkan_renderer_frame_config.frame_config);
     }
 
     ImGui::Render();
     ImDrawData *draw_data = ImGui::GetDrawData();
 
-    ImGui_ImplVulkan_RenderDrawData(draw_data, frame_config.command_buffer);
+    ImGui_ImplVulkan_RenderDrawData(draw_data, vulkan_renderer_frame_config.command_buffer);
   }
 
   void VulkanGuiRenderer::Initialize(VkRenderPass render_pass)

@@ -30,6 +30,7 @@ SOFTWARE.
 #include "../../common.hpp"
 #include "../../scene/scene.hpp"
 #include "../../entities/map/chunk.hpp"
+#include <lib/PerlinNoise.hpp>
 #include <stack>
 #include <unordered_map>
 
@@ -41,8 +42,10 @@ namespace plaincraft_core
 		struct ChunkProcessingData
 		{
 			size_t i, j, k;
-			bool is_finished;
 		};
+
+		uint64_t seed_;
+		siv::PerlinNoise perlin_;
 
 	public:
 		rp3d::PhysicsCommon &physics_common_;
@@ -61,7 +64,8 @@ namespace plaincraft_core
 					 std::shared_ptr<RenderEngine> render_engine,
 					 Scene &scene,
 					 Cache<Model> &models_cache,
-					 Cache<Texture> &textures_cache);
+					 Cache<Texture> &textures_cache,
+					 uint64_t seed);
 
 		std::shared_ptr<Chunk> InitializeChunk(int32_t position_x, int32_t position_z);
 		bool GenerateChunkStep(std::shared_ptr<Chunk> chunk);

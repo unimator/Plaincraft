@@ -24,32 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#include "./stone.hpp"
 
-#include "../../vulkan_gui_widget.hpp"
-#include "./sections/vulkan_diagnostic_widget_section.hpp"
-#include "./sections/vulkan_diagnostic_widget_profiling.hpp"
-#include "./sections/vulkan_diagnostic_widget_logger.hpp"
-#include <memory>
-#include <vector>
-
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_core
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
-    {
-    private:
-        std::vector<std::unique_ptr<VulkanDiagnosticWidgetSection>> sections_;
+    const Block::TextureCoordinates& Stone::GetTextureCoordinates() const {
+        static Block::TextureCoordinates text_cood {
+            std::make_pair(1, 0),
+            std::make_pair(1, 0),
+            std::make_pair(1, 0),
+            std::make_pair(1, 0),
+            std::make_pair(1, 0),
+            std::make_pair(1, 0)
+        };
 
-    public:
-        VulkanDiagnosticWidget();
-
-        void Draw(const FrameConfig& frame_config) override;
-
-    private:
-        void RenderProfiling();
-        void RenderLogValues();
-    };
+        return text_cood;
+    }
 }
-
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET

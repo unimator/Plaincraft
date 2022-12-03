@@ -28,6 +28,7 @@ SOFTWARE.
 #define PLAINCRAFT_RENDER_ENGINE_PLAINCRAFT_RENDER_ENGINE
 
 #include "../src/plaincraft/render_engine/render_engine.hpp"
+#include "../src/plaincraft/render_engine/frame_config.hpp"
 
 #include "../src/plaincraft/render_engine/texture/texture.hpp"
 #include "../src/plaincraft/render_engine/texture/textures_repository.hpp"

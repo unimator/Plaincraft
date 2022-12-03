@@ -27,15 +27,19 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_WIDGET
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_WIDGET
 
+#include <plaincraft_render_engine.hpp>
+
 namespace plaincraft_render_engine_vulkan
 {
+    using namespace plaincraft_render_engine;
+
     class VulkanGuiWidget
     {
     protected:
         bool is_visible_ = true;
 
     public:
-        virtual void Draw() = 0;
+        virtual void Draw(const FrameConfig& frame_config) = 0;
 
         bool IsVisible() const;
         void SetIsVisible(bool is_visible);

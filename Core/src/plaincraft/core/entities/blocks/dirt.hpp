@@ -27,13 +27,16 @@ SOFTWARE.
 #ifndef PLAINCRAFT_BLOCKS_DIRT
 #define PLAINCRAFT_BLOCKS_DIRT
 
-#include "../game_object.hpp"
+#include "./block.hpp"
 
 namespace plaincraft_core
 {
-    class Dirt : public GameObject
+    class Dirt : public Block
     {
-        
+        public:
+            Dirt();
+
+            const TextureCoordinates& GetTextureCoordinates() const override;
     };
 }
 

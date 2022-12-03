@@ -24,32 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#include "global_state.hpp"
 
-#include "../../vulkan_gui_widget.hpp"
-#include "./sections/vulkan_diagnostic_widget_section.hpp"
-#include "./sections/vulkan_diagnostic_widget_profiling.hpp"
-#include "./sections/vulkan_diagnostic_widget_logger.hpp"
-#include <memory>
-#include <vector>
-
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_core 
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    void GlobalState::SetDebugInfoVisibility(bool is_visible)
     {
-    private:
-        std::vector<std::unique_ptr<VulkanDiagnosticWidgetSection>> sections_;
+        is_debug_info_visible_ = is_visible;
+    }
 
-    public:
-        VulkanDiagnosticWidget();
+    bool GlobalState::GetDebugInfoVisibility() const 
+    {
+        return is_debug_info_visible_;
+    }
 
-        void Draw(const FrameConfig& frame_config) override;
+    void GlobalState::SetSeed(uint64_t seed)
+    {
+        seed_ = seed;
+    }
 
-    private:
-        void RenderProfiling();
-        void RenderLogValues();
-    };
+    uint64_t GlobalState::GetSeed() const
+    {
+        return seed_;
+    }
 }
-
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET

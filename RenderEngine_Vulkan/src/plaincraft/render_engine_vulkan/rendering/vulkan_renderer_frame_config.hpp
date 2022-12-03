@@ -28,9 +28,13 @@ SOFTWARE.
 #define VULKAN_RENDER_ENGINE_VULKAN_VULKAN_RENDERER_FRAME_CONFIG
 
 #include <vulkan/vulkan.h>
+#include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_render_engine_vulkan {
+    using namespace plaincraft_render_engine;
+
     struct VulkanRendererFrameConfig {
+        const FrameConfig& frame_config; 
         VkCommandBuffer& command_buffer;
         size_t image_index;
     };

@@ -65,8 +65,13 @@ namespace plaincraft_core
     bool ChunksProcessor::Metric::Compare(const std::shared_ptr<Chunk> &first, const std::shared_ptr<Chunk> &second)
     {
         auto position = origin_->GetRigidBody()->getTransform().getPosition();
-        auto first_distance_to_player_squared = (first->GetPositionX() - position.x) * (first->GetPositionX() - position.x) + (first->GetPositionZ() - position.z) * (first->GetPositionZ() - position.z);
-        auto second_distance_to_player_squared = (second->GetPositionX() - position.x) * (second->GetPositionX() - position.x) + (second->GetPositionZ() - position.z) * (second->GetPositionZ() - position.z);
+        auto first_position_x = first->GetPositionX() * static_cast<float>(Chunk::chunk_size);
+        auto first_position_z = first->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
+        auto second_position_x = second->GetPositionX() * static_cast<float>(Chunk::chunk_size);
+        auto second_position_z = second->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
+        
+        auto first_distance_to_player_squared = (first_position_x - position.x) * (first_position_x - position.x) + (first_position_z - position.z) * (first_position_z - position.z);
+        auto second_distance_to_player_squared = (second_position_x - position.x) * (second_position_x - position.x) + (second_position_z - position.z) * (second_position_z - position.z);
         return first_distance_to_player_squared > second_distance_to_player_squared;
     }
 
@@ -160,16 +165,16 @@ namespace plaincraft_core
             return *chunk_iterator;
         }
 
-        // // // Check if chunk is waiting to be rejected
-        // chunk_iterator = std::find_if(rejected_chunks_.begin(), rejected_chunks_.end(), find_chunk_predicate);
+        // Check if chunk is waiting to be rejected
+        chunk_iterator = std::find_if(rejected_chunks_.begin(), rejected_chunks_.end(), find_chunk_predicate);
 
-        // if(chunk_iterator != std::end(rejected_chunks_))
-        // {
-        //     result = *chunk_iterator;
-        //     // If so it's no longer to be rejected
-        //     rejected_chunks_.remove_if(find_chunk_predicate);
-        //     return result;
-        // }
+        if(chunk_iterator != std::end(rejected_chunks_))
+        {
+            result = *chunk_iterator;
+            // If so it's no longer to be rejected
+            rejected_chunks_.remove_if(find_chunk_predicate);
+            return result;
+        }
 
         // If chunk is neither to be processed nor rejected create it and put to be processed
         result = chunk_builder_->InitializeChunk(chunk_x, chunk_z);
@@ -186,7 +191,11 @@ namespace plaincraft_core
 
         requested_chunks_.remove_if(find_chunk_predicate);
 
-        rejected_chunks_.emplace_back(chunk);
+        // Only initialized chunks requires clean up
+        if(chunk->initialized_)
+        {
+            rejected_chunks_.emplace_back(chunk);
+        }
     }
 
     void ChunksProcessor::CreationStep()
@@ -222,7 +231,7 @@ namespace plaincraft_core
 
     std::shared_ptr<Chunk> ChunksProcessor::GetNextChunkToCreate()
     {
-        if(requested_chunks_.empty())
+        if(requested_chunks_.empty() || stop_processing)
         {
             return nullptr;
         }
@@ -232,7 +241,7 @@ namespace plaincraft_core
             return metric_.Compare(first, second);
         };
 
-        requested_chunks_.sort( compare);
+        requested_chunks_.sort(compare);
         auto result = requested_chunks_.back();
         requested_chunks_.pop_back();
 
@@ -241,7 +250,7 @@ namespace plaincraft_core
 
     std::shared_ptr<Chunk> ChunksProcessor::GetNextChunkToDispose()
     {
-        if(rejected_chunks_.empty())
+        if(rejected_chunks_.empty() || stop_processing)
         {
             return nullptr;
         }

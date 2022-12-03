@@ -62,22 +62,24 @@ namespace plaincraft_core
 
                     auto txt_u_factor = 16.0f / 384.0f;
                     auto txt_v_factor = 16.0f / 544.0f;
+                    auto& text_cood = block->GetTextureCoordinates();
+                    auto& [top, bottom, left, right, front, back] = text_cood;
 
                     // X axis check
-                    if (x > 0 && chunk.blocks_[x - 1][y][z] == nullptr)
+                    if (x == 0 || (x > 0 && chunk.blocks_[x - 1][y][z] == nullptr))
                     {
-                        vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {left.first * txt_u_factor, (left.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {left.first * txt_u_factor, left.second * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {(left.first + 1) * txt_u_factor, left.second * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {(left.first + 1) * txt_u_factor, (left.second + 1) * txt_v_factor}});
                     }
 
-                    if (x < Chunk::chunk_size - 1 && chunk.blocks_[x + 1][y][z] == nullptr)
+                    if ((x == Chunk::chunk_size - 1) || x < Chunk::chunk_size - 1 && chunk.blocks_[x + 1][y][z] == nullptr)
                     {
-                        vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {4 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {right.first * txt_u_factor, (right.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y - 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {(right.first + 1) * txt_u_factor, (right.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {(right.first + 1) * txt_u_factor, right.second * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {right.first * txt_u_factor, right.second * txt_v_factor}});
                     }
 
                     // Y axis check
@@ -90,27 +92,27 @@ namespace plaincraft_core
                     }
                     if (y < Chunk::chunk_height - 1 && chunk.blocks_[x][y + 1][z] == nullptr)
                     {
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0 * txt_u_factor, 1 * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {top.first * txt_u_factor, top.second * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {(top.first + 1) * txt_u_factor, top.second * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {(top.first + 1) * txt_u_factor, (top.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {top.first * txt_u_factor, (top.second + 1) * txt_v_factor}});
                     }
 
                     // Z axis check
-                    if (z > 0 && chunk.blocks_[x][y][z - 1] == nullptr)
+                    if (z == 0 || (z > 0 && chunk.blocks_[x][y][z - 1] == nullptr))
                     {
-                        vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {4 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {front.first * txt_u_factor, (front.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y - 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {(front.first + 1) * txt_u_factor, (front.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {(front.first + 1) * txt_u_factor, front.second * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z - 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {front.first * txt_u_factor, front.second * txt_v_factor}});
                     }
 
-                    if (z < Chunk::chunk_size - 1 && chunk.blocks_[x][y][z + 1] == nullptr)
+                    if (z == Chunk::chunk_size - 1 || (z < Chunk::chunk_size - 1 && chunk.blocks_[x][y][z + 1] == nullptr))
                     {
-                        vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 1 * txt_v_factor}});
-                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {3 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {4 * txt_u_factor, 0 * txt_v_factor}});
-                        vertices.push_back({{x + 0.5f, y - 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {4 * txt_u_factor, 1 * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y - 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {back.first * txt_u_factor, (back.second + 1) * txt_v_factor}});
+                        vertices.push_back({{x - 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {back.first * txt_u_factor, back.second * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y + 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {(back.first + 1) * txt_u_factor, back.second * txt_v_factor}});
+                        vertices.push_back({{x + 0.5f, y - 0.5f, z + 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {(back.first + 1) * txt_u_factor, (back.second + 1) * txt_v_factor}});
                     }
                 }
             }

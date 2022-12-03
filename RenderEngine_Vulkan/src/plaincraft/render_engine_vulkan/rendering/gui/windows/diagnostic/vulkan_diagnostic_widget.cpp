@@ -39,11 +39,11 @@ namespace plaincraft_render_engine_vulkan
         sections_.push_back(std::make_unique<VulkanDiagnosticWidgetLogger>(std::move(VulkanDiagnosticWidgetLogger())));
     }
 
-    void VulkanDiagnosticWidget::Draw()
+    void VulkanDiagnosticWidget::Draw(const FrameConfig& frame_config)
     {
         constexpr float padding = 10.0f;
 
-        if (!is_visible_)
+        if (!is_visible_ || !frame_config.is_debug_enabled)
         {
             return;
         }

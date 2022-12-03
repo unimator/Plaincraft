@@ -24,32 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#ifndef PLAINCRAFT_CORE_FPS_COUNTER
+#define PLAINCRAFT_CORE_FPS_COUNTER
 
-#include "../../vulkan_gui_widget.hpp"
-#include "./sections/vulkan_diagnostic_widget_section.hpp"
-#include "./sections/vulkan_diagnostic_widget_profiling.hpp"
-#include "./sections/vulkan_diagnostic_widget_logger.hpp"
-#include <memory>
-#include <vector>
+#include "../events/loop_events_handler.hpp"
 
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_core
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    class FpsCounter final
     {
-    private:
-        std::vector<std::unique_ptr<VulkanDiagnosticWidgetSection>> sections_;
+        private:
+            uint32_t frame_count_ = 0;
+            float time_passed_ = 0.0f;
 
-    public:
-        VulkanDiagnosticWidget();
+            uint32_t frames_per_second_ = 0;
 
-        void Draw(const FrameConfig& frame_config) override;
+        public:
+            FpsCounter(LoopEventsHandler& loop_events_handler);
+            ~FpsCounter();
+            
+            uint32_t GetFramesPerSecond() const;
 
-    private:
-        void RenderProfiling();
-        void RenderLogValues();
+        private:
+            void OnLoopTick(float delta_time);
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#endif // PLAINCRAFT_CORE_FPS_COUNTER

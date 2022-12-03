@@ -10,6 +10,7 @@ endif()
 
 target_sources(${TARGET_NAME}
 PRIVATE
+    include/lib/PerlinNoise.hpp
     include/lib/stb_image.h
     include/lib/tiny_obj_loader.h
     include/plaincraft_common.hpp

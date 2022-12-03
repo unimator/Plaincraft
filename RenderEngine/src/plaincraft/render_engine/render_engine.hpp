@@ -35,6 +35,7 @@ SOFTWARE.
 #include "texture/textures_repository.hpp"
 #include "window/window.hpp"
 #include "models/models_factory.hpp"
+#include "frame_config.hpp"
 
 namespace plaincraft_render_engine {
 	class RenderEngine {
@@ -64,7 +65,7 @@ namespace plaincraft_render_engine {
 		std::shared_ptr<TexturesRepository> GetTexturesRepository();
 		std::shared_ptr<ModelsFactory> GetModelsFactory();
 
-		virtual void RenderFrame() = 0;
+		virtual void RenderFrame(const FrameConfig& frame_config) = 0;
 
 	protected:
 		RenderEngine(std::shared_ptr<Window> window);

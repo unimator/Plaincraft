@@ -31,53 +31,100 @@ using namespace plaincraft_core;
 
 namespace plaincraft_runner
 {
-    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance()
+    KeyMappingController::KeyMappingController(Game& game_instance)
+    :   game_instance_(game_instance)
     {
-        return std::shared_ptr<KeyMappingController>(new KeyMappingController());
+        key_mappings_.insert(std::make_pair(GLFW_KEY_W, &KeyMappingController::MoveForward));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_S, &KeyMappingController::MoveBackward));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_A, &KeyMappingController::MoveLeft));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_D, &KeyMappingController::MoveRight));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_SPACE, &KeyMappingController::Jump));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_F1, &KeyMappingController::ToggleDebugInfo));
     }
 
-    void KeyMappingController::Setup(Game &game_instance)
+    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance(Game& game_instance)
     {
-        auto player = game_instance.GetScene().FindGameObjectByName("player");
+        return std::shared_ptr<KeyMappingController>(new KeyMappingController(game_instance));
+    }
+
+    void KeyMappingController::Setup()
+    {
+        auto player = game_instance_.GetScene().FindGameObjectByName("player");
         player_ = player;
-        auto camera = game_instance.GetCamera();
+        auto camera = game_instance_.GetCamera();
         camera_ = camera;
         
-        auto& window_events_handler = game_instance.GetWindowEventsHandler();
-        auto& loop_events_handler = game_instance.GetLoopEventsHandler();
+        auto& window_events_handler = game_instance_.GetWindowEventsHandler();
+        auto& loop_events_handler = game_instance_.GetLoopEventsHandler();
         window_events_handler.key_pressed_event_trigger.AddSubscription(this, &KeyMappingController::OnKeyPressed);
         loop_events_handler.loop_event_trigger.AddSubscription(this, &KeyMappingController::OnLoopTick);
     }
 
-    void KeyMappingController::OnKeyPressed(int key, int scancode, int action, int mods)
+    
+
+    void KeyMappingController::MoveForward(int action, int mods)
     {
         if (action == GLFW_PRESS || action == GLFW_RELEASE)
         {
             auto was_pressed = action == GLFW_PRESS;
-            if (key == GLFW_KEY_W)
-            { 
-                forward_ = was_pressed;
-            }
-            if (key == GLFW_KEY_S)
+            forward_ = was_pressed;
+        }
+    }
+
+    void KeyMappingController::MoveBackward(int action, int mods)
+    {
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        {
+            auto was_pressed = action == GLFW_PRESS;
+            backward_ = was_pressed;
+        }
+    }
+
+    void KeyMappingController::MoveLeft(int action, int mods)
+    {
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        {
+            auto was_pressed = action == GLFW_PRESS;
+            left_ = was_pressed;
+        }
+    }
+
+    void KeyMappingController::MoveRight(int action, int mods)
+    {
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        {
+            auto was_pressed = action == GLFW_PRESS;
+            right_ = was_pressed;
+        }
+    }
+
+    void KeyMappingController::Jump(int action, int mods)
+    {
+        if (action == GLFW_PRESS)
+        {
+            if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.0001)
             {
-                backward_ = was_pressed;
+                player_->GetRigidBody()->applyLocalForceAtCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
             }
-            if (key == GLFW_KEY_A)
-            {
-                left_ = was_pressed;
-            }
-            if (key == GLFW_KEY_D)
-            {
-                right_ = was_pressed;
-            }
-            if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
-            {
-                if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.0001)
-                {
-                    //player_->GetRigidBody()->applyForceToCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
-                    player_->GetRigidBody()->applyLocalForceAtCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
-                }
-            }
+        }
+    }
+
+    void KeyMappingController::ToggleDebugInfo(int action, int mods)
+    {
+        if (action == GLFW_PRESS)
+        {
+            auto& global_state = game_instance_.GetGlobalState();
+            auto is_debug_info_visible = global_state.GetDebugInfoVisibility();
+            global_state.SetDebugInfoVisibility(!is_debug_info_visible);
+        }
+    }
+
+    void KeyMappingController::OnKeyPressed(int key, int scancode, int action, int mods)
+    {
+        if(key_mappings_.contains(key))
+        {
+            auto& action_callback = key_mappings_[key];
+            (this->*action_callback)(action, mods);
         }
     }
 

@@ -98,13 +98,13 @@ namespace plaincraft_render_engine
 
 	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable_to_add)
 	{
-		std::cout << "Add [" << drawable_to_add->GetPosition().x << " ; " << drawable_to_add->GetPosition().z << "]" << std::endl;
+		//std::cout << "Add [" << drawable_to_add->GetPosition().x << " ; " << drawable_to_add->GetPosition().z << "]" << std::endl;
 		drawables_list_.push_back(drawable_to_add);
 	}
 
 	void RenderEngine::RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove)
 	{
-		std::cout << "Remove [" << drawable_to_remove->GetPosition().x << " ; " << drawable_to_remove->GetPosition().z << "]" << std::endl;
+		//std::cout << "Remove [" << drawable_to_remove->GetPosition().x << " ; " << drawable_to_remove->GetPosition().z << "]" << std::endl;
 		drawables_list_.erase(std::remove_if(drawables_list_.begin(),
 											 drawables_list_.end(),
 											 [&](std::shared_ptr<Drawable> const &drawable)

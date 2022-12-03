@@ -28,7 +28,9 @@ SOFTWARE.
 #define PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
 
 #include <plaincraft_core.hpp>
+#include <unordered_map>
 #include <memory>
+#include <functional>
 
 using namespace plaincraft_core;
 
@@ -39,20 +41,34 @@ namespace plaincraft_runner
     private:
         std::shared_ptr<GameObject> player_;
         std::shared_ptr<Camera> camera_;
+        Game& game_instance_;
+
+        typedef void (KeyMappingController::*KeyPressedCallback)(int action, int mods);
+        std::unordered_map<int, KeyPressedCallback> key_mappings_;
 
         float movement_speed_ = 6.0f;
         float maximum_speed_ = 6.0f;
 
         bool forward_ = false, backward_ = false, left_ = false, right_ = false;
 
-    public:
-        static std::shared_ptr<KeyMappingController> CreateInstance();
+        KeyMappingController(Game& game_instance);
 
-        void Setup(Game &game_instance);
+    public:
+        static std::shared_ptr<KeyMappingController> CreateInstance(Game& game_instance_);
+
+        void Setup();
 
     private:
         void OnKeyPressed(int key, int scancode, int action, int mods);
         void OnLoopTick(float delta_time);
+
+// Key actions
+        void MoveForward(int action, int mods);
+        void MoveBackward(int action, int mods);
+        void MoveLeft(int action, int mods);
+        void MoveRight(int action, int mods);
+        void Jump(int action, int mods);
+        void ToggleDebugInfo(int action, int mods);
     };
 }
 

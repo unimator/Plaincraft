@@ -28,5 +28,20 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
+    Dirt::Dirt() {
+        
+    }
 
+    const Block::TextureCoordinates& Dirt::GetTextureCoordinates() const {
+        static Block::TextureCoordinates text_cood {
+            std::make_pair(0, 0),
+            std::make_pair(2, 0),
+            std::make_pair(3, 0),
+            std::make_pair(3, 0),
+            std::make_pair(3, 0),
+            std::make_pair(3, 0)
+        };
+
+        return text_cood;
+    }
 }

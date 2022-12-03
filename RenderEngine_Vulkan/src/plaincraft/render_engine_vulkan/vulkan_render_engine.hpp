@@ -66,7 +66,7 @@ namespace plaincraft_render_engine_vulkan {
 		
 		std::unique_ptr<VulkanGuiRenderer> gui_renderer_;
 
-		bool enable_debug_ = false;
+		bool enable_debug_;
 
 	public:
 		VulkanRenderEngine(std::shared_ptr<VulkanWindow> window);
@@ -76,7 +76,7 @@ namespace plaincraft_render_engine_vulkan {
 
 		virtual ~VulkanRenderEngine();
 
-		void RenderFrame() override;
+		void RenderFrame(const FrameConfig& frame_config) override;
 
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 

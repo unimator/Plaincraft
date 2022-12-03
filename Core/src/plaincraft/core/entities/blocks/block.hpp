@@ -28,6 +28,7 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_BLOCK
 
 #include "../game_object.hpp"
+#include <utility>
 
 namespace plaincraft_core
 {
@@ -36,14 +37,22 @@ namespace plaincraft_core
 
     class Block : public GameObject
     {
+    public:
+        struct TextureCoordinates {
+            std::pair<int, int> top, bottom, left, right, front, back;
+        };
+
     friend class Map;
     friend class Chunk;
 
     private:
-        I32Vector3d position_;
+
+    protected:
 
     public:
-        Block(I32Vector3d position);
+        Block();
+
+        virtual const TextureCoordinates& GetTextureCoordinates() const = 0;
     };
 }
 

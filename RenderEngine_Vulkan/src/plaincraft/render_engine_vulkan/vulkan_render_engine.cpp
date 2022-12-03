@@ -51,8 +51,6 @@ namespace plaincraft_render_engine_vulkan
 		  surface_(GetVulkanWindow()->CreateSurface(instance_.GetInstance())),
 		  device_(VulkanDevice(instance_, surface_))
 	{
-		auto image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/text.png");
-
 		models_factory_ = std::make_unique<VulkanModelsFactory>(VulkanModelsFactory(device_));
 
 		RecreateSwapChain();
@@ -176,7 +174,7 @@ namespace plaincraft_render_engine_vulkan
 		throw std::runtime_error("Failed to find suitable memory type");
 	}
 
-	void VulkanRenderEngine::RenderFrame()
+	void VulkanRenderEngine::RenderFrame(const FrameConfig &frame_config)
 	{
 		vkWaitForFences(device_.GetDevice(), 1, &in_flight_fences_[current_frame_], VK_TRUE, UINT64_MAX);
 
@@ -225,15 +223,16 @@ namespace plaincraft_render_engine_vulkan
 
 		auto vulkan_renderer = GetVulkanRenderer();
 
-		VulkanRendererFrameConfig frame_config{
+		VulkanRendererFrameConfig vulkan_renderer_frame_config{
+			frame_config,
 			command_buffer,
 			image_index};
-		
-		vulkan_renderer->BeginFrame(frame_config);
+
+		vulkan_renderer->BeginFrame(vulkan_renderer_frame_config);
 
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
-			auto& drawable = drawables_list_[i];
+			auto &drawable = drawables_list_[i];
 			scene_renderer_->Batch(drawable);
 		}
 
@@ -243,7 +242,7 @@ namespace plaincraft_render_engine_vulkan
 		vulkan_renderer->EndFrame();
 		vulkan_renderer->HasRendered();
 
-		gui_renderer_->Render(frame_config);
+		gui_renderer_->Render(vulkan_renderer_frame_config);
 
 		vkCmdEndRenderPass(command_buffer);
 

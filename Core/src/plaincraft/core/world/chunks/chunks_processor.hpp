@@ -54,8 +54,11 @@ namespace plaincraft_core
 
                     bool Compare(const std::shared_ptr<Chunk> &first, const std::shared_ptr<Chunk> &second);
             };
+        
+        public:
+            bool stop_processing = false;
 
-        private:
+        public:
             std::unique_ptr<ChunkBuilder> chunk_builder_;
             std::unique_ptr<WorldOptimizer> world_optimizer_;
             Metric metric_;

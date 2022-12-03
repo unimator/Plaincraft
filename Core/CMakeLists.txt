@@ -25,6 +25,8 @@ PRIVATE
     src/plaincraft/core/entities/blocks/block.hpp
     src/plaincraft/core/entities/blocks/dirt.cpp
     src/plaincraft/core/entities/blocks/dirt.hpp
+    src/plaincraft/core/entities/blocks/stone.cpp
+    src/plaincraft/core/entities/blocks/stone.hpp
     src/plaincraft/core/entities/map/chunk.cpp
     src/plaincraft/core/entities/map/chunk.hpp
     src/plaincraft/core/entities/map/map.cpp
@@ -46,6 +48,10 @@ PRIVATE
     src/plaincraft/core/scene/scene.hpp
     src/plaincraft/core/utils/conversions.cpp
     src/plaincraft/core/utils/conversions.hpp
+    src/plaincraft/core/utils/fps_counter.cpp
+    src/plaincraft/core/utils/fps_counter.hpp
+    src/plaincraft/core/state/global_state.cpp
+    src/plaincraft/core/state/global_state.hpp
     src/plaincraft/core/world/chunks/chunk_builder.cpp
     src/plaincraft/core/world/chunks/chunk_builder.hpp
     src/plaincraft/core/world/chunks/chunks_processor.cpp

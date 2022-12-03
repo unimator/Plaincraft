@@ -24,32 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#ifndef PLAINCRAFT_RENDER_ENGINE_FRAME_CONFIG
+#define PLAINCRAFT_RENDER_ENGINE_FRAME_CONFIG
 
-#include "../../vulkan_gui_widget.hpp"
-#include "./sections/vulkan_diagnostic_widget_section.hpp"
-#include "./sections/vulkan_diagnostic_widget_profiling.hpp"
-#include "./sections/vulkan_diagnostic_widget_logger.hpp"
-#include <memory>
-#include <vector>
-
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_render_engine 
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    struct FrameConfig 
     {
-    private:
-        std::vector<std::unique_ptr<VulkanDiagnosticWidgetSection>> sections_;
-
-    public:
-        VulkanDiagnosticWidget();
-
-        void Draw(const FrameConfig& frame_config) override;
-
-    private:
-        void RenderProfiling();
-        void RenderLogValues();
+        bool is_debug_enabled;
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#endif // PLAINCRAFT_RENDER_ENGINE_FRAME_CONFIG

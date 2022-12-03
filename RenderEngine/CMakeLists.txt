@@ -33,6 +33,7 @@ PRIVATE
     src/plaincraft/render_engine/window/window.cpp
     src/plaincraft/render_engine/window/window.hpp
     src/plaincraft/render_engine/common.hpp
+    src/plaincraft/render_engine/frame_config.hpp
     src/plaincraft/render_engine/render_engine.cpp
     src/plaincraft/render_engine/render_engine.hpp
 )

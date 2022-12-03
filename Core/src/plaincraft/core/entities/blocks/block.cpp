@@ -28,8 +28,8 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    Block::Block(I32Vector3d position)
-        : position_(position)
+    Block::Block()
     {
     }
+
 }

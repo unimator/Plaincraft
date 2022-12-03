@@ -58,10 +58,18 @@ namespace plaincraft_core
 
         if (origin_position.x < static_cast<float>(lower_boundary_x) || origin_position.z < static_cast<float>(lower_boundary_z) || origin_position.x > static_cast<float>(higher_boundary_x) || origin_position.z > static_cast<float>(higher_boundary_z))
         {
-            ReloadGrid();
+            chunks_processor_.stop_processing = true;
+            if(chunks_processor_.current_to_create_ == nullptr && chunks_processor_.current_to_dispose_ == nullptr)
+            {
+                ReloadGrid();
+            }
+        }
+        else
+        {
+            chunks_processor_.stop_processing = false;
         }
 
-        chunks_processor_.Process(10);
+        chunks_processor_.Process(50);
     }
 
     void WorldGenerator::ReloadGrid()

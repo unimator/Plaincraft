@@ -52,7 +52,9 @@ namespace plaincraft_render_engine_vulkan
 
         VkDescriptorPool imgui_descriptor_pool_;
 
-        std::vector<std::unique_ptr<VulkanGuiWidget>> widgets_;
+        std::vector<std::unique_ptr<VulkanGuiWidget>> debug_widgets_;
+
+        bool are_debug_widgets_visible_;
 
     public:
         VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
@@ -69,8 +71,9 @@ namespace plaincraft_render_engine_vulkan
         VulkanGuiRenderer& operator=(const VulkanGuiRenderer& other) = delete;
         ~VulkanGuiRenderer();
 
-        void Render(VulkanRendererFrameConfig frame_config);
+        void Render(VulkanRendererFrameConfig vulkan_renderer_frame_config);
 
+        void SetDebugWidgetsVisibility(bool are_debug_widgets_visible);
     private:
         void Initialize(VkRenderPass render_pass);
         void UploadFonts();

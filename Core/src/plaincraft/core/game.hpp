@@ -34,11 +34,15 @@ SOFTWARE.
 #include "world/world_generator.hpp"
 #include "world/chunks/chunk_builder.hpp"
 #include "physics_optimization/active_objects_optimizer.hpp"
+#include "utils/fps_counter.hpp"
+#include "state/global_state.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
 	class Game {
 	private:
+		GlobalState global_state_;
+
 		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::unique_ptr<CameraOperator> camera_operator_;
 		
@@ -46,6 +50,7 @@ namespace plaincraft_core {
 		Cache<Texture> textures_cache_;
 		
 		LoopEventsHandler loop_events_handler_;
+		FpsCounter fps_counter_;
 
 		rp3d::PhysicsCommon physics_common_;
 		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
@@ -62,7 +67,8 @@ namespace plaincraft_core {
 
 		void Run();
 
-		auto GetScene() -> Scene& {return scene_;}
+		Scene& GetScene();
+		GlobalState& GetGlobalState();
 		WindowEventsHandler& GetWindowEventsHandler();
 		LoopEventsHandler& GetLoopEventsHandler();
 		std::shared_ptr<Camera> GetCamera();

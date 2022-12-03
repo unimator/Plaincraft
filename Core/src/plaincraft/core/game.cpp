@@ -40,10 +40,14 @@ namespace plaincraft_core
 {
 	Game::Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine)
 		: render_engine_(std::move(render_engine)),
-		  scene_(Scene(render_engine_))
+		  scene_(Scene(render_engine_)),
+		  fps_counter_(GetLoopEventsHandler())
 	{
 		Initialize();
-		srand(23432523);
+		std::random_device dev;
+    	std::mt19937 rng(dev());
+    	std::uniform_int_distribution<std::mt19937::result_type> dist;
+		global_state_.SetSeed((static_cast<uint64_t>(dist(rng)) << 32) + dist(rng));
 	}
 
 	Game::~Game()
@@ -53,6 +57,16 @@ namespace plaincraft_core
 	std::shared_ptr<Camera> Game::GetCamera()
 	{
 		return render_engine_->GetCamera();
+	}
+
+	GlobalState& Game::GetGlobalState() 
+	{
+		return global_state_;
+	}
+
+	Scene& Game::GetScene() 
+	{
+		return scene_;
 	}
 
 	void Game::Initialize()
@@ -73,10 +87,10 @@ namespace plaincraft_core
 		// logger->addStreamDestination(std::cout, log_level, rp3d::DefaultLogger::Format::Text);
 		// physics_common_.setLogger(logger);
 
-		auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube_half.obj");
-		std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_model_obj.data()));
-		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
-		models_cache_.Store("cube_half", std::move(cube_model));
+		// auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube_half.obj");
+		// std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_model_obj.data()));
+		// auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
+		// models_cache_.Store("cube_half", std::move(cube_model));
 
 		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/sphere_half.obj");
 		std::shared_ptr<Mesh> sphere_mesh = std::move(Mesh::LoadWavefront(sphere_model_obj.data()));
@@ -103,7 +117,7 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.25f, 8.75f, 0.25f);
+		auto player_position = Vector3d(0.25f, 100.0f, 0.25f);
 
 		auto orientation = rp3d::Quaternion::identity();
 		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
@@ -126,33 +140,11 @@ namespace plaincraft_core
 		//camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
 		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
-		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
-		// auto game_object = std::make_shared<Block>(I32Vector3d(0, 0, 0));
-		// auto drawable2 = std::make_shared<Drawable>();
-		// drawable2->SetModel(models_cache_.Fetch("cube_half"));
-		// drawable2->SetTexture(textures_cache_.Fetch("minecraft-texture"));
-		// game_object->SetDrawable(drawable2);
-		// auto x = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
-		// auto y = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
-		// auto z = static_cast<int32_t>(Chunk::chunk_size) * 0 + 0 * 1.0;
-		// auto position = Vector3d(x, y, z);
-		// auto orientation2 = rp3d::Quaternion::identity();
-		// rp3d::Transform transform2(rp3d::Vector3(0.0, 0.0, 0.0), orientation2);
-		// auto rigid_body2 = physics_world_->createRigidBody(transform2);
-		// auto collider2 = rigid_body2->addCollider(cube_shape, transform2);
-		// collider2->getMaterial().setFrictionCoefficient(1.0f);
-		// rigid_body2->setType(rp3d::BodyType::STATIC);
-		// rigid_body2->setTransform(rp3d::Transform(FromGlm(position), orientation2));
-		// game_object->SetRigidBody(rigid_body2);
-
-		// game_object->SetColor(color);
-
-		// scene_.AddGameObject(game_object);
-
 		auto map = std::make_shared<Map>();
 		scene_.AddGameObject(map);
 
-		auto chunk_builder = std::make_unique<ChunkBuilder>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_);
+		auto seed = global_state_.GetSeed();
+		auto chunk_builder = std::make_unique<ChunkBuilder>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_, seed);
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
@@ -163,7 +155,7 @@ namespace plaincraft_core
 
 		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
-		//loop_events_handler_.loop_event_trigger.AddSubscription(active_objects_optimizer_.get(), &ActiveObjectsOptimizer::OnLoopFrameTick);
+		loop_events_handler_.loop_event_trigger.AddSubscription(active_objects_optimizer_.get(), &ActiveObjectsOptimizer::OnLoopFrameTick);
 	}
 
 	void Game::Run()
@@ -186,6 +178,9 @@ namespace plaincraft_core
 		auto fps_timer = glfwGetTime();
 
 		bool should_close = false;
+
+		char buffer[0x20];
+		memset(buffer, 0, 0x20);
 
 		do
 		{
@@ -227,9 +222,12 @@ namespace plaincraft_core
 			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
 			camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
 
+			plaincraft_render_engine::FrameConfig frame_config {
+				global_state_.GetDebugInfoVisibility()
+			};
 			MEASURE("graphics render",
 					{
-						render_engine_->RenderFrame();
+						render_engine_->RenderFrame(frame_config);
 					})
 
 			last_cursor_position_x_ = cursor_position_x;
@@ -245,6 +243,9 @@ namespace plaincraft_core
 				frame_ticks = 0;
 				fps_timer = current_time;
 			}
+
+			sprintf(buffer, "%u", fps_counter_.GetFramesPerSecond());
+			LOGVALUE("FPS", buffer);
 
 		} while (!should_close && glfwWindowShouldClose(window_instance) == 0);
 	}
