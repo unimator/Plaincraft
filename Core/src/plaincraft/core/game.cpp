@@ -73,25 +73,6 @@ namespace plaincraft_core
 	{
 		std::shared_ptr<GameObject> player;
 
-		// physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>();
-		auto physics_world_settings = rp3d::PhysicsWorld::WorldSettings();
-		physics_world_ = std::shared_ptr<rp3d::PhysicsWorld>(physics_common_.createPhysicsWorld(physics_world_settings), rp3d::PhysicsWorldDeleter(physics_common_));
-		physics_world_->setIsDebugRenderingEnabled(false);
-		// physics_world_->setGravity(rp3d::Vector3(0, 0, 0));
-		// physics_world_ = physics_common_.createPhysicsWorld(physics_world_settings);
-
-		// auto logger = physics_common_.createDefaultLogger();
-		// uint32_t log_level = static_cast<uint32_t>(static_cast<uint32_t>(rp3d::Logger::Level::Warning)
-		// 	| static_cast<uint32_t>(rp3d::Logger::Level::Information)
-		// 	| static_cast<uint32_t>(rp3d::Logger::Level::Error));
-		// logger->addStreamDestination(std::cout, log_level, rp3d::DefaultLogger::Format::Text);
-		// physics_common_.setLogger(logger);
-
-		// auto cube_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube_half.obj");
-		// std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_model_obj.data()));
-		// auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
-		// models_cache_.Store("cube_half", std::move(cube_model));
-
 		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/sphere_half.obj");
 		std::shared_ptr<Mesh> sphere_mesh = std::move(Mesh::LoadWavefront(sphere_model_obj.data()));
 		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
@@ -117,23 +98,7 @@ namespace plaincraft_core
 		drawable->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
 		player->SetDrawable(drawable);
 
-		auto player_position = Vector3d(0.25f, 100.0f, 0.25f);
-
-		auto orientation = rp3d::Quaternion::identity();
-		rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-		auto rigid_body = physics_world_->createRigidBody(transform);
-
-		rigid_body->setAngularLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
-		// rigid_body->setLinearLockAxisFactor(rp3d::Vector3(0.0f, 1.0f, 0.0f));
-		auto capsule_shape = physics_common_.createCapsuleShape(0.5, 0.75);
-		// auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5f, 0.5f, 0.5f) / 2.0f);
-		auto collider = rigid_body->addCollider(capsule_shape, transform);
-		collider->getMaterial().setFrictionCoefficient(1.0f);
-
-		rigid_body->setTransform(rp3d::Transform(FromGlm(player_position), orientation));
-		rigid_body->setIsFrictionFreezed(true);
-		rigid_body->setIsBouncingFreezed(true);
-		player->SetRigidBody(rigid_body);
+		auto player_position = Vector3d(0.25f, 60.0f, 0.25f);
 
 		scene_.AddGameObject(player);
 
@@ -144,7 +109,7 @@ namespace plaincraft_core
 		scene_.AddGameObject(map);
 
 		auto seed = global_state_.GetSeed();
-		auto chunk_builder = std::make_unique<ChunkBuilder>(physics_common_, physics_world_, render_engine_, scene_, models_cache_, textures_cache_, seed);
+		auto chunk_builder = std::make_unique<ChunkBuilder>(render_engine_, scene_, models_cache_, textures_cache_, seed);
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
@@ -195,7 +160,6 @@ namespace plaincraft_core
 					{
 						while (accumulator >= physics_time_step_)
 						{
-							physics_world_->update(physics_time_step_);
 							accumulator -= physics_time_step_;
 						}
 					})
@@ -203,17 +167,6 @@ namespace plaincraft_core
 			MEASURE("update scene objects", {
 												// scene_.UpdateFrame();
 											});
-
-			auto player = scene_.FindGameObjectByName("player");
-			if (player != nullptr)
-			{
-				auto player_position = player->GetRigidBody()->getTransform().getPosition();
-				const char *format = "(%f, %f, %f)";
-				size_t size = std::snprintf(nullptr, 0, format, player_position.x, player_position.y, player_position.z);
-				std::vector<char> buffer(size + 1);
-				std::snprintf(&buffer[0], buffer.size(), format, player_position.x, player_position.y, player_position.z);
-				LOGVALUE("player position", std::string(buffer.begin(), buffer.end()));
-			}
 
 			MEASURE("loop events", {
 				loop_events_handler_.loop_event_trigger.Trigger(delta_time);

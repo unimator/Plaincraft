@@ -67,12 +67,12 @@ namespace plaincraft_core
 			static_game_objects_list_.push_back(game_object_to_add);
 		}
 
-		auto rigid_body = game_object_to_add->GetRigidBody();
-		if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
-		{
-			const rp3d::Transform &transform = game_object_to_add->GetRigidBody()->getTransform();
-			previous_transforms_.insert({game_object_to_add, transform});
-		}
+		// auto rigid_body = game_object_to_add->GetRigidBody();
+		// if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
+		// {
+		// 	const rp3d::Transform &transform = game_object_to_add->GetRigidBody()->getTransform();
+		// 	previous_transforms_.insert({game_object_to_add, transform});
+		// }
 
 		if (game_object_to_add->GetDrawable() != nullptr)
 		{
@@ -97,11 +97,11 @@ namespace plaincraft_core
 			static_game_objects_list_.remove_if(remove_predicate);
 		}
 
-		auto rigid_body = game_object_to_remove->GetRigidBody();
-		if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
-		{
-			previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
-		}
+		// auto rigid_body = game_object_to_remove->GetRigidBody();
+		// if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
+		// {
+		// 	previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
+		// }
 
 		if (game_object_to_remove->GetDrawable() != nullptr)
 		{
@@ -127,11 +127,11 @@ namespace plaincraft_core
 		for (auto &game_object_to_remove : game_objects_to_remove)
 		{
 			auto object_type = game_object_to_remove->GetObjectType();
-			auto rigid_body = game_object_to_remove->GetRigidBody();
-			if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
-			{
-				previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
-			}
+			// auto rigid_body = game_object_to_remove->GetRigidBody();
+			// if (rigid_body != nullptr && object_type == GameObject::ObjectType::Dynamic)
+			// {
+			// 	previous_transforms_.erase(previous_transforms_.find(game_object_to_remove));
+			// }
 
 			if (game_object_to_remove->GetDrawable() != nullptr)
 			{
@@ -171,38 +171,38 @@ namespace plaincraft_core
 	{
 		for (auto &game_object : dynamic_game_objects_list_)
 		{
-			const auto rb = game_object->GetRigidBody();
+			// const auto rb = game_object->GetRigidBody();
 
-			if (rb == nullptr)
-			{
-				continue;
-			}
+			// if (rb == nullptr)
+			// {
+			// 	continue;
+			// }
 
-			auto transform = rb->getTransform();
-			auto previous_transform = previous_transforms_[game_object];
-			auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
+			// auto transform = rb->getTransform();
+			// auto previous_transform = previous_transforms_[game_object];
+			// auto interpolated_transform = rp3d::Transform::interpolateTransforms(previous_transform, transform, interpolation_factor);
 
-			auto position = FromRP3D(interpolated_transform.getPosition());
-			auto rotation = FromRP3D(interpolated_transform.getOrientation());
+			// auto position = FromRP3D(interpolated_transform.getPosition());
+			// auto rotation = FromRP3D(interpolated_transform.getOrientation());
 
-			auto drawable = game_object->GetDrawable();
+			// auto drawable = game_object->GetDrawable();
 
-			if (drawable == nullptr)
-			{
-				continue;
-			}
+			// if (drawable == nullptr)
+			// {
+			// 	continue;
+			// }
 
-			if (drawable->GetPosition() != position)
-			{
-				game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
-			}
+			// if (drawable->GetPosition() != position)
+			// {
+			// 	game_object->GetDrawable()->SetPosition(Vector3d(position.x, position.y, position.z));
+			// }
 
-			if (drawable->GetRotation() != rotation)
-			{
-				game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
-			}
+			// if (drawable->GetRotation() != rotation)
+			// {
+			// 	game_object->GetDrawable()->SetRotation(Quaternion(rotation.w, rotation.x, rotation.y, rotation.z));
+			// }
 
-			previous_transforms_[game_object] = transform;
+			// previous_transforms_[game_object] = transform;
 		}
 
 		auto l = snprintf(nullptr, 0, "%zd", game_objects_list_.size());

@@ -52,6 +52,7 @@ namespace plaincraft_core
                        std::shared_ptr<ModelsFactory> models_factory);
 
         void OptimizeChunk(Chunk &chunk);
+        void DisposeChunk(Chunk &chunk);
     };
 }
 

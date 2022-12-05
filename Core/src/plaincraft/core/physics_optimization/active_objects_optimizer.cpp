@@ -48,10 +48,10 @@ namespace plaincraft_core
     {
         for (auto &static_entity : static_game_objects_list_)
         {
-            if (static_entity->GetRigidBody() != nullptr)
-            {
-                static_entity->GetRigidBody()->setIsSleeping(true);
-            }
+            // if (static_entity->GetRigidBody() != nullptr)
+            // {
+            //     static_entity->GetRigidBody()->setIsSleeping(true);
+            // }
         }
     }
 

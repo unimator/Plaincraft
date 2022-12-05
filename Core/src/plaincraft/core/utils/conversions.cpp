@@ -28,23 +28,5 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    rp3d::Vector3 FromGlm(const Vector3d &vector)
-    {
-        return rp3d::Vector3(vector.x, vector.y, vector.z);
-    }
 
-    Vector3d FromRP3D(const rp3d::Vector3 &vector)
-    {
-        return Vector3d(vector.x, vector.y, vector.z);
-    }
-
-    rp3d::Quaternion FromGlm(const Quaternion &quaternion)
-    {
-        return rp3d::Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-    }
-
-    Quaternion FromRP3D(const rp3d::Quaternion &quaternion)
-    {
-        return Quaternion(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-    }
 }

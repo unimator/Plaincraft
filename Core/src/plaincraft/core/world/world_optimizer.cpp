@@ -146,4 +146,12 @@ namespace plaincraft_core
         chunk.GetDrawable()->SetModel(model);
         chunk.GetDrawable()->SetTexture(minecraft_texture);
     }
+
+    void WorldOptimizer::DisposeChunk(Chunk& chunk)
+    {
+        if (models_cache_.Contains(chunk.GetName()))
+        {
+            models_cache_.Remove(chunk.GetName());
+        }
+    }
 }

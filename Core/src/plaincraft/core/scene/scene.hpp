@@ -55,7 +55,7 @@ namespace plaincraft_core
 	class Scene
 	{
 	private:
-		std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
+		// std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
 		std::shared_ptr<RenderEngine> render_engine_;
 		mutable std::list<std::shared_ptr<GameObject>> game_objects_list_;
 		mutable std::list<std::shared_ptr<GameObject>> static_game_objects_list_;

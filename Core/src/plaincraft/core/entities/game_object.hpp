@@ -45,7 +45,6 @@ namespace plaincraft_core {
 	private:
 		ObjectType object_type_ = ObjectType::Dynamic;
 		std::shared_ptr<Drawable> drawable_;
-		rp3d::RigidBody* rigid_body_ = nullptr;
 		std::string name_;
 		bool is_active_;
 
@@ -67,9 +66,6 @@ namespace plaincraft_core {
 
 		void SetColor(Vector3d color);
 		Vector3d GetColor();
-
-		void SetRigidBody(rp3d::RigidBody* rigid_body);
-		rp3d::RigidBody* GetRigidBody() const;
 
 		void SetName(std::string name);
 		std::string GetName() const;

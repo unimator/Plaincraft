@@ -29,14 +29,9 @@ SOFTWARE.
 
 #include "../common.hpp"
 
-namespace plaincraft_core {
-    rp3d::Vector3 FromGlm(const Vector3d& vector);
+namespace plaincraft_core
+{
 
-    Vector3d FromRP3D(const rp3d::Vector3& vector);
-
-    rp3d::Quaternion FromGlm(const Quaternion& quaternion);
-
-    Quaternion FromRP3D(const rp3d::Quaternion& quaternion);
 }
 
 #endif // PLAINCRAFT_CORE_CONVERSIONS

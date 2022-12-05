@@ -47,7 +47,7 @@ namespace plaincraft_core
 
     public:
         static constexpr uint32_t chunk_size = 16;
-        static constexpr uint32_t chunk_height = 32;
+        static constexpr uint32_t chunk_height = 64;
 
         static constexpr const char *chunk_model_name_template = "Chunk_%d_%d";
 

@@ -48,8 +48,6 @@ namespace plaincraft_core
 		siv::PerlinNoise perlin_;
 
 	public:
-		rp3d::PhysicsCommon &physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
 		std::shared_ptr<RenderEngine> render_engine_;
 		Scene &scene_;
 		Cache<Model> &models_cache_;
@@ -59,9 +57,7 @@ namespace plaincraft_core
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_disposal_datas_;
 
 	public:
-		ChunkBuilder(rp3d::PhysicsCommon &physics_common,
-					 std::shared_ptr<rp3d::PhysicsWorld> physics_world,
-					 std::shared_ptr<RenderEngine> render_engine,
+		ChunkBuilder(std::shared_ptr<RenderEngine> render_engine,
 					 Scene &scene,
 					 Cache<Model> &models_cache,
 					 Cache<Texture> &textures_cache,
@@ -74,7 +70,7 @@ namespace plaincraft_core
 	private:
 		ChunkProcessingData &GetProcessingData(std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> &collection, std::shared_ptr<Chunk> chunk);
 		void DisposeProcessingData(std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> &collection, std::shared_ptr<Chunk> chunk);
-		bool Increment(ChunkProcessingData& chunk_processing_data);
+		bool Increment(ChunkProcessingData &chunk_processing_data);
 	};
 }
 

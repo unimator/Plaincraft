@@ -52,8 +52,6 @@ namespace plaincraft_core {
 		LoopEventsHandler loop_events_handler_;
 		FpsCounter fps_counter_;
 
-		rp3d::PhysicsCommon physics_common_;
-		std::shared_ptr<rp3d::PhysicsWorld> physics_world_;
 		float physics_time_step_ = 1.0f / 60.0f;
 
 		Scene scene_;

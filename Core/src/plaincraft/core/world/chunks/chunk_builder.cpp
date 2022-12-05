@@ -36,16 +36,12 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	ChunkBuilder::ChunkBuilder(rp3d::PhysicsCommon &physics_common,
-							   std::shared_ptr<rp3d::PhysicsWorld> physics_world,
-							   std::shared_ptr<RenderEngine> render_engine,
+	ChunkBuilder::ChunkBuilder(std::shared_ptr<RenderEngine> render_engine,
 							   Scene &scene,
 							   Cache<Model> &models_cache,
 							   Cache<Texture> &textures_cache,
 							   uint64_t seed)
-		: physics_common_(physics_common),
-		  physics_world_(physics_world),
-		  render_engine_(render_engine),
+		: render_engine_(render_engine),
 		  scene_(scene),
 		  models_cache_(models_cache),
 		  textures_cache_(textures_cache),
@@ -83,10 +79,10 @@ namespace plaincraft_core
 		if (block != nullptr)
 		{
 			scene_.RemoveGameObject(block);
-			if(block->GetRigidBody())
-			{
-				physics_world_->destroyRigidBody(block->GetRigidBody());
-			}
+			// if(block->GetRigidBody())
+			// {
+			// 	physics_world_->destroyRigidBody(block->GetRigidBody());
+			// }
 		}
 		
 		auto result = Increment(chunk_processing_data);
@@ -99,7 +95,7 @@ namespace plaincraft_core
 
 	bool ChunkBuilder::GenerateChunkStep(std::shared_ptr<Chunk> chunk)
 	{
-		static auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+		// static auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
 		
 		auto &chunk_processing_data = GetProcessingData(chunk_creation_datas_, chunk);
 		auto &[i, j, k] = chunk_processing_data;
@@ -107,7 +103,7 @@ namespace plaincraft_core
 		auto x = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionX() + i * 1.0;
 		auto y = static_cast<int32_t>(Chunk::chunk_size) * 0 + j * 1.0;
 		auto z = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionZ() + k * 1.0;
-		auto noise = perlin_.normalizedOctave2D_01(x / 32, z / 32, 4);
+		auto noise = perlin_.normalizedOctave2D_01(x / 256, z / 256, 4);
 
 		const uint32_t height = static_cast<uint32_t>(Chunk::chunk_height * noise);
 
@@ -116,23 +112,6 @@ namespace plaincraft_core
 			std::shared_ptr<Block> game_object;
 			game_object = std::make_shared<Stone>();
 			game_object->SetObjectType(GameObject::ObjectType::Static);
-			// drawable->SetModel(model);
-			// game_object->SetDrawable(drawable);
-
-			// auto position = Vector3d(offset.x + i * 1.0f, round(2 * sin(i) * cos(j)), offset.z + j * 1.0f);
-
-			auto position = Vector3d(x, y, z);
-			auto orientation = rp3d::Quaternion::identity();
-			rp3d::Transform transform(rp3d::Vector3(0.0, 0.0, 0.0), orientation);
-			rp3d::RigidBody *rigid_body;
-			rigid_body = physics_world_->createRigidBody(transform);
-			auto collider = rigid_body->addCollider(cube_shape, transform);
-			collider->getMaterial().setFrictionCoefficient(1.0f);
-			rigid_body->setType(rp3d::BodyType::STATIC);
-			rigid_body->setTransform(rp3d::Transform(FromGlm(position), orientation));
-			game_object->SetRigidBody(rigid_body);
-			rigid_body->setIsSleeping(true);
-
 			chunk->blocks_[i][j][k] = game_object;
 		}
 

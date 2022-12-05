@@ -7,9 +7,6 @@
 [submodule "Dependencies/GLEW"]
 	path = Dependencies/GLEW
 	url = https://github.com/Perlmint/glew-cmake.git
-[submodule "Dependencies/ReactPhysics3D"]
-	path = Dependencies/ReactPhysics3D
-	url = https://github.com/unimator/reactphysics3d
 [submodule "Dependencies/imgui"]
 	path = Dependencies/imgui
 	url = https://github.com/ocornut/imgui.git

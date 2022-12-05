@@ -64,15 +64,16 @@ namespace plaincraft_core
 
     bool ChunksProcessor::Metric::Compare(const std::shared_ptr<Chunk> &first, const std::shared_ptr<Chunk> &second)
     {
-        auto position = origin_->GetRigidBody()->getTransform().getPosition();
-        auto first_position_x = first->GetPositionX() * static_cast<float>(Chunk::chunk_size);
-        auto first_position_z = first->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
-        auto second_position_x = second->GetPositionX() * static_cast<float>(Chunk::chunk_size);
-        auto second_position_z = second->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
+        // auto position = origin_->GetRigidBody()->getTransform().getPosition();
+        // auto first_position_x = first->GetPositionX() * static_cast<float>(Chunk::chunk_size);
+        // auto first_position_z = first->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
+        // auto second_position_x = second->GetPositionX() * static_cast<float>(Chunk::chunk_size);
+        // auto second_position_z = second->GetPositionZ() * static_cast<float>(Chunk::chunk_size);
         
-        auto first_distance_to_player_squared = (first_position_x - position.x) * (first_position_x - position.x) + (first_position_z - position.z) * (first_position_z - position.z);
-        auto second_distance_to_player_squared = (second_position_x - position.x) * (second_position_x - position.x) + (second_position_z - position.z) * (second_position_z - position.z);
-        return first_distance_to_player_squared > second_distance_to_player_squared;
+        // auto first_distance_to_player_squared = (first_position_x - position.x) * (first_position_x - position.x) + (first_position_z - position.z) * (first_position_z - position.z);
+        // auto second_distance_to_player_squared = (second_position_x - position.x) * (second_position_x - position.x) + (second_position_z - position.z) * (second_position_z - position.z);
+        // return first_distance_to_player_squared > second_distance_to_player_squared;
+        return false;
     }
 
     ChunksProcessor::ChunksProcessor(
@@ -225,6 +226,7 @@ namespace plaincraft_core
 
         if(chunk_builder_->DisposeChunkStep(current_to_dispose_))
         {
+            world_optimizer_->DisposeChunk(*current_to_dispose_);
             current_to_dispose_ = nullptr;
         }
     }

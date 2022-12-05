@@ -42,7 +42,6 @@ using namespace plaincraft_common;
 #pragma warning(push, 0)
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <reactphysics3d/reactphysics3d.h>
 #pragma warning(pop)
 
 #endif // PLAINCRAFT_CORE_COMMON

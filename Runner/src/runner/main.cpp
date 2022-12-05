@@ -13,7 +13,7 @@ int main()
 {
 	try
 	{
-		auto window = std::make_shared<VulkanWindow>("Plaincraft", 800*1.6, 600*1.6);
+		auto window = std::make_shared<VulkanWindow>("Plaincraft", 800 * 1.6, 600 * 1.6);
 		auto render_engine = std::make_unique<VulkanRenderEngine>(window);
 
 		auto game = Game(std::move(render_engine));
@@ -22,7 +22,7 @@ int main()
 
 		game.Run();
 	}
-	catch(const std::runtime_error& ex)
+	catch (const std::runtime_error &ex)
 	{
 		std::cout << ex.what() << std::endl;
 	}
