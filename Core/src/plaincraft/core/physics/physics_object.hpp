@@ -24,23 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
-#define PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
+#ifndef PLAINCRAFT_CORE_PHYSICS_OBJECT
+#define PLAINCRAFT_CORE_PHYSICS_OBJECT
 
-#include "../../entities/game_object.hpp"
-#include "../camera_operator.hpp"
+#include <plaincraft_common.hpp>
 
-namespace plaincraft_core {
-    class CameraOperatorFollow : public CameraOperator {
-    private:
-        std::shared_ptr<GameObject> follow_target_;
-        float distance_to_target_;
+namespace plaincraft_core
+{
+    using namespace plaincraft_common;
 
-    public:
-        CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target, float distance_to_target = 6.0f);
+    struct PhysicsObject final
+    {
+        enum ObjectType {
+            Static = 0,
+            Dynamic = 1
+        };
 
-        void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
+        ObjectType type;
+
+        Vector3d position;
+        Vector3d size;
+        Quaternion rotation;
+
+        Vector3d velocity;
+        bool is_grounded;
+
+        float friction;
     };
 }
 
-#endif // PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
+#endif // PLAINCRAFT_CORE_PHYSICS_OBJECT

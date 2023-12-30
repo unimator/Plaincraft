@@ -49,11 +49,14 @@ namespace plaincraft_core
 
     public:
 
-        static constexpr uint32_t render_radius = 12;
+        static constexpr uint32_t render_radius = 4;
         static constexpr uint32_t render_diameter = render_radius * 2;
         static constexpr uint32_t simulation_radius = 2;
 
         Map();
+
+        ChunksRow& operator[](int block_index);
+        const ChunksGrid& GetGrid() const;
 
     private:
         ChunksGrid grid_;

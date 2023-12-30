@@ -36,26 +36,55 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	ChunkBuilder::ChunkBuilder(std::shared_ptr<RenderEngine> render_engine,
-							   Scene &scene,
+	ChunkBuilder::ChunkBuilder(Scene &scene,
 							   Cache<Model> &models_cache,
 							   Cache<Texture> &textures_cache,
 							   uint64_t seed)
-		: render_engine_(render_engine),
-		  scene_(scene),
+		: scene_(scene),
 		  models_cache_(models_cache),
 		  textures_cache_(textures_cache),
 		  seed_(seed),
 		  perlin_(seed)
 	{
+		perlin_.reseed(seed);
 	}
-
-	std::shared_ptr<Chunk> ChunkBuilder::InitializeChunk(int32_t position_x, int32_t position_z)
+	
+	bool ChunkBuilder::GenerateChunkStep(std::shared_ptr<Chunk> chunk)
 	{
-		auto drawable = std::make_shared<Drawable>();
-		auto chunk = std::make_shared<Chunk>(position_x, position_z);
-		chunk->SetDrawable(drawable);
-		return chunk;
+		// static auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
+
+		auto &chunk_processing_data = GetProcessingData(chunk_creation_datas_, chunk);
+		auto &[i, j, k] = chunk_processing_data;
+
+		auto x = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionX() + i * 1.0;
+		auto y = static_cast<int32_t>(Chunk::chunk_size) * 0 + j * 1.0;
+		auto z = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionZ() + k * 1.0;
+		auto noise = perlin_.normalizedOctave2D_01(x / 256, z / 256, 4);
+
+		const uint32_t height = static_cast<uint32_t>(Chunk::chunk_height * noise);
+
+		if (j <= height)
+		{
+			std::shared_ptr<Block> game_object;
+			game_object = std::make_shared<Stone>();
+			auto physics_object = std::make_shared<PhysicsObject>();
+			physics_object->size = Vector3d(1.0f, 1.0f, 1.0f);
+			physics_object->position = Vector3d(x, y, z);
+			physics_object->type = PhysicsObject::ObjectType::Static;
+			game_object->SetPhysicsObject(physics_object);
+			// game_object->SetObjectType(GameObject::ObjectType::Static);
+			chunk->blocks_[i][j][k] = game_object;
+		}
+
+		auto result = Increment(chunk_processing_data);
+
+		if (result)
+		{
+			DisposeProcessingData(chunk_creation_datas_, chunk);
+			chunk->initialized_ = true;
+		}
+
+		return result;
 	}
 
 	bool ChunkBuilder::DisposeChunkStep(std::shared_ptr<Chunk> chunk)
@@ -84,7 +113,7 @@ namespace plaincraft_core
 			// 	physics_world_->destroyRigidBody(block->GetRigidBody());
 			// }
 		}
-		
+
 		auto result = Increment(chunk_processing_data);
 		if (result)
 		{
@@ -93,40 +122,7 @@ namespace plaincraft_core
 		return result;
 	}
 
-	bool ChunkBuilder::GenerateChunkStep(std::shared_ptr<Chunk> chunk)
-	{
-		// static auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
-		
-		auto &chunk_processing_data = GetProcessingData(chunk_creation_datas_, chunk);
-		auto &[i, j, k] = chunk_processing_data;
-
-		auto x = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionX() + i * 1.0;
-		auto y = static_cast<int32_t>(Chunk::chunk_size) * 0 + j * 1.0;
-		auto z = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionZ() + k * 1.0;
-		auto noise = perlin_.normalizedOctave2D_01(x / 256, z / 256, 4);
-
-		const uint32_t height = static_cast<uint32_t>(Chunk::chunk_height * noise);
-
-		if (j <= height)
-		{
-			std::shared_ptr<Block> game_object;
-			game_object = std::make_shared<Stone>();
-			game_object->SetObjectType(GameObject::ObjectType::Static);
-			chunk->blocks_[i][j][k] = game_object;
-		}
-
-		auto result = Increment(chunk_processing_data);
-		
-		if (result)
-		{
-			DisposeProcessingData(chunk_creation_datas_, chunk);
-			chunk->initialized_ = true;
-		}
-
-		return result;
-	}
-
-	ChunkBuilder::ChunkProcessingData& ChunkBuilder::GetProcessingData(std::unordered_map<std::shared_ptr<Chunk>, ChunkBuilder::ChunkProcessingData> &collection, std::shared_ptr<Chunk> chunk)
+	ChunkBuilder::ChunkProcessingData &ChunkBuilder::GetProcessingData(std::unordered_map<std::shared_ptr<Chunk>, ChunkBuilder::ChunkProcessingData> &collection, std::shared_ptr<Chunk> chunk)
 	{
 		if (!collection.contains(chunk))
 		{
@@ -143,7 +139,7 @@ namespace plaincraft_core
 		collection.erase(chunk);
 	}
 
-	bool ChunkBuilder::Increment(ChunkProcessingData& chunk_processing_data)
+	bool ChunkBuilder::Increment(ChunkProcessingData &chunk_processing_data)
 	{
 		auto &[i, j, k] = chunk_processing_data;
 

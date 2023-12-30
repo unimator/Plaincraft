@@ -31,7 +31,7 @@ SOFTWARE.
 #include "../../entities/game_object.hpp"
 #include "../../entities/map/chunk.hpp"
 #include "../../scene/scene.hpp"
-#include "./chunk_builder.hpp"
+#include "./chunk_builder_base.hpp"
 #include <list>
 #include <memory>
 
@@ -59,7 +59,7 @@ namespace plaincraft_core
             bool stop_processing = false;
 
         public:
-            std::unique_ptr<ChunkBuilder> chunk_builder_;
+            std::unique_ptr<ChunkBuilderBase> chunk_builder_;
             std::unique_ptr<WorldOptimizer> world_optimizer_;
             Metric metric_;
             std::reference_wrapper<Scene> scene_;
@@ -72,7 +72,7 @@ namespace plaincraft_core
 
         public: 
             ChunksProcessor(
-                std::unique_ptr<ChunkBuilder> chunk_builder, 
+                std::unique_ptr<ChunkBuilderBase> chunk_builder, 
                 std::unique_ptr<WorldOptimizer> world_optimizer, 
                 Scene& scene, 
                 Metric metric);

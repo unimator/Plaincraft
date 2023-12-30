@@ -27,16 +27,16 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_CHUNK_BUILDER
 #define PLAINCRAFT_CORE_CHUNK_BUILDER
 
+#include "chunk_builder_base.hpp"
 #include "../../common.hpp"
 #include "../../scene/scene.hpp"
-#include "../../entities/map/chunk.hpp"
 #include <lib/PerlinNoise.hpp>
 #include <stack>
 #include <unordered_map>
 
 namespace plaincraft_core
 {
-	class ChunkBuilder
+	class ChunkBuilder : public ChunkBuilderBase
 	{
 	private:
 		struct ChunkProcessingData
@@ -48,7 +48,6 @@ namespace plaincraft_core
 		siv::PerlinNoise perlin_;
 
 	public:
-		std::shared_ptr<RenderEngine> render_engine_;
 		Scene &scene_;
 		Cache<Model> &models_cache_;
 		Cache<Texture> &textures_cache_;
@@ -57,15 +56,13 @@ namespace plaincraft_core
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_disposal_datas_;
 
 	public:
-		ChunkBuilder(std::shared_ptr<RenderEngine> render_engine,
-					 Scene &scene,
+		ChunkBuilder(Scene &scene,
 					 Cache<Model> &models_cache,
 					 Cache<Texture> &textures_cache,
 					 uint64_t seed);
 
-		std::shared_ptr<Chunk> InitializeChunk(int32_t position_x, int32_t position_z);
-		bool GenerateChunkStep(std::shared_ptr<Chunk> chunk);
-		bool DisposeChunkStep(std::shared_ptr<Chunk> chunk);
+		bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) override;
+		bool DisposeChunkStep(std::shared_ptr<Chunk> chunk) override;
 
 	private:
 		ChunkProcessingData &GetProcessingData(std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> &collection, std::shared_ptr<Chunk> chunk);

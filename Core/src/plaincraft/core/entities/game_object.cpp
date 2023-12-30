@@ -36,16 +36,14 @@ namespace plaincraft_core
 		unique_id_ = next_id_++;
 	}
 
-	
-	GameObject::GameObject(GameObject&& other) noexcept
+	GameObject::GameObject(GameObject &&other) noexcept
 		: name_(std::move(other.name_))
 	{
-
 	}
 
-	GameObject& GameObject::operator=(GameObject&& other) noexcept
+	GameObject &GameObject::operator=(GameObject &&other) noexcept
 	{
-		if(this == &other)
+		if (this == &other)
 		{
 			return *this;
 		}
@@ -54,7 +52,7 @@ namespace plaincraft_core
 
 		return *this;
 	}
-	
+
 	GameObject::~GameObject()
 	{
 	}
@@ -67,6 +65,16 @@ namespace plaincraft_core
 	std::shared_ptr<plaincraft_render_engine::Drawable> GameObject::GetDrawable() const
 	{
 		return drawable_;
+	}
+
+	void GameObject::SetPhysicsObject(std::shared_ptr<PhysicsObject> physics_object)
+	{
+		physics_object_ = physics_object;
+	}
+
+	std::shared_ptr<PhysicsObject> GameObject::GetPhysicsObject() const
+	{
+		return physics_object_;
 	}
 
 	void GameObject::SetColor(Vector3d color)
@@ -87,16 +95,6 @@ namespace plaincraft_core
 	std::string GameObject::GetName() const
 	{
 		return name_;
-	}
-
-	void GameObject::SetObjectType(ObjectType object_type)
-	{
-		object_type_ = object_type;
-	}
-
-	GameObject::ObjectType GameObject::GetObjectType() const
-	{
-		return object_type_;
 	}
 
 	void GameObject::SetIsActive(bool is_active)

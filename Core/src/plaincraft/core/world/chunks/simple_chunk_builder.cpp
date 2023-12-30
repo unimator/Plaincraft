@@ -24,29 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "map.hpp"
-#include <iostream>
-#include <cmath>
-#include <vector>
+#include "simple_chunk_builder.hpp"
+#include "../../entities/blocks/stone.hpp"
 
 namespace plaincraft_core
 {
-    Map::Map()
+    SimpleChunkBuilder::SimpleChunkBuilder(Scene &scene) : scene_(scene)
     {
-        grid_ = Map::ChunksGrid(Map::render_diameter);
-        for (auto &row : grid_)
+    }
+
+    bool SimpleChunkBuilder::GenerateChunkStep(std::shared_ptr<Chunk> chunk)
+    {
+        auto chunk_x = chunk->GetPositionX();
+        auto chunk_z = chunk->GetPositionZ();
+
+        std::shared_ptr<Block> game_object;
+        game_object = std::make_shared<Stone>();
+        auto physics_object = std::make_shared<PhysicsObject>();
+        physics_object->size = Vector3d(1.0f, 1.0f, 1.0f);
+        physics_object->type = PhysicsObject::ObjectType::Static;
+        auto offset = Vector3d(8.0f, 15.0f, 8.0f);
+        physics_object->position = Vector3d(chunk_x, 0.0f, chunk_z) + offset;
+        game_object->SetPhysicsObject(physics_object);
+        chunk->blocks_[8][15][8] = game_object;
+
+        chunk->initialized_ = true;
+        return true;
+    }
+
+    bool SimpleChunkBuilder::DisposeChunkStep(std::shared_ptr<Chunk> chunk)
+    {
+        scene_.RemoveGameObject(chunk);
+        auto &blocks = chunk->GetData();
+        auto &block = blocks[8][15][8];
+        if (block != nullptr)
         {
-            row = Map::ChunksRow(Map::render_diameter);
+            scene_.RemoveGameObject(block);
         }
-    }
-
-    Map::ChunksRow &Map::operator[](int block_index)
-    {
-        return grid_[block_index];
-    }
-
-    const Map::ChunksGrid &Map::GetGrid() const
-    {
-        return grid_;
+        return true;
     }
 }

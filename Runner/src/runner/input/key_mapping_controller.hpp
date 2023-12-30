@@ -46,10 +46,10 @@ namespace plaincraft_runner
         typedef void (KeyMappingController::*KeyPressedCallback)(int action, int mods);
         std::unordered_map<int, KeyPressedCallback> key_mappings_;
 
-        float movement_speed_ = 6.0f;
-        float maximum_speed_ = 6.0f;
+        float movement_speed_ = 0.125f * 500.0f;
+        float maximum_speed_ = 3.0f;
 
-        bool forward_ = false, backward_ = false, left_ = false, right_ = false;
+        bool forward_ = false, backward_ = false, left_ = false, right_ = false, jump_ = false, crouch_ = false;
 
         KeyMappingController(Game& game_instance);
 
@@ -68,6 +68,7 @@ namespace plaincraft_runner
         void MoveLeft(int action, int mods);
         void MoveRight(int action, int mods);
         void Jump(int action, int mods);
+        void Crouch(int action, int mods);
         void ToggleDebugInfo(int action, int mods);
     };
 }

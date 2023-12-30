@@ -31,18 +31,19 @@ using namespace plaincraft_core;
 
 namespace plaincraft_runner
 {
-    KeyMappingController::KeyMappingController(Game& game_instance)
-    :   game_instance_(game_instance)
+    KeyMappingController::KeyMappingController(Game &game_instance)
+        : game_instance_(game_instance)
     {
         key_mappings_.insert(std::make_pair(GLFW_KEY_W, &KeyMappingController::MoveForward));
         key_mappings_.insert(std::make_pair(GLFW_KEY_S, &KeyMappingController::MoveBackward));
         key_mappings_.insert(std::make_pair(GLFW_KEY_A, &KeyMappingController::MoveLeft));
         key_mappings_.insert(std::make_pair(GLFW_KEY_D, &KeyMappingController::MoveRight));
         key_mappings_.insert(std::make_pair(GLFW_KEY_SPACE, &KeyMappingController::Jump));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_LEFT_CONTROL, &KeyMappingController::Crouch));
         key_mappings_.insert(std::make_pair(GLFW_KEY_F1, &KeyMappingController::ToggleDebugInfo));
     }
 
-    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance(Game& game_instance)
+    std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance(Game &game_instance)
     {
         return std::shared_ptr<KeyMappingController>(new KeyMappingController(game_instance));
     }
@@ -53,14 +54,12 @@ namespace plaincraft_runner
         player_ = player;
         auto camera = game_instance_.GetCamera();
         camera_ = camera;
-        
-        auto& window_events_handler = game_instance_.GetWindowEventsHandler();
-        auto& loop_events_handler = game_instance_.GetLoopEventsHandler();
+
+        auto &window_events_handler = game_instance_.GetWindowEventsHandler();
+        auto &loop_events_handler = game_instance_.GetLoopEventsHandler();
         window_events_handler.key_pressed_event_trigger.AddSubscription(this, &KeyMappingController::OnKeyPressed);
         loop_events_handler.loop_event_trigger.AddSubscription(this, &KeyMappingController::OnLoopTick);
     }
-
-    
 
     void KeyMappingController::MoveForward(int action, int mods)
     {
@@ -100,12 +99,19 @@ namespace plaincraft_runner
 
     void KeyMappingController::Jump(int action, int mods)
     {
-        if (action == GLFW_PRESS)
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
         {
-            // if (abs(player_->GetRigidBody()->getLinearVelocity().y) < 0.0001)
-            // {
-            //     player_->GetRigidBody()->applyLocalForceAtCenterOfMass(rp3d::Vector3(0.0, 300.0, 0.0));
-            // }
+            auto was_pressed = action == GLFW_PRESS;
+            jump_ = was_pressed;
+        }
+    }
+
+    void KeyMappingController::Crouch(int action, int mods) 
+    {
+        if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        {
+            auto was_pressed = action == GLFW_PRESS;
+            crouch_ = was_pressed;
         }
     }
 
@@ -113,7 +119,7 @@ namespace plaincraft_runner
     {
         if (action == GLFW_PRESS)
         {
-            auto& global_state = game_instance_.GetGlobalState();
+            auto &global_state = game_instance_.GetGlobalState();
             auto is_debug_info_visible = global_state.GetDebugInfoVisibility();
             global_state.SetDebugInfoVisibility(!is_debug_info_visible);
         }
@@ -121,15 +127,85 @@ namespace plaincraft_runner
 
     void KeyMappingController::OnKeyPressed(int key, int scancode, int action, int mods)
     {
-        if(key_mappings_.contains(key))
+        if (key_mappings_.contains(key))
         {
-            auto& action_callback = key_mappings_[key];
+            auto &action_callback = key_mappings_[key];
             (this->*action_callback)(action, mods);
         }
     }
 
     void KeyMappingController::OnLoopTick(float delta_time)
     {
+        if (forward_ || backward_ || left_ || right_ || jump_ || crouch_)
+        {
+            const auto direction = camera_->direction;
+            const auto& physics_object = player_->GetPhysicsObject(); 
+            Vector3d target {};
+
+            if (forward_)
+            {
+                target += Vector3d(direction.x, 0, direction.z);
+            }
+            if (backward_)
+            {
+                target -= Vector3d(direction.x, 0, direction.z);
+            }
+            if (right_)
+            {
+                target += glm::cross(Vector3d(direction.x, 0, direction.z), camera_->up);
+            }
+            if (left_)
+            {
+                target -= glm::cross(Vector3d(direction.x, 0, direction.z), camera_->up);
+            }
+            if(glm::length(target) > 0.000001f)
+            {
+                target = glm::normalize(target);
+                target *= movement_speed_ * delta_time;
+            }
+
+            if (jump_ && physics_object->is_grounded)
+            {
+                target += Vector3d(0, 6.0f, 0);
+                physics_object->is_grounded = false;
+            }
+            if(crouch_)
+            {
+                target += Vector3d(0, -1.0f, 0);
+            }
+
+            if(glm::length(target) <= 0.000001f) {
+                return;
+            }
+
+            // printf("%f %f %f\n", target.x, target.y, target.z);
+
+            auto current_velocity = player_->GetPhysicsObject()->velocity;
+
+            // if(abs(target.x + current_velocity.x) < maximum_speed_) {
+            //     target.x += current_velocity.x;
+            // } else if (current_velocity.x < maximum_speed_) {
+            //     target.x = maximum_speed_;
+            // } else if (current_velocity.x > -maximum_speed_) {
+            //     target.x = -maximum_speed_;
+            // } else {
+            //     target.x = current_velocity.x;
+            // }
+
+            // if(abs(target.z + current_velocity.z) < maximum_speed_) {
+            //     target.z += current_velocity.z;
+            // } else if (current_velocity.z < maximum_speed_) {
+            //     target.z = maximum_speed_;
+            // } else if (current_velocity.z > -maximum_speed_) {
+            //     target.z = -maximum_speed_;
+            // } else {
+            //     target.z = current_velocity.z;
+            // }
+
+            //target.y = current_velocity.y;
+            player_->GetPhysicsObject()->velocity += target;
+        }
+
         // static rp3d::Vector3 target;
 
         // if (forward_ || backward_ || left_ || right_)
@@ -159,29 +235,29 @@ namespace plaincraft_runner
 
         //         auto current_velocity = player_->GetRigidBody()->getLinearVelocity();
 
-                /*if(abs(target.x + current_velocity.x) < maximum_speed_) {
-                        target.x += current_velocity.x;
-                    } else if (current_velocity.x < maximum_speed_) {
-                        target.x = maximum_speed_;
-                    } else if (current_velocity.x > -maximum_speed_) {
-                        target.x = -maximum_speed_;
-                    } else {
-                        target.x = current_velocity.x;
-                    }
+        /*if(abs(target.x + current_velocity.x) < maximum_speed_) {
+                target.x += current_velocity.x;
+            } else if (current_velocity.x < maximum_speed_) {
+                target.x = maximum_speed_;
+            } else if (current_velocity.x > -maximum_speed_) {
+                target.x = -maximum_speed_;
+            } else {
+                target.x = current_velocity.x;
+            }
 
-                    if(abs(target.y + current_velocity.y) < maximum_speed_) {
-                        target.y += current_velocity.y;
-                    } else if (current_velocity.y < maximum_speed_) {
-                        target.y = maximum_speed_;
-                    } else if (current_velocity.y > -maximum_speed_) {
-                        target.y = -maximum_speed_;
-                    } else {
-                        target.y = current_velocity.y;
-                    }*/
+            if(abs(target.y + current_velocity.y) < maximum_speed_) {
+                target.y += current_velocity.y;
+            } else if (current_velocity.y < maximum_speed_) {
+                target.y = maximum_speed_;
+            } else if (current_velocity.y > -maximum_speed_) {
+                target.y = -maximum_speed_;
+            } else {
+                target.y = current_velocity.y;
+            }*/
 
-                // target.y = current_velocity.y;
+        // target.y = current_velocity.y;
 
-                // player_->GetRigidBody()->setLinearVelocity(target);
-            // }
+        // player_->GetRigidBody()->setLinearVelocity(target);
+        // }
     }
 }

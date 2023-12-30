@@ -28,24 +28,19 @@ SOFTWARE.
 #define PLAINCRAFT_CORE_GAME_OBJECT
 
 #include "../common.hpp"
+#include "../physics/physics_object.hpp"
 #include <plaincraft_render_engine.hpp>
-
 
 namespace plaincraft_core {
 	using namespace plaincraft_render_engine;
 	
 	class GameObject
 	{
-	public:
-		enum ObjectType {
-			Static = 0,
-			Dynamic = 1
-		};
-
 	private:
-		ObjectType object_type_ = ObjectType::Dynamic;
 		std::shared_ptr<Drawable> drawable_;
+		std::shared_ptr<PhysicsObject> physics_object_;
 		std::string name_;
+		
 		bool is_active_;
 
 		static uint32_t next_id_;
@@ -64,15 +59,15 @@ namespace plaincraft_core {
 		void SetDrawable(std::shared_ptr<Drawable> drawable);
 		std::shared_ptr<Drawable> GetDrawable() const;
 
+		void SetPhysicsObject(std::shared_ptr<PhysicsObject> physics_object);
+		std::shared_ptr<PhysicsObject> GetPhysicsObject() const;
+
 		void SetColor(Vector3d color);
 		Vector3d GetColor();
 
 		void SetName(std::string name);
 		std::string GetName() const;
-
-		void SetObjectType(ObjectType object_type);
-		ObjectType GetObjectType() const;
-
+		
 		void SetIsActive(bool is_active);
 		bool GetIsActive() const;
 

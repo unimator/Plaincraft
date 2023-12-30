@@ -41,12 +41,12 @@ namespace plaincraft_render_engine_vulkan
 
 		VulkanPipelineConfig pipeline_config{};
 		descriptor_sets_.resize(images_count);
-		
+
 		CreateDescriptorSetLayout();
 		CreateDescriptorPool();
 		RecreateEntitiesBuffers();
 		CreatePipelineLayout();
-		
+
 		VkViewport viewport{};
 		VkRect2D scissor{};
 		SetupPipelineConfig(pipeline_config, viewport, scissor);
@@ -66,9 +66,9 @@ namespace plaincraft_render_engine_vulkan
 		}
 	}
 
-	void VulkanSceneRenderer::BeginFrame(VulkanRendererFrameConfig& frame_config)
+	void VulkanSceneRenderer::BeginFrame(VulkanRendererFrameConfig &frame_config)
 	{
-		if(frame_config_ != nullptr && frame_config_ != &frame_config)
+		if (frame_config_ != nullptr && frame_config_ != &frame_config)
 		{
 			throw std::runtime_error("Other frame has already begun recording");
 		}
@@ -76,7 +76,7 @@ namespace plaincraft_render_engine_vulkan
 		frame_config_ = &frame_config;
 	}
 
-    void VulkanSceneRenderer::EndFrame()
+	void VulkanSceneRenderer::EndFrame()
 	{
 		frame_config_ = nullptr;
 	}
@@ -85,7 +85,7 @@ namespace plaincraft_render_engine_vulkan
 	{
 		SceneRenderer::Batch(drawable);
 
-		if(frame_config_ == nullptr)
+		if (frame_config_ == nullptr)
 		{
 			throw std::runtime_error("Frame has not begun recording");
 		}
@@ -93,15 +93,15 @@ namespace plaincraft_render_engine_vulkan
 		auto texture = drawable->GetTexture();
 		auto &frame_descriptor_sets = descriptor_sets_[frame_config_->image_index];
 		auto &material_descriptor_set = frame_descriptor_sets.materials_descriptor_set;
-		
-		if(!texture.expired() && !material_descriptor_set.contains(texture.lock()))
+
+		if (!texture.expired() && !material_descriptor_set.contains(texture.lock()))
 		{
 			auto vulkan_texture = std::dynamic_pointer_cast<VulkanTexture>(texture.lock());
 			auto texture_descriptor_set = CreateMaterialDescriptorSet(vulkan_texture->GetImageView().GetImageView(), vulkan_texture->GetSampler());
 			material_descriptor_set.insert(std::pair(texture.lock(), texture_descriptor_set));
 		}
 	}
-	
+
 	void VulkanSceneRenderer::Render()
 	{
 		if (drawables_list_.size() > buffers_instance_count_)
@@ -121,7 +121,7 @@ namespace plaincraft_render_engine_vulkan
 
 		auto &view_projection_buffer = view_projection_buffers_[frame_config.image_index];
 		auto &model_buffer = model_buffers_[frame_config.image_index];
-		//auto &texture_images = descriptor_set.materials_descriptor_set;
+		// auto &texture_images = descriptor_set.materials_descriptor_set;
 		auto alignment_size = view_projection_buffer->GetAlignmentSize();
 
 		ViewProjectionMatrix vp_matrix{
@@ -135,16 +135,16 @@ namespace plaincraft_render_engine_vulkan
 
 		std::unordered_map<std::shared_ptr<Texture>, std::vector<std::reference_wrapper<Drawable>>> drawables_grouped;
 
-		for(auto &drawable : drawables_list_)
+		for (auto &drawable : drawables_list_)
 		{
 			auto texture = drawable->GetTexture();
 			drawables_grouped[texture.lock()].push_back(*drawable);
 		}
 
 		auto i = 0;
-		for(auto material_group : drawables_grouped)
+		for (auto material_group : drawables_grouped)
 		{
-			for(auto &drawable : material_group.second)
+			for (auto &drawable : material_group.second)
 			{
 				auto color = drawable.get().GetColor();
 				auto model = drawable.get().GetModelMatrix();
@@ -164,19 +164,19 @@ namespace plaincraft_render_engine_vulkan
 		// model_buffer->Flush(alignment_size * drawables_list_.size(), 0);
 
 		i = 0;
-		for(auto material_group : drawables_grouped)
+		for (auto material_group : drawables_grouped)
 		{
 			auto mvp_descriptor_set = descriptor_set.mvp_descriptor_set;
 
-			if(material_group.first == nullptr)
+			if (material_group.first == nullptr)
 			{
 				continue;
 			}
 
 			auto material_descriptor_set = descriptor_set.materials_descriptor_set[material_group.first];
 			std::vector<VkDescriptorSet> descriptor_sets = {mvp_descriptor_set, material_descriptor_set};
-						
-			for(auto &drawable : material_group.second)
+
+			for (auto &drawable : material_group.second)
 			{
 				uint32_t dynamic_offset = i * alignment_size;
 				vkCmdBindDescriptorSets(command_buffer,
@@ -308,12 +308,12 @@ namespace plaincraft_render_engine_vulkan
 	void VulkanSceneRenderer::CreateDescriptorSetLayout()
 	{
 		mvp_descriptor_set_layout_ = VulkanDescriptorSetLayout::Builder(device_)
-									 .AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1)
-									 .AddLayoutBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1)
-									 .Build();
+										 .AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1)
+										 .AddLayoutBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1)
+										 .Build();
 		material_descriptor_set_layout_ = VulkanDescriptorSetLayout::Builder(device_)
-									 .AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-									 .Build();
+											  .AddLayoutBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
+											  .Build();
 	}
 
 	void VulkanSceneRenderer::CreateDescriptorPool()
@@ -327,7 +327,7 @@ namespace plaincraft_render_engine_vulkan
 		descriptor_sets_.resize(images_count_);
 	}
 
-    VkDescriptorSet VulkanSceneRenderer::CreateMaterialDescriptorSet(VkImageView texture_image_view, VkSampler texture_sampler)
+	VkDescriptorSet VulkanSceneRenderer::CreateMaterialDescriptorSet(VkImageView texture_image_view, VkSampler texture_sampler)
 	{
 		VkDescriptorSet result;
 
@@ -356,7 +356,7 @@ namespace plaincraft_render_engine_vulkan
 			view_projection_buffer_descriptor_info.offset = 0;
 			view_projection_buffer_descriptor_info.range = sizeof(ViewProjectionMatrix);
 
-			if(descriptor_sets_[i].mvp_descriptor_set != VK_NULL_HANDLE)
+			if (descriptor_sets_[i].mvp_descriptor_set != VK_NULL_HANDLE)
 			{
 				std::vector<VkDescriptorSet> old_descriptor_sets = {descriptor_sets_[i].mvp_descriptor_set};
 				descriptor_pool_->FreeDescriptors(old_descriptor_sets);

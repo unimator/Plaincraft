@@ -33,9 +33,11 @@ SOFTWARE.
 #include "events/loop_events_handler.hpp"
 #include "world/world_generator.hpp"
 #include "world/chunks/chunk_builder.hpp"
+#include "world/chunks/simple_chunk_builder.hpp"
 #include "physics_optimization/active_objects_optimizer.hpp"
 #include "utils/fps_counter.hpp"
 #include "state/global_state.hpp"
+#include "physics/physics_engine.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
@@ -58,6 +60,7 @@ namespace plaincraft_core {
 		
 		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
+		std::unique_ptr<PhysicsEngine> physics_engine_;
 
 	public:
 		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);

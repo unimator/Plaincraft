@@ -38,11 +38,13 @@ namespace plaincraft_core
     class ModelsCache;
     class WorldOptimizer;
     class ChunkBuilder;
+    class SimpleChunkBuilder;
 
     class Chunk : public GameObject
     {
         friend class WorldOptimizer;
         friend class ChunkBuilder;
+        friend class SimpleChunkBuilder;
         friend class ChunksProcessor;
 
     public:
@@ -53,7 +55,7 @@ namespace plaincraft_core
 
         using Data = std::array<std::array<std::array<std::shared_ptr<Block>, chunk_size>, chunk_height>, chunk_size>;
 
-        bool initialized_ = false;
+    bool initialized_ = false;
 
     private:
         Data blocks_;

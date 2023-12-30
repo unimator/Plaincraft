@@ -50,7 +50,7 @@ namespace plaincraft_core {
             camera_->pitch = -(glm::half_pi<float>() - 0.05f);
         }
 
-        auto target_position = follow_target_->GetDrawable()->GetPosition();
+        auto target_position = follow_target_->GetPhysicsObject()->position;
         camera_->position = Vector3d(
             target_position.x + distance_to_target_ * glm::cos(camera_->pitch) * glm::cos(camera_->yaw),
             target_position.y + distance_to_target_ * glm::sin(camera_->pitch),

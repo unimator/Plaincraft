@@ -39,6 +39,10 @@ PRIVATE
     src/plaincraft/core/entities/game_object.hpp
     src/plaincraft/core/events/loop_events_handler.cpp
     src/plaincraft/core/events/loop_events_handler.hpp
+    src/plaincraft/core/physics/physics_engine.cpp
+    src/plaincraft/core/physics/physics_engine.hpp
+    src/plaincraft/core/physics/physics_object.cpp
+    src/plaincraft/core/physics/physics_object.hpp
     src/plaincraft/core/physics_optimization/active_objects_optimizer.cpp
     src/plaincraft/core/physics_optimization/active_objects_optimizer.hpp
     src/plaincraft/core/physics_optimization/map_optimizer.cpp
@@ -52,10 +56,14 @@ PRIVATE
     src/plaincraft/core/utils/fps_counter.hpp
     src/plaincraft/core/state/global_state.cpp
     src/plaincraft/core/state/global_state.hpp
+    src/plaincraft/core/world/chunks/chunk_builder_base.cpp
+    src/plaincraft/core/world/chunks/chunk_builder_base.hpp
     src/plaincraft/core/world/chunks/chunk_builder.cpp
     src/plaincraft/core/world/chunks/chunk_builder.hpp
     src/plaincraft/core/world/chunks/chunks_processor.cpp
     src/plaincraft/core/world/chunks/chunks_processor.hpp
+    src/plaincraft/core/world/chunks/simple_chunk_builder.cpp
+    src/plaincraft/core/world/chunks/simple_chunk_builder.hpp
     src/plaincraft/core/world/world_generator.cpp
     src/plaincraft/core/world/world_generator.hpp
     src/plaincraft/core/world/world_optimizer.cpp

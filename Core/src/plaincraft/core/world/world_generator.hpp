@@ -31,7 +31,7 @@ SOFTWARE.
 #include "../entities/game_object.hpp"
 #include "../scene/scene.hpp"
 #include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder.hpp"
+#include "./chunks/chunk_builder_base.hpp"
 #include "./chunks/chunks_processor.hpp"
 #include <vector>
 #include <functional>
@@ -50,10 +50,10 @@ namespace plaincraft_core
 
     public:
         WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                     std::unique_ptr<ChunkBuilder> chunk_builder,
-                     Scene &scene,
-                     std::shared_ptr<Map> map,
-                     std::shared_ptr<GameObject> origin_entity);
+                        std::unique_ptr<ChunkBuilderBase> chunk_builder,
+                        Scene &scene,
+                        std::shared_ptr<Map> map,
+                        std::shared_ptr<GameObject> origin_entity);
 
         void OnLoopFrameTick(float delta_time);
 

@@ -24,23 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
-#define PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
+#ifndef PLAINCRAFT_CORE_SIMPLE_CHUNK_BUILDER
+#define PLAINCRAFT_CORE_SIMPLE_CHUNK_BUILDER
 
-#include "../../entities/game_object.hpp"
-#include "../camera_operator.hpp"
+#include "chunk_builder_base.hpp"
+#include "../../scene/scene.hpp"
 
-namespace plaincraft_core {
-    class CameraOperatorFollow : public CameraOperator {
+namespace plaincraft_core
+{
+    class SimpleChunkBuilder : public ChunkBuilderBase
+    {
     private:
-        std::shared_ptr<GameObject> follow_target_;
-        float distance_to_target_;
+        Scene &scene_;
 
     public:
-        CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target, float distance_to_target = 6.0f);
+        SimpleChunkBuilder(Scene &scene);
 
-        void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
+        bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) override;
+        bool DisposeChunkStep(std::shared_ptr<Chunk> chunk) override;
     };
 }
 
-#endif // PLAINCRAFT_CORE_CAMERA_OPERATOR_FOLLOW
+#endif // PLAINCRAFT_CORE_SIMPLE_CHUNK_BUILDER

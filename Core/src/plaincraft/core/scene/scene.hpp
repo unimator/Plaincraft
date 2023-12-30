@@ -62,7 +62,7 @@ namespace plaincraft_core
 		mutable std::list<std::shared_ptr<GameObject>> dynamic_game_objects_list_;
 
 		SceneEventsHandler scene_events_handler_;
-
+		
 
 	public:
 		Scene(std::shared_ptr<RenderEngine> render_engine);
