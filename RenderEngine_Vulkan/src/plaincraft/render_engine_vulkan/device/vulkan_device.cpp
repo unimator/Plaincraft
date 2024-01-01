@@ -38,13 +38,15 @@ namespace plaincraft_render_engine_vulkan {
     {
         PickPhysicalDevice(instance, surface);
         CreateLogicalDevice(surface);
+		CreateSyncObjects();
 		CreateQueues(surface);
 		CreateCommandPool(surface);
     }
 
     VulkanDevice::~VulkanDevice()
     {
-		vkDestroyCommandPool(device_, command_pool_, nullptr);
+		vkDestroyCommandPool(device_, graphics_command_pool_, nullptr);
+		vkDestroyCommandPool(device_, transfer_command_pool_, nullptr);
 		vkDestroyDevice(device_, nullptr);
     }
 
@@ -89,7 +91,7 @@ namespace plaincraft_render_engine_vulkan {
 			VkDeviceQueueCreateInfo device_queue_create_info{};
 			device_queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 			device_queue_create_info.queueFamilyIndex = queue_family;
-			device_queue_create_info.queueCount = 1;
+			device_queue_create_info.queueCount = queue_family == indices.graphics_family.value() ? 2 : 1;
 			device_queue_create_info.pQueuePriorities = &queue_priority;
 			queue_create_infos.push_back(device_queue_create_info);
 		}
@@ -158,10 +160,15 @@ namespace plaincraft_render_engine_vulkan {
 		return required_extensions.empty();
 	}
 
+	void VulkanDevice::CreateSyncObjects()
+	{
+	}
+
 	void VulkanDevice::CreateQueues(VkSurfaceKHR surface)
 	{
 		auto indices = FindQueueFamilyIndices(physical_device_, surface);
 		vkGetDeviceQueue(device_, indices.graphics_family.value(), 0, &graphics_queue_);
+		vkGetDeviceQueue(device_, indices.graphics_family.value(), 1, &transfer_queue_);
 		vkGetDeviceQueue(device_, indices.present_family.value(), 0, &presentation_queue_);
 	}
 
@@ -169,14 +176,24 @@ namespace plaincraft_render_engine_vulkan {
 	{
 		QueueFamilyIndices indices = FindQueueFamilyIndices(physical_device_, surface);
 
-		VkCommandPoolCreateInfo command_pool_info{};
-		command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		command_pool_info.queueFamilyIndex = indices.graphics_family.value();
-		command_pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		VkCommandPoolCreateInfo graphics_command_pool_info{};
+		graphics_command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		graphics_command_pool_info.queueFamilyIndex = indices.graphics_family.value();
+		graphics_command_pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-		if (vkCreateCommandPool(device_, &command_pool_info, nullptr, &command_pool_) != VK_SUCCESS)
+		if (vkCreateCommandPool(device_, &graphics_command_pool_info, nullptr, &graphics_command_pool_) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to create command pool");
+			throw std::runtime_error("Failed to create graphics command pool");
+		}
+
+		VkCommandPoolCreateInfo transfer_command_pool_info{};
+		transfer_command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		transfer_command_pool_info.queueFamilyIndex = indices.graphics_family.value();
+		transfer_command_pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+		if (vkCreateCommandPool(device_, &transfer_command_pool_info, nullptr, &transfer_command_pool_) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create transfer command pool");
 		}
 	}
 
@@ -222,12 +239,12 @@ namespace plaincraft_render_engine_vulkan {
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
 	
-    VkCommandBuffer VulkanDevice::BeginSingleTimeCommands() const
+    VkCommandBuffer VulkanDevice::BeginSingleTimeCommands(VkCommandPool command_pool) const
 	{
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocate_info.commandPool = command_pool_;
+		allocate_info.commandPool = command_pool;
 		allocate_info.commandBufferCount = 1;
 
 		VkCommandBuffer command_buffer;
@@ -242,20 +259,18 @@ namespace plaincraft_render_engine_vulkan {
 		return command_buffer;
 	}
 
-	void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer command_buffer) const
+	void VulkanDevice::EndSingleTimeCommands(VkCommandPool command_pool, VkCommandBuffer command_buffer, VkQueue queue) const
 	{
 		vkEndCommandBuffer(command_buffer);
 
-		VkSubmitInfo submit_info{};
-		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submit_info.commandBufferCount = 1;
-		submit_info.pCommandBuffers = &command_buffer;
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
 
-		auto graphics_queue = graphics_queue_;
+		vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+		vkQueueWaitIdle(queue);
 
-		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-		vkQueueWaitIdle(graphics_queue);
-
-		vkFreeCommandBuffers(device_, command_pool_, 1, &command_buffer);
+		vkFreeCommandBuffers(device_, command_pool, 1, &command_buffer);
 	}
 }

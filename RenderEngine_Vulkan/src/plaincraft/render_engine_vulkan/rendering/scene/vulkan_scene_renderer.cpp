@@ -323,6 +323,7 @@ namespace plaincraft_render_engine_vulkan
 							   .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1)
 							   .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
 							   .AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
+							   .SetPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 							   .Build();
 		descriptor_sets_.resize(images_count_);
 	}

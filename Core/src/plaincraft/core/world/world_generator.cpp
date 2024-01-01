@@ -42,7 +42,6 @@ namespace plaincraft_core
           chunks_processor_(std::move(world_generator), std::move(world_optimizer), scene, ChunksProcessor::Metric(origin_entity))
     {
         ReloadGrid();
-        chunks_processor_.Process(INT32_MAX);
     }
 
     void WorldGenerator::OnLoopFrameTick(float delta_time)
@@ -68,8 +67,6 @@ namespace plaincraft_core
         {
             chunks_processor_.stop_processing = false;
         }
-
-        chunks_processor_.Process(200);
     }
 
     void WorldGenerator::ReloadGrid()

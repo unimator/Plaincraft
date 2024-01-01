@@ -28,6 +28,11 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
+    ChunkBuilderBase::~ChunkBuilderBase()
+    {
+        
+    }
+
     std::shared_ptr<Chunk> ChunkBuilderBase::InitializeChunk(int32_t position_x, int32_t position_z)
     {
         auto drawable = std::make_shared<Drawable>();

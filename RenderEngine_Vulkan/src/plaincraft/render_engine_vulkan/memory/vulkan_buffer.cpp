@@ -136,7 +136,7 @@ namespace plaincraft_render_engine_vulkan
     void VulkanBuffer::CopyFromBuffer(const VulkanBuffer& other)
     {
         auto& device = device_.get();
-        auto command_buffer = device.BeginSingleTimeCommands();
+        auto command_buffer = device.BeginSingleTimeCommands(device.GetTransferCommandPool());
 
         VkBufferCopy copy_region{};
         copy_region.srcOffset = 0;
@@ -144,7 +144,7 @@ namespace plaincraft_render_engine_vulkan
         copy_region.size = other.GetBufferSize();
         vkCmdCopyBuffer(command_buffer, other.buffer_, buffer_, 1, &copy_region);
 
-        device.EndSingleTimeCommands(command_buffer);
+        device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
     }
 
     VulkanBuffer VulkanBuffer::MoveBuffer(const VulkanDevice& device, VulkanBuffer&& buffer, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties)

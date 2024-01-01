@@ -59,7 +59,7 @@ namespace plaincraft_render_engine_vulkan
 	void VulkanTexture::TransitionImageLayout(VkFormat format, VkImageLayout old_image_layout, VkImageLayout new_image_layout)
 	{
 		auto &device = device_.get();
-		auto command_buffer = device.BeginSingleTimeCommands();
+		auto command_buffer = device.BeginSingleTimeCommands(device.GetTransferCommandPool());
 
 		VkImageMemoryBarrier image_memory_barrier{};
 		image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -121,9 +121,9 @@ namespace plaincraft_render_engine_vulkan
 			throw std::invalid_argument("Unsupported layout transition");
 		}
 
-		vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+		vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, VK_NULL_HANDLE, 0, VK_NULL_HANDLE, 1, &image_memory_barrier);
 
-		device.EndSingleTimeCommands(command_buffer);
+		device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
 	}
 
 	void VulkanTexture::CreateTexture(void *image_data)

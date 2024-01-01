@@ -126,7 +126,7 @@ namespace plaincraft_render_engine_vulkan
     void VulkanImage::CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
     {
         auto &device = device_.get();
-        auto command_buffer = device.BeginSingleTimeCommands();
+        auto command_buffer = device.BeginSingleTimeCommands(device.GetTransferCommandPool());
 
         VkBufferImageCopy image_copy_region{};
         image_copy_region.bufferOffset = 0;
@@ -143,7 +143,7 @@ namespace plaincraft_render_engine_vulkan
 
         vkCmdCopyBufferToImage(command_buffer, buffer, image_, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &image_copy_region);
 
-        device.EndSingleTimeCommands(command_buffer);
+        device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
     }
 
     void VulkanImage::CreateImage()

@@ -36,6 +36,9 @@ SOFTWARE.
 #include <ctime>
 #include <string>
 #include <random>
+#include <exception>
+#include <typeinfo>
+#include <stdexcept>
 
 namespace plaincraft_core
 {
@@ -127,29 +130,41 @@ namespace plaincraft_core
 		auto map = std::make_shared<Map>();
 		map->SetName("map");
 		scene_.AddGameObject(map);
-		PhysicsEngine::PhysicsSettings physics_settings{Vector3d(0.0f, -9.81f, 0.0f)};
+		PhysicsEngine::PhysicsSettings physics_settings{Vector3d(0.0f, 0.0f, 0.0f)};
 		physics_engine_ = std::make_unique<PhysicsEngine>(physics_settings, map);
 		physics_engine_->AddObject(player_physics_object);
 
 		auto seed = global_state_.GetSeed();
-		//auto chunk_builder = std::make_unique<SimpleChunkBuilder>(scene_);
-		auto chunk_builder = std::make_unique<ChunkBuilder>(scene_, models_cache_, textures_cache_, seed);
+		// auto chunk_builder = std::make_unique<SimpleChunkBuilder>(scene_);
+		auto chunk_builder = std::make_unique<ChunkBuilder>(scene_, seed);
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
-		active_objects_optimizer_ = std::make_unique<ActiveObjectsOptimizer>(
-			scene_.GetGameObjectsList(),
-			scene_.GetStaticGameObjectsList(),
-			scene_.GetDynamicGameOjectsList());
-
 		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
-		loop_events_handler_.loop_event_trigger.AddSubscription(active_objects_optimizer_.get(), &ActiveObjectsOptimizer::OnLoopFrameTick);
 	}
 
 	void Game::Run()
 	{
-		MainLoop();
+		try
+		{
+			MainLoop();
+		}
+		catch (const std::runtime_error &re)
+		{
+			// speciffic handling for runtime_error
+			std::cerr << "Runtime error: " << re.what() << std::endl;
+		}
+		catch (const std::exception &ex)
+		{
+			// speciffic handling for all exceptions extending std::exception, except
+			// std::runtime_error which is handled explicitly
+			std::cerr << "Error occurred: " << ex.what() << std::endl;
+		}
+		catch (...)
+		{
+			std::cout << "error" << std::endl;
+		}
 	}
 
 	void Game::MainLoop()
@@ -245,7 +260,8 @@ namespace plaincraft_core
 				global_state_.GetDebugInfoVisibility()};
 			MEASURE("graphics render",
 					{
-						render_engine_->RenderFrame(frame_config);
+						// render_engine_->RenderFrame(frame_config);
+						scene_.RenderFrame(frame_config);
 					})
 
 			last_cursor_position_x_ = cursor_position_x;

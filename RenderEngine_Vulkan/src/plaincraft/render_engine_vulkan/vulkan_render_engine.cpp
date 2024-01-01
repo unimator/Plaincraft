@@ -90,7 +90,7 @@ namespace plaincraft_render_engine_vulkan
 
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocate_info.commandPool = device_.GetCommandPool();
+		allocate_info.commandPool = device_.GetGraphicsCommandPool();
 		allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocate_info.commandBufferCount = static_cast<uint32_t>(command_buffers_.size());
 
@@ -267,9 +267,10 @@ namespace plaincraft_render_engine_vulkan
 		submit_info.pSignalSemaphores = signal_semaphores;
 
 		vkResetFences(device_.GetDevice(), 1, &in_flight_fences_[current_frame_]);
-		if (vkQueueSubmit(device_.GetGraphicsQueue(), 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)
+		auto queueSubmitResult = vkQueueSubmit(device_.GetGraphicsQueue(), 1, &submit_info, in_flight_fences_[current_frame_]);
+		if (queueSubmitResult != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to submitt draw command buffer");
+			throw std::runtime_error("Failed to submit draw command buffer");
 		}
 
 		VkPresentInfoKHR presentation_info{};

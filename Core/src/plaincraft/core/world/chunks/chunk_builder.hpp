@@ -33,6 +33,7 @@ SOFTWARE.
 #include <lib/PerlinNoise.hpp>
 #include <stack>
 #include <unordered_map>
+#include <mutex>
 
 namespace plaincraft_core
 {
@@ -49,17 +50,15 @@ namespace plaincraft_core
 
 	public:
 		Scene &scene_;
-		Cache<Model> &models_cache_;
-		Cache<Texture> &textures_cache_;
 
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_creation_datas_;
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_disposal_datas_;
+		std::mutex chunk_creation_datas_mutex_;
+		std::mutex chunk_disposal_datas_mutex_;
 
 	public:
-		ChunkBuilder(Scene &scene,
-					 Cache<Model> &models_cache,
-					 Cache<Texture> &textures_cache,
-					 uint64_t seed);
+		ChunkBuilder(Scene &scene, uint64_t seed);
+		virtual ~ChunkBuilder();
 
 		bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) override;
 		bool DisposeChunkStep(std::shared_ptr<Chunk> chunk) override;

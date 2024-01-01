@@ -35,6 +35,8 @@ namespace plaincraft_core
     class ChunkBuilderBase
     {
         public:
+            virtual ~ChunkBuilderBase();
+
             virtual std::shared_ptr<Chunk> InitializeChunk(int32_t position_x, int32_t position_z);
             virtual bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) = 0;
             virtual bool DisposeChunkStep(std::shared_ptr<Chunk> chunk) = 0;

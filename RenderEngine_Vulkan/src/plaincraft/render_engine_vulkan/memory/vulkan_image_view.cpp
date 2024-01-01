@@ -52,6 +52,8 @@ namespace plaincraft_render_engine_vulkan
 
         other.image_view_ = VK_NULL_HANDLE;
         other.aspect_flags_ = 0;
+
+        return *this;
     }
 
     VulkanImageView::~VulkanImageView() 

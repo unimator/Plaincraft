@@ -37,23 +37,24 @@ SOFTWARE.
 namespace plaincraft_core
 {
 	ChunkBuilder::ChunkBuilder(Scene &scene,
-							   Cache<Model> &models_cache,
-							   Cache<Texture> &textures_cache,
 							   uint64_t seed)
 		: scene_(scene),
-		  models_cache_(models_cache),
-		  textures_cache_(textures_cache),
 		  seed_(seed),
 		  perlin_(seed)
 	{
 		perlin_.reseed(seed);
 	}
-	
+
+	ChunkBuilder::~ChunkBuilder()
+	{
+	}
+
 	bool ChunkBuilder::GenerateChunkStep(std::shared_ptr<Chunk> chunk)
 	{
 		// static auto cube_shape = physics_common_.createBoxShape(rp3d::Vector3(0.5, 0.5, 0.5));
-
+		std::unique_lock lk(chunk_creation_datas_mutex_);
 		auto &chunk_processing_data = GetProcessingData(chunk_creation_datas_, chunk);
+		lk.unlock();
 		auto &[i, j, k] = chunk_processing_data;
 
 		auto x = static_cast<int32_t>(Chunk::chunk_size) * chunk->GetPositionX() + i * 1.0;
@@ -80,7 +81,9 @@ namespace plaincraft_core
 
 		if (result)
 		{
+			lk.lock();
 			DisposeProcessingData(chunk_creation_datas_, chunk);
+			lk.unlock();
 			chunk->initialized_ = true;
 		}
 
@@ -89,7 +92,9 @@ namespace plaincraft_core
 
 	bool ChunkBuilder::DisposeChunkStep(std::shared_ptr<Chunk> chunk)
 	{
+		std::unique_lock lk(chunk_disposal_datas_mutex_);
 		auto &chunk_processing_data = GetProcessingData(chunk_disposal_datas_, chunk);
+		lk.unlock();
 		auto &[i, j, k] = chunk_processing_data;
 
 		if (i == 0 && j == 0 && k == 0)
@@ -107,7 +112,7 @@ namespace plaincraft_core
 		auto &block = blocks[i][j][k];
 		if (block != nullptr)
 		{
-			scene_.RemoveGameObject(block);
+			//scene_.RemoveGameObject(block);
 			// if(block->GetRigidBody())
 			// {
 			// 	physics_world_->destroyRigidBody(block->GetRigidBody());
@@ -117,7 +122,9 @@ namespace plaincraft_core
 		auto result = Increment(chunk_processing_data);
 		if (result)
 		{
+			lk.lock();
 			DisposeProcessingData(chunk_disposal_datas_, chunk);
+			lk.unlock();
 		}
 		return result;
 	}

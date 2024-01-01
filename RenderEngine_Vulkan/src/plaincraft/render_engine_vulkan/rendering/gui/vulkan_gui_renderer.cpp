@@ -128,7 +128,7 @@ namespace plaincraft_render_engine_vulkan
     vulkan_init_info.Instance = vulkan_instance.GetInstance();
     vulkan_init_info.PhysicalDevice = vulkan_device.GetPhysicalDevice();
     vulkan_init_info.Device = vulkan_device.GetDevice();
-    vulkan_init_info.Queue = vulkan_device.GetGraphicsQueue();
+    vulkan_init_info.Queue = vulkan_device.GetTransferQueue();
     vulkan_init_info.DescriptorPool = imgui_descriptor_pool_;
     vulkan_init_info.MinImageCount = 3;
     vulkan_init_info.ImageCount = 3;
@@ -140,12 +140,11 @@ namespace plaincraft_render_engine_vulkan
   void VulkanGuiRenderer::UploadFonts()
   {
     auto &device = vulkan_device_.get();
-    VkCommandPool command_pool = device.GetCommandPool();
-    VkCommandBuffer command_buffer = device.BeginSingleTimeCommands();
+    VkCommandBuffer command_buffer = device.BeginSingleTimeCommands(device.GetTransferCommandPool());
 
     ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
 
-    device.EndSingleTimeCommands(command_buffer);
+    device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
     ImGui_ImplVulkan_DestroyFontUploadObjects();
   }
 }

@@ -37,9 +37,11 @@ namespace plaincraft_render_engine_vulkan {
 		VkDevice device_;
 
         VkQueue graphics_queue_;
+        VkQueue transfer_queue_;
         VkQueue presentation_queue_;
 
-        VkCommandPool command_pool_;
+        VkCommandPool graphics_command_pool_;
+        VkCommandPool transfer_command_pool_;
 
         const std::vector<const char*> device_extensions_ = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -54,17 +56,19 @@ namespace plaincraft_render_engine_vulkan {
         auto GetPhysicalDevice() const -> VkPhysicalDevice { return physical_device_; }
 
         auto GetGraphicsQueue() const -> VkQueue { return graphics_queue_; }
+        auto GetTransferQueue() const -> VkQueue { return transfer_queue_; }
         auto GetPresentationQueue() const -> VkQueue { return presentation_queue_; }
 
-        auto GetCommandPool() const -> VkCommandPool { return command_pool_; }
+        auto GetGraphicsCommandPool() const -> VkCommandPool { return graphics_command_pool_; }
+        auto GetTransferCommandPool() const -> VkCommandPool { return transfer_command_pool_; }
 
         uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags memory_properties) const;
         VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const;
         
         bool HasStencilComponent(VkFormat format) const;
         
-        VkCommandBuffer BeginSingleTimeCommands() const;
-		void EndSingleTimeCommands(VkCommandBuffer command_buffer) const;
+        VkCommandBuffer BeginSingleTimeCommands(VkCommandPool command_pool) const;
+		void EndSingleTimeCommands(VkCommandPool command_pool, VkCommandBuffer command_buffer, VkQueue queue) const;
 
     private:
         void PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface);
@@ -73,6 +77,7 @@ namespace plaincraft_render_engine_vulkan {
         bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
         bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
 
+        void CreateSyncObjects();
         void CreateQueues(VkSurfaceKHR surface);
 		void CreateCommandPool(VkSurfaceKHR surface);
     };

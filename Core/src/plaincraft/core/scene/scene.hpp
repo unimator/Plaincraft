@@ -38,6 +38,7 @@ namespace plaincraft_core
 #include "./events/scene_events_handler.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
+#include <mutex>
 
 namespace std 
 {
@@ -56,14 +57,13 @@ namespace plaincraft_core
 	{
 	private:
 		// std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
+
+		mutable std::mutex scene_access_;
 		std::shared_ptr<RenderEngine> render_engine_;
 		mutable std::list<std::shared_ptr<GameObject>> game_objects_list_;
-		mutable std::list<std::shared_ptr<GameObject>> static_game_objects_list_;
-		mutable std::list<std::shared_ptr<GameObject>> dynamic_game_objects_list_;
 
 		SceneEventsHandler scene_events_handler_;
 		
-
 	public:
 		Scene(std::shared_ptr<RenderEngine> render_engine);
 		~Scene();
@@ -73,13 +73,11 @@ namespace plaincraft_core
 		void RemoveGameObjects(std::vector<std::shared_ptr<GameObject>> &game_objects_to_remove);
 		
 		std::shared_ptr<GameObject> FindGameObjectByName(const std::string& name) const;
-		std::list<std::shared_ptr<GameObject>> &GetGameObjectsList() const;
-		std::list<std::shared_ptr<GameObject>> &GetStaticGameObjectsList() const;
-		std::list<std::shared_ptr<GameObject>> &GetDynamicGameOjectsList() const;
 
 		SceneEventsHandler& GetSceneEventsHandler();
 		
 		void UpdateFrame(float interpolation_factor = 0.0f);
+		void RenderFrame(plaincraft_render_engine::FrameConfig frame_config);
 
 	private:
 	};
