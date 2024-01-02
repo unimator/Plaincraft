@@ -52,8 +52,6 @@ namespace plaincraft_core
 	{
 		std::lock_guard lg(scene_access_);
 		game_objects_list_.clear();
-		printf("Scene destroyed\n");
-		fflush(stdout);
 	}
 
 	void Scene::AddGameObject(std::shared_ptr<GameObject> game_object_to_add)

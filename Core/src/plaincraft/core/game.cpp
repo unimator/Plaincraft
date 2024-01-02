@@ -114,7 +114,7 @@ namespace plaincraft_core
 		player->SetDrawable(drawable);
 
 		auto player_physics_object = std::make_shared<PhysicsObject>();
-		auto player_position = Vector3d(8.0f, 55.0f, 8.0f);
+		auto player_position = Vector3d(8.0f, 55.0f, 16.0f);
 		auto player_size = Vector3d(0.8f, 1.8f, 0.8f);
 		player_physics_object->position = player_position;
 		player_physics_object->size = player_size;
@@ -130,7 +130,7 @@ namespace plaincraft_core
 		auto map = std::make_shared<Map>();
 		map->SetName("map");
 		scene_.AddGameObject(map);
-		PhysicsEngine::PhysicsSettings physics_settings{Vector3d(0.0f, 0.0f, 0.0f)};
+		PhysicsEngine::PhysicsSettings physics_settings{Vector3d(0.0f, -9.81, 0.0f)};
 		physics_engine_ = std::make_unique<PhysicsEngine>(physics_settings, map);
 		physics_engine_->AddObject(player_physics_object);
 
@@ -237,6 +237,11 @@ namespace plaincraft_core
 
 				auto &chunk = grid[chunk_x][chunk_z];
 				chunk->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
+
+				const char *format = "(%d, %d)";
+				std::vector<char> buffer(1024);
+				std::snprintf(&buffer[0], buffer.size(), format, chunk_x + grid[0][0]->GetPositionX(), chunk_z + grid[0][0]->GetPositionZ());
+				LOGVALUE("Active chunk", std::string(buffer.begin(), buffer.end()));
 
 				physics_engine_->Step(physics_time_step_);
 				accumulator -= physics_time_step_;

@@ -80,9 +80,7 @@ namespace plaincraft_core
             {
                 physic_object->velocity = Vector3d(0.0f, 0.0f, 0.0f);
             }
-            physic_object->velocity += time_step * physics_settings_.gravity;
 
-            
             physic_object->is_grounded = false;
 
             for (size_t i = 0; i < 3; ++i)
@@ -128,8 +126,9 @@ namespace plaincraft_core
                     physic_object->position.z += adjusted_velocity.z * entry_time;
                 }
             }
-
+            
             physic_object->position += physic_object->velocity * time_step;
+            physic_object->velocity += time_step * physics_settings_.gravity;
         }
     }
 
@@ -312,71 +311,71 @@ namespace plaincraft_core
     {
         auto &size = tested_object->size;
         auto &position = tested_object->position;
+        auto radius = Max(size.x, size.y, size.z);
+
         auto block_size = Vector3d(1.0f, 1.0f, 1.0f);
-
-        auto p1 = position + Vector3d(+size.x / 2, +size.y / 2, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p2 = position + Vector3d(-size.x / 2, +size.y / 2, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p3 = position + Vector3d(+size.x / 2, -size.y / 2, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p4 = position + Vector3d(+size.x / 2, +size.y / 2, -size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p5 = position + Vector3d(-size.x / 2, -size.y / 2, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p6 = position + Vector3d(+size.x / 2, -size.y / 2, -size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p7 = position + Vector3d(-size.x / 2, +size.y / 2, -size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p8 = position + Vector3d(-size.x / 2, -size.y / 2, -size.z / 2) + predicted_move + block_size / 2.0f;
-
-        auto p9 = position + Vector3d(-size.x / 2, 0.0f, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p10 = position + Vector3d(+size.x / 2, 0.0f, +size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p11 = position + Vector3d(+size.x / 2, 0.0f, -size.z / 2) + predicted_move + block_size / 2.0f;
-        auto p12 = position + Vector3d(-size.x / 2, 0.0f, -size.z / 2) + predicted_move + block_size / 2.0f;
-
-        Vector3d bounding_points[] = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12};
-
-        auto &grid = map_->GetGrid();
 
         auto result = std::set<std::shared_ptr<Block>>();
 
-        for (auto point : bounding_points)
+        auto &grid = map_->GetGrid();
+        auto grid_x = grid[0][0]->GetPositionX();
+        auto grid_z = grid[0][0]->GetPositionZ();
+
+        Vector3d broadPhaseBoxMin = Vector3d(
+            predicted_move.x > 0 ? position.x : position.x + predicted_move.x,
+            predicted_move.y > 0 ? position.y : position.y + predicted_move.y,
+            predicted_move.z > 0 ? position.z : position.z + predicted_move.z
+        ) - Vector3d(size.x / 2, size.y / 2, size.z / 2);
+
+        Vector3d broadPhaseBoxMax = Vector3d(
+            predicted_move.x > 0 ? position.x + predicted_move.x : position.x,
+            predicted_move.y > 0 ? position.y + predicted_move.y : position.y,
+            predicted_move.z > 0 ? position.z + predicted_move.z : position.z
+        ) + Vector3d(size.x / 2, size.y / 2, size.z / 2);
+
+        auto chunk_size = static_cast<int32_t>(Chunk::chunk_size);
+
+        for(int32_t x = static_cast<int32_t>(position.x) - radius; x <= static_cast<int32_t>(position.x) + radius; ++x)
         {
-            if (point.y > Chunk::chunk_height)
-                continue;
-
-            auto pos_x = static_cast<int32_t>(point.x);
-            auto pos_y = static_cast<int32_t>(point.y);
-            auto pos_z = static_cast<int32_t>(point.z);
-            auto chunk_size = static_cast<int32_t>(Chunk::chunk_size);
-            auto x = pos_x / chunk_size - (pos_x % chunk_size < 0 ? 1 : 0);
-            auto y = static_cast<int32_t>(point.y) / static_cast<int32_t>(Chunk::chunk_height);
-            auto z = pos_z / chunk_size - (pos_z % chunk_size < 0 ? 1 : 0);
-
-            auto grid_x = grid[0][0]->GetPositionX();
-            auto grid_z = grid[0][0]->GetPositionZ();
-            auto chunk_x = x - grid[0][0]->GetPositionX();
-            auto chunk_z = z - grid[0][0]->GetPositionZ();
-
-            auto block_x = pos_x % static_cast<int32_t>(Chunk::chunk_size);
-            auto block_y = pos_y % static_cast<int32_t>(Chunk::chunk_height);
-            auto block_z = pos_z % static_cast<int32_t>(Chunk::chunk_size);
-
-            if (block_x < 0)
+            for(int32_t y = static_cast<int32_t>(position.y) - radius; y <= static_cast<int32_t>(position.y) + radius; ++y)
             {
-                block_x += static_cast<int32_t>(Chunk::chunk_size) - 1;
+                for(int32_t z = static_cast<int32_t>(position.z) - radius; z <= static_cast<int32_t>(position.z) + radius; ++z)
+                {
+                    int32_t x_grid_alligned = x < 0 ? (x - chunk_size + 1) / chunk_size : x / chunk_size;
+                    int32_t z_grid_alligned = z < 0 ? (z - chunk_size + 1) / chunk_size : z / chunk_size;
+                    auto chunk_x = x_grid_alligned - grid[0][0]->GetPositionX();
+                    auto chunk_z = z_grid_alligned - grid[0][0]->GetPositionZ();
+
+                    auto block_x = (x % chunk_size + chunk_size) % chunk_size;
+                    auto block_y = y % Chunk::chunk_height;
+                    auto block_z = (z % chunk_size + chunk_size) % chunk_size;
+
+                    Vector3d block_position(x_grid_alligned * chunk_size + block_x, block_y, z_grid_alligned * chunk_size + block_z);
+
+                    if(block_position.x + block_size.x / 2 < broadPhaseBoxMin.x || block_position.x - block_size.x / 2 > broadPhaseBoxMax.x
+                        || block_position.y + block_size.y / 2 < broadPhaseBoxMin.y || block_position.y - block_size.y / 2 > broadPhaseBoxMax.y
+                        || block_position.z + block_size.z / 2 < broadPhaseBoxMin.z || block_position.z - block_size.z / 2 > broadPhaseBoxMax.z
+                    ) 
+                    {
+                        continue;
+                    }
+
+                    if(block_x < 0 || block_x >= chunk_size || block_y < 0 || block_y >= Chunk::chunk_height || block_z < 0 || block_z >= chunk_size)
+                    {
+                        printf("Warning: block out of range (%d, %d, %d)\n", block_x, block_y, block_z);
+                        continue;
+                    }
+
+                    auto chunk = grid[chunk_x][chunk_z];
+                    auto& block_data = chunk->GetData();
+
+                    auto block = block_data[block_x][block_y][block_z];
+                    if(block != nullptr)
+                    {
+                        result.insert(block);
+                    }
+                }
             }
-
-            if (block_z < 0)
-            {
-                block_z += static_cast<int32_t>(Chunk::chunk_size) - 1;
-            }
-
-            auto chunk = grid[chunk_x][chunk_z];
-            auto& block_data = chunk->GetData();
-
-            auto block = block_data[block_x][block_y][block_z];
-
-            if (block == nullptr)
-            {
-                continue;
-            }
-
-            result.insert(block);
         }
         return result;
     }
