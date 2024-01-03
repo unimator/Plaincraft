@@ -22,6 +22,8 @@ add_subdirectory("Dependencies/glm")
 add_subdirectory("Dependencies/GLEW")
 add_subdirectory("Dependencies/GLFW")
 
+set(BINARY_OUTPUT "Runner")
+
 # Include sub-projects.
 add_subdirectory("Common")
 add_subdirectory("Core")
@@ -29,4 +31,4 @@ add_subdirectory("RenderEngine")
 add_subdirectory("RenderEngine_Vulkan")
 add_subdirectory("Runner")
 add_subdirectory("Dear_ImGui")
-
+add_subdirectory("Assets")

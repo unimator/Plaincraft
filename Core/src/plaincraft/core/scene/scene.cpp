@@ -115,21 +115,6 @@ namespace plaincraft_core
 		return nullptr;
 	}
 
-	void Scene::UpdateFrame(float interpolation_factor)
-	{
-		std::lock_guard lg(scene_access_);
-		auto l = snprintf(nullptr, 0, "%zd", game_objects_list_.size());
-		std::vector<char> buf(l + 1);
-		snprintf(&buf[0], l + 1, "%zd", game_objects_list_.size());
-		LOGVALUE("Entities count", std::string(buf.begin(), buf.end()));
-	}
-
-	void Scene::RenderFrame(plaincraft_render_engine::FrameConfig frame_config)
-	{
-		std::lock_guard lg(scene_access_);
-		render_engine_->RenderFrame(frame_config);
-	}
-
 	SceneEventsHandler &Scene::GetSceneEventsHandler()
 	{
 		return scene_events_handler_;

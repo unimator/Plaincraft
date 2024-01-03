@@ -56,8 +56,6 @@ namespace plaincraft_core
 	class Scene
 	{
 	private:
-		// std::unordered_map<std::shared_ptr<GameObject>, rp3d::Transform> previous_transforms_;
-
 		mutable std::mutex scene_access_;
 		std::shared_ptr<RenderEngine> render_engine_;
 		mutable std::list<std::shared_ptr<GameObject>> game_objects_list_;
@@ -75,11 +73,6 @@ namespace plaincraft_core
 		std::shared_ptr<GameObject> FindGameObjectByName(const std::string& name) const;
 
 		SceneEventsHandler& GetSceneEventsHandler();
-		
-		void UpdateFrame(float interpolation_factor = 0.0f);
-		void RenderFrame(plaincraft_render_engine::FrameConfig frame_config);
-
-	private:
 	};
 }
 

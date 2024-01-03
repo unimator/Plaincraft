@@ -78,27 +78,27 @@ namespace plaincraft_core
 	{
 		std::shared_ptr<GameObject> player;
 
-		auto sphere_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/sphere_half.obj");
+		auto sphere_model_obj = read_file_raw("Assets/Models/sphere_half.obj");
 		std::shared_ptr<Mesh> sphere_mesh = std::move(Mesh::LoadWavefront(sphere_model_obj.data()));
 		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
 		models_cache_.Store("sphere_half", std::move(sphere_model));
 
-		auto capsule_model_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/capsule_half.obj");
+		auto capsule_model_obj = read_file_raw("Assets/Models/capsule_half.obj");
 		std::shared_ptr<Mesh> capsule_mesh = std::move(Mesh::LoadWavefront(capsule_model_obj.data()));
 		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
 		models_cache_.Store("capsule_half", std::move(capsule_model));
 
-		auto player_cuboid_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/player_cuboid.obj");
+		auto player_cuboid_obj = read_file_raw("Assets/Models/player_cuboid.obj");
 		std::shared_ptr<Mesh> player_cuboid_mesh = std::move(Mesh::LoadWavefront(player_cuboid_obj.data()));
 		auto player_cuboid_model = render_engine_->GetModelsFactory()->CreateModel(player_cuboid_mesh);
 		models_cache_.Store("player_cuboid", std::move(player_cuboid_model));
 
-		auto cube_obj = read_file_raw("F:/Projekty/Plaincraft/Assets/Models/cube.obj");
+		auto cube_obj = read_file_raw("Assets/Models/cube.obj");
 		std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_obj.data()));
 		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
 		models_cache_.Store("cube", std::move(cube_model));
 
-		auto minecraft_texture_image = load_bmp_image_from_file("F:/Projekty/Plaincraft/Assets/Textures/minecraft-textures.png");
+		auto minecraft_texture_image = load_bmp_image_from_file("Assets/Textures/minecraft-textures.png");
 		auto minecraft_texture = render_engine_->GetTexturesFactory()->LoadFromImage(minecraft_texture_image);
 		textures_cache_.Store("minecraft-texture", std::move(minecraft_texture));
 
@@ -124,8 +124,8 @@ namespace plaincraft_core
 
 		scene_.AddGameObject(player);
 
-		camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
-		// camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
+		// camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
 		auto map = std::make_shared<Map>();
 		map->SetName("map");
@@ -140,7 +140,6 @@ namespace plaincraft_core
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
-		loop_events_handler_.loop_event_trigger.AddSubscription(&scene_, &Scene::UpdateFrame);
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
 	}
 
@@ -203,46 +202,6 @@ namespace plaincraft_core
 			Profiler::Start(info);
 			while (accumulator >= physics_time_step_)
 			{
-				auto position = player->GetPhysicsObject()->position;
-				auto pos_x = static_cast<int32_t>(position.x);
-				auto pos_z = static_cast<int32_t>(position.z);
-				auto chunk_size = static_cast<int32_t>(Chunk::chunk_size);
-				auto x = pos_x / chunk_size - (pos_x % chunk_size < 0 ? 1 : 0);
-				auto z = pos_z / chunk_size - (pos_z % chunk_size < 0 ? 1 : 0);
-				// auto z = static_cast<int32_t>(position.z) / static_cast<int32_t>(Chunk::chunk_size);
-
-				auto grid = map->GetGrid();
-
-				for (auto i = 0; i < Map::render_diameter; ++i)
-				{
-					for (auto j = 0; j < Map::render_diameter; ++j)
-					{
-						grid[i][j]->SetColor(Vector3d(1.0f, 1.0f, 1.0f));
-					}
-				}
-
-				auto chunk_x = x - grid[0][0]->GetPositionX();
-				auto chunk_z = z - grid[0][0]->GetPositionZ();
-
-				// if(chunk_x < 0 || chunk_x >= Map::render_diameter || chunk_z < 0 || chunk_z >= Map::render_diameter)
-				// {
-				// 	break;
-				// }
-
-				// One chunk of "safety"
-				if (chunk_x < 1 || chunk_x >= Map::render_diameter - 1 || chunk_z < 1 || chunk_z >= Map::render_diameter - 1)
-				{
-					break;
-				}
-
-				auto &chunk = grid[chunk_x][chunk_z];
-				chunk->SetColor(Vector3d(1.0f, 0.0f, 0.0f));
-
-				const char *format = "(%d, %d)";
-				std::vector<char> buffer(1024);
-				std::snprintf(&buffer[0], buffer.size(), format, chunk_x + grid[0][0]->GetPositionX(), chunk_z + grid[0][0]->GetPositionZ());
-				LOGVALUE("Active chunk", std::string(buffer.begin(), buffer.end()));
-
 				physics_engine_->Step(physics_time_step_);
 				accumulator -= physics_time_step_;
 			}
@@ -265,8 +224,7 @@ namespace plaincraft_core
 				global_state_.GetDebugInfoVisibility()};
 			MEASURE("graphics render",
 					{
-						// render_engine_->RenderFrame(frame_config);
-						scene_.RenderFrame(frame_config);
+						render_engine_->RenderFrame(frame_config);
 					})
 
 			last_cursor_position_x_ = cursor_position_x;
