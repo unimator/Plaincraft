@@ -24,41 +24,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
+#include "../common.hpp"
+#include "../models/model.hpp"
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+namespace plaincraft_render_engine
+{
+	class Drawable
+	{
+	private:
+		std::weak_ptr<Model> model_;
+		std::weak_ptr<Texture> texture_;
+		Vector3d position_;
+		Vector3d color_;
+		Quaternion rotation_;
+		float scale_ = 1.0f;
+		
+		glm::mat4 model_matrix_;
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
+	public:
+		void SetModel(std::shared_ptr<Model> model);
+		std::weak_ptr<Model> GetModel() const;
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
-    public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
+		void SetTexture(std::shared_ptr<Texture> texture);
+		std::weak_ptr<Texture> GetTexture() const;
 
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
+		void SetScale(float scale);
+		float GetScale() const;
 
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
+		void SetRotation(Quaternion rotation);
+		Quaternion GetRotation() const;
 
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
+		void SetPosition(Vector3d position);
+		Vector3d GetPosition() const;
 
-    private:
-    };
+		void SetColor(Vector3d color);
+		Vector3d GetColor() const;
 
+		glm::mat4 GetModelMatrix() const;
+
+	private:
+		void CalculateModelMatrix();
+	};
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+
+#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE

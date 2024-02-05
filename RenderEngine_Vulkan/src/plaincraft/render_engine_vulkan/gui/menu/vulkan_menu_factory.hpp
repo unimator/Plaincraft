@@ -24,41 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU_FACTORY
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU_FACTORY
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
 #include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+#include <memory>
 
-namespace plaincraft_render_engine_vulkan {
+namespace plaincraft_render_engine_vulkan
+{
     using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
+    class VulkanMenuFactory : public MenuFactory
+    {
     public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
-
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
-
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
-
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
-
-    private:
+        std::unique_ptr<Menu> CreateMenu() override;
     };
-
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU_FACTORY

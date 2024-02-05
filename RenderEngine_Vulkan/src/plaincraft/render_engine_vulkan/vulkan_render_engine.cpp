@@ -29,12 +29,14 @@ SOFTWARE.
 #include "vulkan_render_engine.hpp"
 #include "textures/vulkan_textures_factory.hpp"
 #include "shader/vulkan_shader.hpp"
-#include "rendering/scene/vertex_utils.hpp"
+#include "scene/vertex_utils.hpp"
 #include "window/vulkan_window.hpp"
 #include "utils/queue_family.hpp"
 #include "swapchain/vulkan_swapchain.hpp"
-#include "rendering/scene/vulkan_scene_renderer.hpp"
-#include "rendering/vulkan_renderer_frame_config.hpp"
+#include "scene/vulkan_scene_renderer.hpp"
+#include "vulkan_renderer_frame_config.hpp"
+#include "gui/font/vulkan_fonts_factory.hpp"
+#include "gui/menu/vulkan_menu_factory.hpp"
 #include "models/vulkan_models_factory.hpp"
 #include <stdexcept>
 #include <iostream>
@@ -58,6 +60,8 @@ namespace plaincraft_render_engine_vulkan
 		CreateSyncObjects();
 
 		textures_factory_ = std::make_shared<VulkanTexturesFactory>(device_);
+		menu_factory_ = std::make_shared<VulkanMenuFactory>();
+		fonts_factory_ = std::make_shared<VulkanFontsFactory>(device_);
 	}
 
 	VulkanRenderEngine::~VulkanRenderEngine()
@@ -221,28 +225,43 @@ namespace plaincraft_render_engine_vulkan
 		render_pass_begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
 		render_pass_begin_info.pClearValues = clear_values.data();
 
-		auto vulkan_renderer = GetVulkanRenderer();
+		auto vulkan_scene_renderer = GetVulkanSceneRenderer();
 
 		VulkanRendererFrameConfig vulkan_renderer_frame_config{
 			frame_config,
 			command_buffer,
 			image_index};
 
-		vulkan_renderer->BeginFrame(vulkan_renderer_frame_config);
+		vulkan_scene_renderer->BeginFrame(vulkan_renderer_frame_config);
 
+		std::unique_lock drawables_lock(drawables_list_mutex_);
 		for (auto i = 0; i < drawables_list_.size(); ++i)
 		{
 			auto &drawable = drawables_list_[i];
-			scene_renderer_->Batch(drawable);
+			vulkan_scene_renderer->Batch(drawable);
 		}
+		drawables_lock.unlock();
 
 		vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
-		vulkan_renderer->Render();
-		vulkan_renderer->EndFrame();
-		vulkan_renderer->HasRendered();
+		vulkan_scene_renderer->Render();
+		vulkan_scene_renderer->EndFrame();
+		vulkan_scene_renderer->HasRendered();
 
-		gui_renderer_->Render(vulkan_renderer_frame_config);
+		auto vulkan_gui_renderer = GetVulkanGuiRenderer();
+
+		vulkan_gui_renderer->BeginFrame(vulkan_renderer_frame_config);
+
+		std::unique_lock widgets_lock(widgets_list_mutex_);
+		for (auto &widget : widgets_list_)
+		{
+			vulkan_gui_renderer->Batch(widget);
+		}
+		widgets_lock.unlock();
+
+		vulkan_gui_renderer->Render();
+		vulkan_gui_renderer->EndFrame();
+		vulkan_gui_renderer->HasRendered();
 
 		vkCmdEndRenderPass(command_buffer);
 

@@ -11,6 +11,24 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/descriptors/vulkan_descriptor_writer.hpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.cpp
     src/plaincraft/render_engine_vulkan/device/vulkan_device.hpp
+    src/plaincraft/render_engine_vulkan/gui/font/vulkan_font.cpp
+    src/plaincraft/render_engine_vulkan/gui/font/vulkan_font.hpp
+    src/plaincraft/render_engine_vulkan/gui/font/vulkan_fonts_factory.cpp
+    src/plaincraft/render_engine_vulkan/gui/font/vulkan_fonts_factory.hpp
+    src/plaincraft/render_engine_vulkan/gui/menu/vulkan_menu_factory.cpp
+    src/plaincraft/render_engine_vulkan/gui/menu/vulkan_menu_factory.hpp
+    src/plaincraft/render_engine_vulkan/gui/menu/vulkan_menu.cpp
+    src/plaincraft/render_engine_vulkan/gui/menu/vulkan_menu.hpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.cpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.hpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.cpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.hpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.cpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.hpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/vulkan_diagnostic_widget.cpp
+    src/plaincraft/render_engine_vulkan/gui/windows/diagnostic/vulkan_diagnostic_widget.hpp
+    src/plaincraft/render_engine_vulkan/gui/vulkan_gui_renderer.cpp
+    src/plaincraft/render_engine_vulkan/gui/vulkan_gui_renderer.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.cpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance_config.hpp
     src/plaincraft/render_engine_vulkan/instance/vulkan_instance.cpp
@@ -32,25 +50,12 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline_config.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.hpp
     src/plaincraft/render_engine_vulkan/pipeline/vulkan_pipeline.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_logger.hpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_profiling.hpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/sections/vulkan_diagnostic_widget_section.hpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/windows/diagnostic/vulkan_diagnostic_widget.hpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_renderer.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_renderer.hpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_widget.cpp
-    src/plaincraft/render_engine_vulkan/rendering/gui/vulkan_gui_widget.hpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vertex_utils.cpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vertex_utils.hpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_drawable.hpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer_config.hpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer.cpp
-    src/plaincraft/render_engine_vulkan/rendering/scene/vulkan_scene_renderer.hpp
-    src/plaincraft/render_engine_vulkan/rendering/vulkan_renderer_frame_config.hpp
+    src/plaincraft/render_engine_vulkan/scene/vertex_utils.cpp
+    src/plaincraft/render_engine_vulkan/scene/vertex_utils.hpp
+    src/plaincraft/render_engine_vulkan/scene/vulkan_drawable.hpp
+    src/plaincraft/render_engine_vulkan/scene/vulkan_scene_renderer_config.hpp
+    src/plaincraft/render_engine_vulkan/scene/vulkan_scene_renderer.cpp
+    src/plaincraft/render_engine_vulkan/scene/vulkan_scene_renderer.hpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.cpp
     src/plaincraft/render_engine_vulkan/shader/vulkan_shader.hpp
     src/plaincraft/render_engine_vulkan/swapchain/vulkan_swapchain.cpp
@@ -66,6 +71,7 @@ PRIVATE
     src/plaincraft/render_engine_vulkan/common.hpp
     src/plaincraft/render_engine_vulkan/vulkan_render_engine.cpp
     src/plaincraft/render_engine_vulkan/vulkan_render_engine.hpp
+    src/plaincraft/render_engine_vulkan/vulkan_renderer_frame_config.hpp
 )
 
 find_package(Vulkan)

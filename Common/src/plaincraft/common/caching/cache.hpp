@@ -31,7 +31,7 @@ SOFTWARE.
 #include <map>
 #include <memory>
 
-namespace plaincraft_core
+namespace plaincraft_common
 {
     template <typename TCacheObject, typename TKey = std::string>
     class Cache
@@ -42,8 +42,20 @@ namespace plaincraft_core
     public:
         Cache() {}
 
-        Cache(const Cache& other) = delete;
-        Cache& operator=(const Cache& other) = delete;
+        Cache(const Cache &other) = delete;
+        Cache &operator=(const Cache &other) = delete;
+
+        Cache(Cache &&other)
+        {
+            data_ = std::move(other.data_);
+        }
+
+        Cache &operator=(Cache&& other) 
+        {
+            data_ = std::move(other.data_);
+            
+            return *this;
+        }
 
         void Store(TKey key, std::shared_ptr<TCacheObject> value)
         {

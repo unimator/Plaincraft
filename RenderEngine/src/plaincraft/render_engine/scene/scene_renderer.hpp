@@ -24,17 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "vulkan_gui_widget.hpp"
+#ifndef PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+#define PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
 
-namespace plaincraft_render_engine_vulkan
-{
-        bool VulkanGuiWidget::IsVisible() const 
-        {
-            return is_visible_;
-        }
+#include "../common.hpp"
+#include "../camera/camera.hpp"
+#include "drawable.hpp"
 
-        void VulkanGuiWidget::SetIsVisible(bool is_visible)
-        {
-            is_visible_ = is_visible;
-        }
+namespace plaincraft_render_engine {
+	class SceneRenderer
+	{
+	protected:
+		std::vector<std::shared_ptr<Drawable>> drawables_list_;
+		std::shared_ptr<Camera> camera_;
+
+		SceneRenderer(std::shared_ptr<Camera> camera);
+
+	public:
+
+		virtual ~SceneRenderer();
+
+		virtual void Render() = 0;
+		virtual void Batch(std::shared_ptr<Drawable> drawable);
+		void HasRendered();
+	};
 }
+#endif // PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER

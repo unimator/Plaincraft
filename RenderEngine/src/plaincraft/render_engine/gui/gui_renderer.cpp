@@ -24,41 +24,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#include "gui_renderer.hpp"
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+namespace plaincraft_render_engine
+{
+    GuiRenderer::~GuiRenderer() {}
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
+    void GuiRenderer::Batch(std::shared_ptr<GuiWidget> widget)
+    {
+        widgets_list_.push_back(std::move(widget));
+    }
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
-    public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
-
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
-
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
-
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
-
-    private:
-    };
-
+    void GuiRenderer::HasRendered()
+    {
+        widgets_list_.clear();
+    }
 }
-
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL

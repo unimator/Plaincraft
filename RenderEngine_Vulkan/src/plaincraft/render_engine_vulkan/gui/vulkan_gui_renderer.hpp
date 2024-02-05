@@ -24,15 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_RENDERER
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_RENDERER
 
-#include "../../instance/vulkan_instance.hpp"
-#include "../../device/vulkan_device.hpp"
+#include "../instance/vulkan_instance.hpp"
+#include "../device/vulkan_device.hpp"
 #include "../scene/vulkan_drawable.hpp"
-#include "../../window/vulkan_window.hpp"
+#include "../window/vulkan_window.hpp"
 #include "../vulkan_renderer_frame_config.hpp"
-#include "vulkan_gui_widget.hpp"
+#include "menu/vulkan_menu.hpp"
+#include <plaincraft_render_engine.hpp>
 
 #include <vulkan/vulkan.h>
 #include <imgui.h>
@@ -42,7 +43,9 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-    class VulkanGuiRenderer final
+    using namespace plaincraft_render_engine;
+
+    class VulkanGuiRenderer final : public GuiRenderer
     {
     private:
         std::reference_wrapper<const VulkanDevice> vulkan_device_;
@@ -52,32 +55,36 @@ namespace plaincraft_render_engine_vulkan
 
         VkDescriptorPool imgui_descriptor_pool_;
 
-        std::vector<std::unique_ptr<VulkanGuiWidget>> debug_widgets_;
+        std::shared_ptr<ImFont> standard_font_;
+        std::shared_ptr<ImFont> details_font_;
 
         bool are_debug_widgets_visible_;
 
+        VulkanRendererFrameConfig *frame_config_{nullptr};
+
     public:
         VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
-                         const VulkanDevice &vulkan_device,
-                         std::shared_ptr<VulkanWindow> vulkan_window,
-                         VkRenderPass render_pass);
+                          const VulkanDevice &vulkan_device,
+                          std::shared_ptr<VulkanWindow> vulkan_window,
+                          VkRenderPass render_pass);
         VulkanGuiRenderer(const VulkanInstance &vulkan_instance,
-                         const VulkanDevice &vulkan_device,
-                         std::shared_ptr<VulkanWindow> vulkan_window,
-                         VkRenderPass render_pass,
-                         std::unique_ptr<VulkanGuiRenderer> old_context);
+                          const VulkanDevice &vulkan_device,
+                          std::shared_ptr<VulkanWindow> vulkan_window,
+                          VkRenderPass render_pass,
+                          std::unique_ptr<VulkanGuiRenderer> old_context);
 
-        VulkanGuiRenderer(const VulkanGuiRenderer& other) = delete;
-        VulkanGuiRenderer& operator=(const VulkanGuiRenderer& other) = delete;
+        VulkanGuiRenderer(const VulkanGuiRenderer &other) = delete;
+        VulkanGuiRenderer &operator=(const VulkanGuiRenderer &other) = delete;
         ~VulkanGuiRenderer();
 
-        void Render(VulkanRendererFrameConfig vulkan_renderer_frame_config);
+        void BeginFrame(VulkanRendererFrameConfig &frame_config);
+        void EndFrame();
+        void Render();
 
-        void SetDebugWidgetsVisibility(bool are_debug_widgets_visible);
     private:
         void Initialize(VkRenderPass render_pass);
         void UploadFonts();
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_CONTEXT
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_RENDERER

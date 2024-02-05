@@ -24,22 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../../common.hpp"
+#include "vulkan_font.hpp"
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VERTEX
-#define PLAINCRAFT_RENDER_ENGINE_VERTEX
+namespace plaincraft_render_engine_vulkan
+{
+    VulkanFont::VulkanFont(ImFont* im_font)
+        : im_font_(im_font)
+    {
+    }
 
-namespace plaincraft_render_engine {
-
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 color;
-		glm::vec3 normal;
-		glm::vec2 text_coordinates;
-
-		bool operator==(const Vertex& other) const;
-	};
+    VulkanFont::~VulkanFont()
+    {
+    }
+    
+    ImFont* VulkanFont::GetImFont()
+    {
+        return im_font_;
+    }
 }
-
-#endif // PLAINCRAFT_RENDER_ENGINE_VERTEX

@@ -34,11 +34,9 @@ namespace plaincraft_render_engine
 		: window_(std::move(window)),
 		  camera_(std::make_shared<Camera>())
 	{
-		textures_repository_ = std::make_shared<TexturesRepository>();
-
 		camera_->direction = glm::vec3(0.0f, 0.0f, -1.0f);
 		camera_->up = glm::vec3(0.0f, 1.0f, 0.0f);
-		camera_->fov = 45.0f;
+		camera_->fov = 50.0f;
 	}
 
 	RenderEngine::~RenderEngine(){
@@ -48,30 +46,38 @@ namespace plaincraft_render_engine
 	RenderEngine::RenderEngine(RenderEngine &&other)
 		: window_(std::move(other.window_))
 	{
-		this->camera_ = other.camera_;
-		other.camera_ = nullptr;
+		this->camera_ = std::move(other.camera_);
+		this->scene_renderer_ = std::move(other.scene_renderer_);
+		this->gui_renderer_ = std::move(other.gui_renderer_);
 
+		std::lock_guard drawables_lg(drawables_list_mutex_);
 		this->drawables_list_ = std::move(other.drawables_list_);
 
-		this->textures_factory_ = other.textures_factory_;
-		other.textures_factory_ = nullptr;
-
-		this->textures_repository_ = other.textures_repository_;
-		other.textures_repository_ = nullptr;
+		std::lock_guard widgets_lg(widgets_list_mutex_);
+		this->widgets_list_ = std::move(other.widgets_list_);
+		
+		this->textures_factory_ = std::move(other.textures_factory_);
+		this->models_factory_ = std::move(other.models_factory_);
+		this->menu_factory_ = std::move(other.menu_factory_);
+		this->fonts_factory_ = std::move(other.fonts_factory_);
 	}
 
 	RenderEngine &RenderEngine::operator=(RenderEngine &&other)
 	{
-		this->camera_ = other.camera_;
-		other.camera_ = nullptr;
+		this->camera_ = std::move(other.camera_);
+		this->scene_renderer_ = std::move(other.scene_renderer_);
+		this->gui_renderer_ = std::move(other.gui_renderer_);
 
+		std::lock_guard drawables_lg(drawables_list_mutex_);
 		this->drawables_list_ = std::move(other.drawables_list_);
 
-		this->textures_factory_ = other.textures_factory_;
-		other.textures_factory_ = nullptr;
-
-		this->textures_repository_ = other.textures_repository_;
-		other.textures_repository_ = nullptr;
+		std::lock_guard widgets_lg(widgets_list_mutex_);
+		this->widgets_list_ = std::move(other.widgets_list_);
+		
+		this->textures_factory_ = std::move(other.textures_factory_);
+		this->models_factory_ = std::move(other.models_factory_);
+		this->menu_factory_ = std::move(other.menu_factory_);
+		this->fonts_factory_ = std::move(other.fonts_factory_);
 
 		return *this;
 	}
@@ -86,30 +92,54 @@ namespace plaincraft_render_engine
 		return textures_factory_;
 	}
 
-	std::shared_ptr<TexturesRepository> RenderEngine::GetTexturesRepository()
-	{
-		return textures_repository_;
-	}
-
 	std::shared_ptr<ModelsFactory> RenderEngine::GetModelsFactory()
 	{
 		return models_factory_;
 	}
 
+	std::shared_ptr<MenuFactory> RenderEngine::GetMenuFactory()
+	{
+		return menu_factory_;
+	}
+
+	std::shared_ptr<FontsFactory> RenderEngine::GetFontsFactory()
+	{
+		return fonts_factory_;
+	}
+
 	void RenderEngine::AddDrawable(std::shared_ptr<Drawable> drawable_to_add)
 	{
-		//std::cout << "Add [" << drawable_to_add->GetPosition().x << " ; " << drawable_to_add->GetPosition().z << "]" << std::endl;
+		std::lock_guard guard(drawables_list_mutex_);
 		drawables_list_.push_back(drawable_to_add);
 	}
 
 	void RenderEngine::RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove)
 	{
-		//std::cout << "Remove [" << drawable_to_remove->GetPosition().x << " ; " << drawable_to_remove->GetPosition().z << "]" << std::endl;
+		std::lock_guard guard(drawables_list_mutex_);
 		drawables_list_.erase(std::remove_if(drawables_list_.begin(),
 											 drawables_list_.end(),
 											 [&](std::shared_ptr<Drawable> const &drawable)
 											 {
 												 return drawable == drawable_to_remove;
-											 }), drawables_list_.end());
+											 }),
+							  drawables_list_.end());
+	}
+
+	void RenderEngine::AddWidget(std::shared_ptr<GuiWidget> widget_to_add)
+	{
+		std::lock_guard guard(widgets_list_mutex_);
+		widgets_list_.push_back(widget_to_add);
+	}
+
+	void RenderEngine::RemoveWidget(std::shared_ptr<GuiWidget> widget_to_remove)
+	{
+		std::lock_guard guard(widgets_list_mutex_);
+		widgets_list_.erase(std::remove_if(widgets_list_.begin(),
+										   widgets_list_.end(),
+										   [&](std::shared_ptr<GuiWidget> const &widget)
+										   {
+											   return widget == widget_to_remove;
+										   }),
+							widgets_list_.end());
 	}
 }

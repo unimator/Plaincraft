@@ -24,26 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_WIDGET
+#ifndef PLAINCRAFT_RENDER_ENGINE_FONTS_FACTORY
+#define PLAINCRAFT_RENDER_ENGINE_FONTS_FACTORY
 
-#include <plaincraft_render_engine.hpp>
+#include "font.hpp"
+#include <vector>
+#include <memory>
+#include <utility>
+#include <string>
 
-namespace plaincraft_render_engine_vulkan
+namespace plaincraft_render_engine
 {
-    using namespace plaincraft_render_engine;
-
-    class VulkanGuiWidget
+    class FontsFactory
     {
-    protected:
-        bool is_visible_ = true;
-
     public:
-        virtual void Draw(const FrameConfig& frame_config) = 0;
-
-        bool IsVisible() const;
-        void SetIsVisible(bool is_visible);
+        virtual std::vector<std::pair<std::string, std::shared_ptr<Font>>> LoadStandardFonts() = 0;
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_GUI_WIDGET
+#endif // PLAINCRAFT_RENDER_ENGINE_FONTS_FACTORY

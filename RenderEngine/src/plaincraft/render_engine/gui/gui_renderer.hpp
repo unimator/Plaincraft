@@ -3,7 +3,7 @@ MIT License
 
 This file is part of Plaincraft (https://github.com/unimator/Plaincraft)
 
-Copyright (c) 2020 Marcin Górka
+Copyright (c) 2020 Marcin Gorka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,27 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX
-#define PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX
+#ifndef PLAINCRAFT_RENDER_ENGINE_GUI_RENDERER
+#define PLAINCRAFT_RENDER_ENGINE_GUI_RENDERER
 
-#include "../../common.hpp"
+#include "gui_widget.hpp"
+#include <vector>
+#include <memory>
 
-namespace plaincraft_render_engine {
-	struct ModelViewProjectionMatrix {
-		glm::mat4 model;
-		glm::mat4 view;
-		glm::mat4 projection;
-		glm::vec3 color;
-	};
+namespace plaincraft_render_engine
+{
+    class GuiRenderer
+    {
+        protected:
+            std::vector<std::shared_ptr<GuiWidget>> widgets_list_;
 
-	struct ViewProjectionMatrix {
-		glm::mat4 view;
-		glm::mat4 projection;
-	};
+        public: 
+            virtual ~GuiRenderer();
 
-	struct ModelMatrix {
-		glm::mat4 model;
-		glm::vec3 color;
-	};
+            virtual void Render() = 0;
+            void Batch(std::shared_ptr<GuiWidget> widget);
+            void HasRendered();
+    };
 }
-#endif // PLAINCRAFT_RENDER_ENGINE_MVP_MATRIX
+
+#endif // PLAINCRAFT_RENDER_ENGINE_GUI_RENDERER

@@ -38,8 +38,8 @@ SOFTWARE.
 #include "memory/vulkan_texture.hpp"
 #include "memory/vulkan_image.hpp"
 #include "models/vulkan_model.hpp"
-#include "rendering/scene/vulkan_scene_renderer.hpp"
-#include "rendering/gui/vulkan_gui_renderer.hpp"
+#include "scene/vulkan_scene_renderer.hpp"
+#include "gui/vulkan_gui_renderer.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <vulkan/vulkan.h>
 
@@ -80,7 +80,8 @@ namespace plaincraft_render_engine_vulkan {
 
 	private:
 		auto GetVulkanWindow() -> std::shared_ptr<VulkanWindow> { return std::static_pointer_cast<VulkanWindow>(window_); } 
-		auto GetVulkanRenderer() -> VulkanSceneRenderer* { return dynamic_cast<VulkanSceneRenderer*>(scene_renderer_.get()); }
+		auto GetVulkanSceneRenderer() -> VulkanSceneRenderer* { return dynamic_cast<VulkanSceneRenderer*>(scene_renderer_.get()); }
+		auto GetVulkanGuiRenderer() -> VulkanGuiRenderer* { return dynamic_cast<VulkanGuiRenderer*>(gui_renderer_.get()); }
         
         auto GetCommandBuffer(uint32_t index) -> VkCommandBuffer { return command_buffers_[index]; }
 

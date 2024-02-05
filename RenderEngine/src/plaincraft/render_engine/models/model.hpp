@@ -27,7 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_MODEL
 #define PLAINCRAFT_RENDER_ENGINE_MODEL
 
-#include "../rendering/scene/objects/mesh.hpp"
+#include "../scene/objects/mesh.hpp"
 #include "../texture/texture.hpp"
 
 namespace plaincraft_render_engine {

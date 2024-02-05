@@ -24,50 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#define PLAINCRAFT_RENDER_ENGINE_DRAWABLE
-#include "../../common.hpp"
-#include "../../models/model.hpp"
+#include "vulkan_menu.hpp"
 
-namespace plaincraft_render_engine
+namespace plaincraft_render_engine_vulkan
 {
-	class Drawable
-	{
-	private:
-		std::weak_ptr<Model> model_;
-		std::weak_ptr<Texture> texture_;
-		Vector3d position_;
-		Vector3d color_;
-		Quaternion rotation_;
-		float scale_ = 1.0f;
-		
-		glm::mat4 model_matrix_;
+    VulkanMenu::VulkanMenu() {}
 
-	public:
-		void SetModel(std::shared_ptr<Model> model);
-		std::weak_ptr<Model> GetModel() const;
+    VulkanMenu::~VulkanMenu()
+    {
+    }
 
-		void SetTexture(std::shared_ptr<Texture> texture);
-		std::weak_ptr<Texture> GetTexture() const;
+    void VulkanMenu::Draw(const FrameConfig &frame_config)
+    {
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
 
-		void SetScale(float scale);
-		float GetScale() const;
+        // ImGui::SetNextWindowPos({static_cast<float>(GetPositionX()), static_cast<float>(GetPositionY())});
+        // ImGui::SetNextWindowSize({static_cast<float>(GetWidth()), static_cast<float>(GetHeight())});
+        // ImGui::SetNextWindowBgAlpha(0.0f);
+        // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-		void SetRotation(Quaternion rotation);
-		Quaternion GetRotation() const;
+        // ImGui::PushFont(font_.get());
+        // ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+        // for(auto& button : GetButtons())
+        // {
 
-		void SetPosition(Vector3d position);
-		Vector3d GetPosition() const;
-
-		void SetColor(Vector3d color);
-		Vector3d GetColor() const;
-
-		glm::mat4 GetModelMatrix() const;
-
-	private:
-		void CalculateModelMatrix();
-	};
+        // }
+    }
 }
-
-
-#endif // PLAINCRAFT_RENDER_ENGINE_DRAWABLE

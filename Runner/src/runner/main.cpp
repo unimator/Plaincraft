@@ -14,7 +14,7 @@ int main()
 	try
 	{
 		auto scale = 1.6f;
-		auto window = std::make_shared<VulkanWindow>("Plaincraft", static_cast<uint32_t>(800 * scale), static_cast<uint32_t>(600 * scale));
+		auto window = std::make_shared<VulkanWindow>("Plaincraft", static_cast<uint32_t>(1024 * scale), static_cast<uint32_t>(768 * scale));
 		auto render_engine = std::make_unique<VulkanRenderEngine>(window);
 
 		auto game = Game(std::move(render_engine));

@@ -24,49 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_POLYGON
-#define PLAINCRAFT_RENDER_ENGINE_POLYGON
+#ifndef PLAINCRAFT_RENDER_ENGINE_GUI_WIDGET
+#define PLAINCRAFT_RENDER_ENGINE_GUI_WIDGET
 
-#include <lib/tiny_obj_loader.h>
-
-#include "../../../common.hpp"
-#include "../vertex.hpp"
-
-#include <cstdint>
-#include <string>
+#include "../frame_config.hpp"
 
 namespace plaincraft_render_engine
 {
-	class Mesh
-	{
-	protected:
-		Mesh() {}
-		std::vector<Vertex> vertices_;
-		std::vector<uint32_t> indices_;
+    class GuiWidget
+    {
+        protected: 
+            bool is_visible_;
+        
+        public:
+            virtual ~GuiWidget();
+            virtual void Draw(const FrameConfig& frame_config) = 0;
 
-	public:
-		Mesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> indices);
-
-		Mesh(const Mesh &other) = delete;
-		Mesh &operator=(const Mesh &other) = delete;
-
-		Mesh(Mesh &&other);
-		Mesh &operator=(Mesh &&other);
-
-		virtual ~Mesh(){};
-
-		const std::vector<Vertex> &GetVertices() const
-		{
-			return vertices_;
-		}
-
-		const std::vector<uint32_t> &GetIndices() const
-		{
-			return indices_;
-		}
-
-		static std::unique_ptr<Mesh> LoadWavefront(const char *data);
-	};
+            bool IsVisible() const;
+            void SetIsVisible(bool is_visible);
+    };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_POLYGON
+#endif // PLAINCRAFT_RENDER_ENGINE_GUI_WIDGET

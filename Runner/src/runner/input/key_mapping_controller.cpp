@@ -41,6 +41,7 @@ namespace plaincraft_runner
         key_mappings_.insert(std::make_pair(GLFW_KEY_SPACE, &KeyMappingController::Jump));
         key_mappings_.insert(std::make_pair(GLFW_KEY_LEFT_CONTROL, &KeyMappingController::Crouch));
         key_mappings_.insert(std::make_pair(GLFW_KEY_F1, &KeyMappingController::ToggleDebugInfo));
+        key_mappings_.insert(std::make_pair(GLFW_KEY_ESCAPE, &KeyMappingController::ToggleMenu));
     }
 
     std::shared_ptr<KeyMappingController> KeyMappingController::CreateInstance(Game &game_instance)
@@ -122,6 +123,15 @@ namespace plaincraft_runner
             auto &global_state = game_instance_.GetGlobalState();
             auto is_debug_info_visible = global_state.GetDebugInfoVisibility();
             global_state.SetDebugInfoVisibility(!is_debug_info_visible);
+        }
+    }
+
+    void KeyMappingController::ToggleMenu(int action, int mods)
+    {
+        if(action == GLFW_PRESS)
+        {
+            auto &global_state = game_instance_.GetGlobalState();
+
         }
     }
 

@@ -24,32 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IN_GAME_MENU
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IN_GAME_MENU
 
-#include "../../vulkan_gui_widget.hpp"
-#include "./sections/vulkan_diagnostic_widget_section.hpp"
-#include "./sections/vulkan_diagnostic_widget_profiling.hpp"
-#include "./sections/vulkan_diagnostic_widget_logger.hpp"
+#include "../vulkan_menu.hpp"
+
+#include <vulkan/vulkan.h>
+#include <imgui.h>
 #include <memory>
-#include <vector>
 
 namespace plaincraft_render_engine_vulkan
 {
-    class VulkanDiagnosticWidget final : public VulkanGuiWidget
+    class VulkanInGameMenu final : public VulkanMenu
     {
     private:
-        std::vector<std::unique_ptr<VulkanDiagnosticWidgetSection>> sections_;
+        std::shared_ptr<ImFont> standard_font_;
 
     public:
-        VulkanDiagnosticWidget();
+        VulkanInGameMenu(std::shared_ptr<ImFont> standard_font);
 
-        void Draw(const FrameConfig& frame_config) override;
-
-    private:
-        void RenderProfiling();
-        void RenderLogValues();
+        void Draw(const FrameConfig &frame_config) override;
     };
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_DIAGNOSTIC_WIDGET
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_IN_GAME_MENU

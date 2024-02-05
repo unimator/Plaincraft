@@ -29,13 +29,17 @@ SOFTWARE.
 
 #include "common.hpp"
 #include <GLFW/glfw3.h>
-#include "rendering/scene/drawable.hpp"
-#include "rendering/scene/scene_renderer.hpp"
+#include "scene/drawable.hpp"
+#include "scene/scene_renderer.hpp"
+#include "gui/menu/menu_factory.hpp"
+#include "gui/font/fonts_factory.hpp"
 #include "texture/textures_factory.hpp"
-#include "texture/textures_repository.hpp"
+#include "texture/texture.hpp"
 #include "window/window.hpp"
 #include "models/models_factory.hpp"
 #include "frame_config.hpp"
+#include "gui/gui_renderer.hpp"
+#include <mutex>
 
 namespace plaincraft_render_engine {
 	class RenderEngine {
@@ -45,26 +49,42 @@ namespace plaincraft_render_engine {
 
 		std::shared_ptr<Camera> camera_;
 		std::unique_ptr<SceneRenderer> scene_renderer_;
-		std::vector<std::shared_ptr<Drawable>> drawables_list_;
+		std::unique_ptr<GuiRenderer> gui_renderer_;
 
-		std::shared_ptr<TexturesRepository> textures_repository_;
+		std::vector<std::shared_ptr<Drawable>> drawables_list_;
+		std::mutex drawables_list_mutex_;
+
+		std::vector<std::shared_ptr<GuiWidget>> widgets_list_;
+		std::mutex widgets_list_mutex_;
+
 		std::shared_ptr<TexturesFactory> textures_factory_;
 		std::shared_ptr<ModelsFactory> models_factory_;
+		std::shared_ptr<MenuFactory> menu_factory_;
+		std::shared_ptr<FontsFactory> fonts_factory_;
 
 	public:
 		virtual ~RenderEngine();
 		
 		auto GetCamera() const -> const std::shared_ptr<Camera>& { return camera_; }
 		auto GetWindow() -> std::shared_ptr<Window> { return window_; }
-		
+
 		void AddDrawable(std::shared_ptr<Drawable> drawable_to_add);
 		void RemoveDrawable(std::shared_ptr<Drawable> drawable_to_remove);
 
+		void AddWidget(std::shared_ptr<GuiWidget> widget_to_add);
+		void RemoveWidget(std::shared_ptr<GuiWidget> widget_to_remove);
+		
 		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
-		std::shared_ptr<TexturesFactory> GetTexturesFactory();
-		std::shared_ptr<TexturesRepository> GetTexturesRepository();
-		std::shared_ptr<ModelsFactory> GetModelsFactory();
 
+
+		plaincraft_common::Cache<Texture>& GetTexturesRepository();
+		plaincraft_common::Cache<Font>& GetFontsRepository();
+
+		std::shared_ptr<TexturesFactory> GetTexturesFactory();
+		std::shared_ptr<ModelsFactory> GetModelsFactory();
+		std::shared_ptr<MenuFactory> GetMenuFactory();
+		std::shared_ptr<FontsFactory> GetFontsFactory();
+		
 		virtual void RenderFrame(const FrameConfig& frame_config) = 0;
 
 	protected:

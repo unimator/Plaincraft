@@ -35,6 +35,7 @@ namespace plaincraft_core
         private:
             bool is_debug_info_visible_;
             uint64_t seed_;
+            bool is_running_{true};
 
         public:
             void SetDebugInfoVisibility(bool is_visible);
@@ -42,6 +43,9 @@ namespace plaincraft_core
 
             void SetSeed(uint64_t seed);
             uint64_t GetSeed() const;
+
+            void SetIsRunning(bool is_running);
+            bool GetIsRunning() const;
     };
 }
 

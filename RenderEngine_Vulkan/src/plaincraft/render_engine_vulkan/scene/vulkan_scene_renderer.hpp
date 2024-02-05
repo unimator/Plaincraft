@@ -27,16 +27,16 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER
 #define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_SCENE_RENDERER
 
-#include "../../device/vulkan_device.hpp"
-#include "../../swapchain/vulkan_swapchain.hpp"
-#include "../../pipeline/vulkan_pipeline.hpp"
-#include "../../memory/vulkan_buffer.hpp"
-#include "../../models/vulkan_model.hpp"
+#include "../device/vulkan_device.hpp"
+#include "../swapchain/vulkan_swapchain.hpp"
+#include "../pipeline/vulkan_pipeline.hpp"
+#include "../memory/vulkan_buffer.hpp"
+#include "../models/vulkan_model.hpp"
 #include "../vulkan_renderer_frame_config.hpp"
-#include "../../descriptors/vulkan_descriptor_set_layout.hpp"
-#include "../../descriptors/vulkan_descriptor_pool.hpp"
-#include "../../descriptors/vulkan_descriptor_writer.hpp"
-#include "../../memory/vulkan_texture.hpp"
+#include "../descriptors/vulkan_descriptor_set_layout.hpp"
+#include "../descriptors/vulkan_descriptor_pool.hpp"
+#include "../descriptors/vulkan_descriptor_writer.hpp"
+#include "../memory/vulkan_texture.hpp"
 #include <unordered_map>
 #include <plaincraft_render_engine.hpp>
 #include <vector>
@@ -76,12 +76,12 @@ namespace plaincraft_render_engine_vulkan {
         ModelMatrix* model_memory_ = nullptr;
 
         std::vector<std::unique_ptr<VulkanBuffer>> view_projection_buffers_;
-		        
+
         std::vector<std::unique_ptr<VulkanImage>> texture_images_;
         std::vector<std::unique_ptr<VulkanImageView>> texture_images_views_;
         std::vector<std::unique_ptr<VulkanTexture>> textures_;
 
-        VulkanRendererFrameConfig* frame_config_ = nullptr;
+        VulkanRendererFrameConfig* frame_config_ {nullptr};
 
     public:
         VulkanSceneRenderer(VulkanDevice& device, VkRenderPass render_pass, VkExtent2D extent, size_t images_count, std::shared_ptr<Camera> camera);

@@ -50,6 +50,7 @@ namespace plaincraft_core {
 		
 		Cache<Model> models_cache_;
 		Cache<Texture> textures_cache_;
+		Cache<Font> fonts_cache_;
 		
 		LoopEventsHandler loop_events_handler_;
 		FpsCounter fps_counter_;

@@ -24,37 +24,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "global_state.hpp"
+#include "menu.hpp"
+#include <functional>
 
-namespace plaincraft_core 
+namespace plaincraft_render_engine
 {
-    void GlobalState::SetDebugInfoVisibility(bool is_visible)
+    Menu::Menu()
     {
-        is_debug_info_visible_ = is_visible;
     }
 
-    bool GlobalState::GetDebugInfoVisibility() const 
+    void Menu::AddButton(std::unique_ptr<MenuButton> button)
     {
-        return is_debug_info_visible_;
+        buttons_.push_back(std::move(button));
     }
 
-    void GlobalState::SetSeed(uint64_t seed)
+    std::vector<std::unique_ptr<MenuButton>> &Menu::GetButtons()
     {
-        seed_ = seed;
+        return buttons_;
     }
 
-    uint64_t GlobalState::GetSeed() const
+    void Menu::SetFont(std::shared_ptr<Font> font)
     {
-        return seed_;
+        font_ = font;
     }
 
-    void GlobalState::SetIsRunning(bool is_running)
+    std::shared_ptr<Font> Menu::GetFont() const
     {
-        is_running_ = is_running;
+        return font_;
     }
 
-    bool GlobalState::GetIsRunning() const
+    void Menu::SetPositionX(uint32_t position_x)
     {
-        return is_running_;
+        position_x_ = position_x;
+    }
+
+    uint32_t Menu::GetPositionX() const
+    {
+        return position_x_;
+    }
+
+    void Menu::SetPositionY(uint32_t position_y)
+    {
+        position_y_ = position_y;
+    }
+
+    uint32_t Menu::GetPositionY() const
+    {
+        return position_y_;
+    }
+
+    void Menu::SetWidth(uint32_t width)
+    {
+        width_ = width;
+    }
+
+    uint32_t Menu::GetWidth() const
+    {
+        return width_;
+    }
+
+    void Menu::SetHeight(uint32_t height)
+    {
+        height_ = height;
+    }
+
+    uint32_t Menu::GetHeight() const
+    {
+        return height_;
     }
 }

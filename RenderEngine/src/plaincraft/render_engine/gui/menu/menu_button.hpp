@@ -24,29 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
-#define PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+#ifndef PLAINCRAFT_RENDER_ENGINE_MENU_BUTTON
+#define PLAINCRAFT_RENDER_ENGINE_MENU_BUTTON
 
 #include "../../common.hpp"
-#include "../../camera/camera.hpp"
-#include "drawable.hpp"
+#include <string>
+#include <memory>
 
-namespace plaincraft_render_engine {
-	class SceneRenderer
-	{
-	protected:
-		std::vector<std::shared_ptr<Drawable>> drawables_list_;
-		std::shared_ptr<Camera> camera_;
+namespace plaincraft_render_engine
+{
+    class MenuButton
+    {
+    private:
+        const std::string name_;
 
-		SceneRenderer(std::shared_ptr<Camera> camera);
+    public:
+        MenuButton(const std::string name);
 
-	public:
+        MenuButton(const MenuButton& other) = delete;
 
-		virtual ~SceneRenderer();
-
-		virtual void Render() = 0;
-		virtual void Batch(std::shared_ptr<Drawable> drawable);
-		void HasRendered();
-	};
+        plaincraft_common::EventTrigger<> on_button_click;
+    };
 }
-#endif // PLAINCRAFT_RENDER_ENGINE_SCENE_RENDERER
+
+#endif // PLAINCRAFT_RENDER_ENGINE_MENU_BUTTON

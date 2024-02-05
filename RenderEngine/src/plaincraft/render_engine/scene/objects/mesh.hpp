@@ -24,41 +24,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_POLYGON
+#define PLAINCRAFT_RENDER_ENGINE_POLYGON
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+#include <lib/tiny_obj_loader.h>
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
+#include "../../common.hpp"
+#include "../vertex.hpp"
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
-    public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
+#include <cstdint>
+#include <string>
 
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
+namespace plaincraft_render_engine
+{
+	class Mesh
+	{
+	protected:
+		Mesh() {}
+		std::vector<Vertex> vertices_;
+		std::vector<uint32_t> indices_;
 
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
+	public:
+		Mesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> indices);
 
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
+		Mesh(const Mesh &other) = delete;
+		Mesh &operator=(const Mesh &other) = delete;
 
-    private:
-    };
+		Mesh(Mesh &&other);
+		Mesh &operator=(Mesh &&other);
 
+		virtual ~Mesh(){};
+
+		const std::vector<Vertex> &GetVertices() const
+		{
+			return vertices_;
+		}
+
+		const std::vector<uint32_t> &GetIndices() const
+		{
+			return indices_;
+		}
+
+		static std::unique_ptr<Mesh> LoadWavefront(const char *data);
+	};
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_POLYGON

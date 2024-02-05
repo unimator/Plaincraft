@@ -141,6 +141,18 @@ namespace plaincraft_core
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
+
+		auto fonts_factory = render_engine_->GetFontsFactory();
+		auto default_fonts = fonts_factory->LoadStandardFonts();
+
+		auto menu_factory = render_engine_->GetMenuFactory();
+		std::shared_ptr<Menu> in_game_menu = menu_factory->CreateMenu();
+		in_game_menu->AddButton(std::make_unique<MenuButton>("Quit"));
+		in_game_menu->SetPositionX(10);
+		in_game_menu->SetPositionY(10);
+		in_game_menu->SetWidth(200);
+		in_game_menu->SetHeight(200);
+		render_engine_->AddWidget(in_game_menu);
 	}
 
 	void Game::Run()
@@ -256,7 +268,7 @@ namespace plaincraft_core
 			sprintf(buffer, "%u", fps_counter_.GetFramesPerSecond());
 			LOGVALUE("FPS", buffer);
 
-		} while (!should_close && glfwWindowShouldClose(window_instance) == 0);
+		} while (global_state_.GetIsRunning() && glfwWindowShouldClose(window_instance) == 0);
 	}
 
 	WindowEventsHandler &Game::GetWindowEventsHandler()

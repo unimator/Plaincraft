@@ -24,41 +24,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_MENU
+#define PLAINCRAFT_RENDER_ENGINE_MENU
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+#include "menu_button.hpp"
+#include "../gui_widget.hpp"
+#include "../font/font.hpp"
+#include <vector>
+#include <functional>
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
+namespace plaincraft_render_engine
+{
+    class Menu : public GuiWidget
+    {
     private:
-        const VulkanDevice& device_;
+        std::vector<std::unique_ptr<MenuButton>> buttons_;
+        std::shared_ptr<Font> font_;
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
+        uint32_t position_x_;
+        uint32_t position_y_;
+        uint32_t width_;
+        uint32_t height_;
+
     public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
+        Menu();
 
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
+        void AddButton(std::unique_ptr<MenuButton> button);
 
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
+        std::vector<std::unique_ptr<MenuButton>> &GetButtons();
 
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
+        void SetFont(std::shared_ptr<Font> font);
+        std::shared_ptr<Font> GetFont() const;
 
-    private:
+        void SetPositionX(uint32_t position_x);
+        uint32_t GetPositionX() const;
+
+        void SetPositionY(uint32_t position_y);
+        uint32_t GetPositionY() const;
+
+        void SetWidth(uint32_t width);
+        uint32_t GetWidth() const;
+
+        void SetHeight(uint32_t height);
+        uint32_t GetHeight() const;
     };
-
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_MENU

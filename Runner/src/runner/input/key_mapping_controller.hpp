@@ -70,6 +70,7 @@ namespace plaincraft_runner
         void Jump(int action, int mods);
         void Crouch(int action, int mods);
         void ToggleDebugInfo(int action, int mods);
+        void ToggleMenu(int action, int mods);
     };
 }
 

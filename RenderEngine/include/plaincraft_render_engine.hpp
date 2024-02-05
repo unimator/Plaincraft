@@ -31,19 +31,28 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/frame_config.hpp"
 
 #include "../src/plaincraft/render_engine/texture/texture.hpp"
-#include "../src/plaincraft/render_engine/texture/textures_repository.hpp"
 #include "../src/plaincraft/render_engine/texture/textures_factory.hpp"
 
 #include "../src/plaincraft/render_engine/utils/image/image.hpp"
 #include "../src/plaincraft/render_engine/camera/camera.hpp"
 
-#include "../src/plaincraft/render_engine/rendering/scene/objects/cube.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/objects/no_draw.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/objects/mesh.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/scene_renderer.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/vertex.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/mvp_matrix.hpp"
-#include "../src/plaincraft/render_engine/rendering/scene/drawable.hpp"
+#include "../src/plaincraft/render_engine/gui/font/font.hpp"
+#include "../src/plaincraft/render_engine/gui/font/fonts_factory.hpp"
+
+#include "../src/plaincraft/render_engine/gui/menu/menu_button.hpp"
+#include "../src/plaincraft/render_engine/gui/menu/menu_factory.hpp"
+#include "../src/plaincraft/render_engine/gui/menu/menu.hpp"
+
+#include "../src/plaincraft/render_engine/gui/gui_renderer.hpp"
+#include "../src/plaincraft/render_engine/gui/gui_widget.hpp"
+
+#include "../src/plaincraft/render_engine/scene/objects/cube.hpp"
+#include "../src/plaincraft/render_engine/scene/objects/no_draw.hpp"
+#include "../src/plaincraft/render_engine/scene/objects/mesh.hpp"
+#include "../src/plaincraft/render_engine/scene/scene_renderer.hpp"
+#include "../src/plaincraft/render_engine/scene/vertex.hpp"
+#include "../src/plaincraft/render_engine/scene/mvp_matrix.hpp"
+#include "../src/plaincraft/render_engine/scene/drawable.hpp"
 
 #include "../src/plaincraft/render_engine/window/window.hpp"
 

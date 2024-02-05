@@ -7,23 +7,35 @@ PRIVATE
     src/plaincraft/render_engine/camera/camera.hpp
     src/plaincraft/render_engine/events/window_events_handler.cpp
     src/plaincraft/render_engine/events/window_events_handler.hpp
+    src/plaincraft/render_engine/gui/font/font.hpp
+    src/plaincraft/render_engine/gui/font/fonts_factory.hpp
+    src/plaincraft/render_engine/gui/menu/menu_button.cpp
+    src/plaincraft/render_engine/gui/menu/menu_button.hpp
+    src/plaincraft/render_engine/gui/menu/menu_factory.cpp
+    src/plaincraft/render_engine/gui/menu/menu_factory.hpp
+    src/plaincraft/render_engine/gui/menu/menu.cpp
+    src/plaincraft/render_engine/gui/menu/menu.hpp
+    src/plaincraft/render_engine/gui/gui_renderer.cpp
+    src/plaincraft/render_engine/gui/gui_renderer.hpp
+    src/plaincraft/render_engine/gui/gui_widget.cpp
+    src/plaincraft/render_engine/gui/gui_widget.hpp
     src/plaincraft/render_engine/models/model.cpp
     src/plaincraft/render_engine/models/model.hpp
     src/plaincraft/render_engine/models/models_factory.cpp
     src/plaincraft/render_engine/models/models_factory.hpp
-    src/plaincraft/render_engine/rendering/scene/objects/cube.cpp
-    src/plaincraft/render_engine/rendering/scene/objects/cube.hpp
-    src/plaincraft/render_engine/rendering/scene/objects/mesh.cpp
-    src/plaincraft/render_engine/rendering/scene/objects/mesh.hpp
-    src/plaincraft/render_engine/rendering/scene/objects/no_draw.cpp
-    src/plaincraft/render_engine/rendering/scene/objects/no_draw.hpp
-    src/plaincraft/render_engine/rendering/scene/drawable.cpp
-    src/plaincraft/render_engine/rendering/scene/drawable.hpp
-    src/plaincraft/render_engine/rendering/scene/mvp_matrix.hpp
-    src/plaincraft/render_engine/rendering/scene/scene_renderer.cpp
-    src/plaincraft/render_engine/rendering/scene/scene_renderer.hpp
-    src/plaincraft/render_engine/rendering/scene/vertex.cpp
-    src/plaincraft/render_engine/rendering/scene/vertex.hpp
+    src/plaincraft/render_engine/scene/objects/cube.cpp
+    src/plaincraft/render_engine/scene/objects/cube.hpp
+    src/plaincraft/render_engine/scene/objects/mesh.cpp
+    src/plaincraft/render_engine/scene/objects/mesh.hpp
+    src/plaincraft/render_engine/scene/objects/no_draw.cpp
+    src/plaincraft/render_engine/scene/objects/no_draw.hpp
+    src/plaincraft/render_engine/scene/drawable.cpp
+    src/plaincraft/render_engine/scene/drawable.hpp
+    src/plaincraft/render_engine/scene/mvp_matrix.hpp
+    src/plaincraft/render_engine/scene/scene_renderer.cpp
+    src/plaincraft/render_engine/scene/scene_renderer.hpp
+    src/plaincraft/render_engine/scene/vertex.cpp
+    src/plaincraft/render_engine/scene/vertex.hpp
     src/plaincraft/render_engine/texture/texture.hpp
     src/plaincraft/render_engine/texture/textures_factory.hpp
     src/plaincraft/render_engine/texture/textures_repository.cpp

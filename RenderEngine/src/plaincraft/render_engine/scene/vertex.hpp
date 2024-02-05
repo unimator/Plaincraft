@@ -24,41 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#include "../common.hpp"
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
-#include <plaincraft_render_engine.hpp>
-#include <vulkan/vulkan.h>
+#ifndef PLAINCRAFT_RENDER_ENGINE_VERTEX
+#define PLAINCRAFT_RENDER_ENGINE_VERTEX
 
-namespace plaincraft_render_engine_vulkan {
-    using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
+namespace plaincraft_render_engine {
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
-    public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
+	struct Vertex
+	{
+		glm::vec3 position;
+		glm::vec3 color;
+		glm::vec3 normal;
+		glm::vec2 text_coordinates;
 
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
-
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
-
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
-
-    private:
-    };
-
+		bool operator==(const Vertex& other) const;
+	};
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_VERTEX

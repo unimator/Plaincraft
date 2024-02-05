@@ -24,41 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
-#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#ifndef PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU
+#define PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU
 
-#include "../device/vulkan_device.hpp"
-#include "../memory/vulkan_buffer.hpp"
-#include "../scene/vulkan_drawable.hpp"
 #include <plaincraft_render_engine.hpp>
+
 #include <vulkan/vulkan.h>
+#include <imgui.h>
+#include <memory>
 
-namespace plaincraft_render_engine_vulkan {
+namespace plaincraft_render_engine_vulkan
+{
     using namespace plaincraft_render_engine;
-    
-    class VulkanModel : public Model, VulkanDrawable {
-    private:
-        const VulkanDevice& device_;
 
-        VulkanBuffer vertex_buffer_;
-        VulkanBuffer index_buffer_;
-    
+    class VulkanMenu : public Menu
+    {
     public:
-        VulkanModel(const VulkanDevice& device, std::shared_ptr<Mesh const> mesh);
-        virtual ~VulkanModel();
+        VulkanMenu();
+        virtual ~VulkanMenu();
 
-        VulkanModel(const VulkanModel& other) = delete;
-        VulkanModel& operator=(const VulkanModel& other) = delete;
-
-        VulkanModel(VulkanModel&& other);
-        VulkanModel& operator=(VulkanModel&& other);
-
-        void Bind(VkCommandBuffer command_buffer) override;
-        void Draw(VkCommandBuffer command_buffer) override;
-
-    private:
+        void Draw(const FrameConfig& frame_config) override;
     };
-
 }
 
-#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MODEL
+#endif // PLAINCRAFT_RENDER_ENGINE_VULKAN_VULKAN_MENU

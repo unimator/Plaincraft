@@ -43,6 +43,28 @@ namespace plaincraft_common
         std::vector<EventSubscriptionBasePointer> subscriptions_;
 
     public:
+        EventTrigger() {}
+        
+        EventTrigger(const EventTrigger& other) = delete;
+        EventTrigger& operator=(const EventTrigger& other) = delete;
+        
+        EventTrigger(EventTrigger&& other) noexcept
+        {
+            subscriptions_ = std::move(other.subscriptions_);
+        }
+        
+        EventTrigger& operator=(EventTrigger&& other) noexcept
+        {
+            if(this == &other)
+            {
+                return *this;
+            }
+
+            this->subscriptions_ = std::move(other.subscriptions_);
+
+            return *this;
+        }
+
         void Trigger(Args... args) 
         {
             for(auto& subscription : subscriptions_) 
