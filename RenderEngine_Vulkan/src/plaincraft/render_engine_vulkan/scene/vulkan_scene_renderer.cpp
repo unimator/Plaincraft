@@ -85,6 +85,11 @@ namespace plaincraft_render_engine_vulkan
 	{
 		SceneRenderer::Batch(drawable);
 
+		if(drawable->GetModel() == nullptr || drawable->GetTexture() == nullptr)
+		{
+			return;
+		}
+
 		if (frame_config_ == nullptr)
 		{
 			throw std::runtime_error("Frame has not begun recording");

@@ -35,10 +35,10 @@ namespace plaincraft_core
     class SimpleChunkBuilder : public ChunkBuilderBase
     {
     private:
-        Scene &scene_;
+        std::shared_ptr<Scene> scene_;
 
     public:
-        SimpleChunkBuilder(Scene &scene);
+        SimpleChunkBuilder(std::shared_ptr<Scene> scene);
 
         bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) override;
         bool DisposeChunkStep(std::shared_ptr<Chunk> chunk) override;

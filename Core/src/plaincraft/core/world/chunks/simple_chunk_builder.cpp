@@ -29,7 +29,7 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    SimpleChunkBuilder::SimpleChunkBuilder(Scene &scene) : scene_(scene)
+    SimpleChunkBuilder::SimpleChunkBuilder(std::shared_ptr<Scene> scene) : scene_(scene)
     {
     }
 
@@ -54,12 +54,12 @@ namespace plaincraft_core
 
     bool SimpleChunkBuilder::DisposeChunkStep(std::shared_ptr<Chunk> chunk)
     {
-        scene_.RemoveGameObject(chunk);
+        scene_->RemoveGameObject(chunk);
         auto &blocks = chunk->GetData();
         auto &block = blocks[8][15][8];
         if (block != nullptr)
         {
-            scene_.RemoveGameObject(block);
+            scene_->RemoveGameObject(block);
         }
         return true;
     }

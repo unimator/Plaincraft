@@ -62,6 +62,7 @@ namespace plaincraft_core
         player->SetPhysicsObject(player_physics_object);
 
         scene->AddGameObject(player);
+        scene->GetPhysicsEngine().AddObject(player_physics_object);
 
         return scene;
     }

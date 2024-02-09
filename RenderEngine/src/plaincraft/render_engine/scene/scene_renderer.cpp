@@ -6,6 +6,10 @@ namespace plaincraft_render_engine {
 	SceneRenderer::~SceneRenderer() {}
 
 	void SceneRenderer::Batch(std::shared_ptr<Drawable> drawable) {
+		if(drawable->GetModel() == nullptr || drawable->GetTexture() == nullptr)
+		{
+			return;
+		}
 		drawables_list_.push_back(drawable);
 	}
 
