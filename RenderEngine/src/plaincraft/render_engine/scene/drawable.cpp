@@ -34,7 +34,7 @@ namespace plaincraft_render_engine
 		model_ = model;
 	}
 
-	std::weak_ptr<Model> Drawable::GetModel() const
+	std::shared_ptr<Model> Drawable::GetModel() const
 	{
 		return model_;
 	}
@@ -44,7 +44,7 @@ namespace plaincraft_render_engine
 		texture_ = texture;
 	}
 
-	std::weak_ptr<Texture> Drawable::GetTexture() const
+	std::shared_ptr<Texture> Drawable::GetTexture() const
 	{
 		return texture_;
 	}

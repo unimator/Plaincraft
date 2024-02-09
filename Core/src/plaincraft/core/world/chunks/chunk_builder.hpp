@@ -49,7 +49,7 @@ namespace plaincraft_core
 		siv::PerlinNoise perlin_;
 
 	public:
-		Scene &scene_;
+		std::shared_ptr<Scene> scene_;
 
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_creation_datas_;
 		std::unordered_map<std::shared_ptr<Chunk>, ChunkProcessingData> chunk_disposal_datas_;
@@ -57,7 +57,7 @@ namespace plaincraft_core
 		std::mutex chunk_disposal_datas_mutex_;
 
 	public:
-		ChunkBuilder(Scene &scene, uint64_t seed);
+		ChunkBuilder(std::shared_ptr<Scene> scene, uint64_t seed);
 		virtual ~ChunkBuilder();
 
 		bool GenerateChunkStep(std::shared_ptr<Chunk> chunk) override;

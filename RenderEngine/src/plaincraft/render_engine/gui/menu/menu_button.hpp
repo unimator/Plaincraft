@@ -44,6 +44,8 @@ namespace plaincraft_render_engine
         MenuButton(const MenuButton& other) = delete;
 
         plaincraft_common::EventTrigger<> on_button_click;
+
+        const std::string &GetName() const;
     };
 }
 

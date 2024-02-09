@@ -24,44 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
-
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
-#include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder_base.hpp"
-#include "./chunks/chunks_processor.hpp"
-#include <vector>
-#include <functional>
-#include <memory>
-#include <tuple>
+#include "asset.hpp"
 
 namespace plaincraft_core
 {
-    class WorldGenerator final
-    {
-        std::shared_ptr<Scene> scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
+    std::map<std::string, Asset> model_assets = {
+        std::make_pair<std::string, Asset>("player_cuboid", {Asset::AssetType::Model, "Assets/Models/player_cuboid.obj", "player_cuboid"})};
 
-        ChunksProcessor chunks_processor_;
-
-    public:
-        WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                       std::unique_ptr<ChunkBuilderBase> chunk_builder,
-                       std::shared_ptr<Scene> scene,
-                       std::shared_ptr<Map> map,
-                       std::shared_ptr<GameObject> origin_entity);
-
-        void OnLoopFrameTick(float delta_time);
-
-    private:
-        void ReloadGrid();
-
-        void Log();
-    };
+    std::map<std::string, Asset> texture_assets = {
+        std::make_pair<std::string, Asset>("blocks", {Asset::AssetType::Texture, "Assets/Textures/block_textures.png", "blocks"})};
 }
-
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR

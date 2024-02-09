@@ -40,7 +40,8 @@ namespace plaincraft_render_engine
 	}
 
 	RenderEngine::~RenderEngine(){
-
+		std::lock_guard guard(drawables_list_mutex_);
+		drawables_list_.clear();
 	};
 
 	RenderEngine::RenderEngine(RenderEngine &&other)
@@ -87,22 +88,22 @@ namespace plaincraft_render_engine
 		glfwGetCursorPos(window_->GetInstance(), cursor_position_x, cursor_position_y);
 	}
 
-	std::shared_ptr<TexturesFactory> RenderEngine::GetTexturesFactory()
+	std::unique_ptr<TexturesFactory>& RenderEngine::GetTexturesFactory()
 	{
 		return textures_factory_;
 	}
 
-	std::shared_ptr<ModelsFactory> RenderEngine::GetModelsFactory()
+	std::unique_ptr<ModelsFactory>& RenderEngine::GetModelsFactory()
 	{
 		return models_factory_;
 	}
 
-	std::shared_ptr<MenuFactory> RenderEngine::GetMenuFactory()
+	std::unique_ptr<MenuFactory>& RenderEngine::GetMenuFactory()
 	{
 		return menu_factory_;
 	}
 
-	std::shared_ptr<FontsFactory> RenderEngine::GetFontsFactory()
+	std::unique_ptr<FontsFactory>& RenderEngine::GetFontsFactory()
 	{
 		return fonts_factory_;
 	}

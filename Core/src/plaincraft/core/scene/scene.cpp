@@ -43,8 +43,11 @@ namespace plaincraft_core
 {
 	using namespace plaincraft_render_engine;
 
-	Scene::Scene(std::shared_ptr<RenderEngine> render_engine)
-		: render_engine_(render_engine)
+	Scene::Scene(
+		std::shared_ptr<RenderEngine> render_engine,
+		PhysicsEngine::PhysicsSettings physics_settings,
+		std::shared_ptr<Map> map)
+		: render_engine_(render_engine), physics_engine_(PhysicsEngine(physics_settings, map))
 	{
 	}
 
@@ -118,5 +121,10 @@ namespace plaincraft_core
 	SceneEventsHandler &Scene::GetSceneEventsHandler()
 	{
 		return scene_events_handler_;
+	}
+
+	PhysicsEngine& Scene::GetPhysicsEngine()
+	{
+		return physics_engine_;
 	}
 }

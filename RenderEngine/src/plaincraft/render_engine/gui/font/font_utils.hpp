@@ -24,44 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
+#ifndef PLAINCRAFT_RENDER_ENGINE_FONT_UTILS
+#define PLAINCRAFT_RENDER_ENGINE_FONT_UTILS
 
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
-#include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder_base.hpp"
-#include "./chunks/chunks_processor.hpp"
-#include <vector>
-#include <functional>
+#include <cstdint>
+#include <string>
 #include <memory>
-#include <tuple>
+#include "font.hpp"
 
-namespace plaincraft_core
+namespace plaincraft_render_engine
 {
-    class WorldGenerator final
+    class FontUtils
     {
-        std::shared_ptr<Scene> scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
-
-        ChunksProcessor chunks_processor_;
-
     public:
-        WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                       std::unique_ptr<ChunkBuilderBase> chunk_builder,
-                       std::shared_ptr<Scene> scene,
-                       std::shared_ptr<Map> map,
-                       std::shared_ptr<GameObject> origin_entity);
-
-        void OnLoopFrameTick(float delta_time);
-
-    private:
-        void ReloadGrid();
-
-        void Log();
+        virtual float CalcStringWidth(std::string text, std::shared_ptr<Font> font) = 0;
+        virtual float CalcStringHeight(std::string text, std::shared_ptr<Font> font) = 0;
     };
 }
 
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR
+#endif // PLAINCRAFT_RENDER_ENGINE_FONT_UTILS

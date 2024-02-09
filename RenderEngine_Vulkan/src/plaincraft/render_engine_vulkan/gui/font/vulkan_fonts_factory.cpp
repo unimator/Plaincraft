@@ -26,13 +26,14 @@ SOFTWARE.
 
 #include "vulkan_fonts_factory.hpp"
 #include "vulkan_font.hpp"
+#include "vulkan_font_utils.hpp"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
 namespace plaincraft_render_engine_vulkan
 {
     VulkanFontsFactory::VulkanFontsFactory(const VulkanDevice &vulkan_device)
-        : vulkan_device_(vulkan_device)
+        : plaincraft_render_engine::FontsFactory(std::make_unique<VulkanFontUtils>()), vulkan_device_(vulkan_device)
     {
     }
 

@@ -27,15 +27,16 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_SCENE
 #define PLAINCRAFT_CORE_SCENE
 
-namespace plaincraft_core 
-{
-	class Scene;
-}
+// namespace plaincraft_core 
+// {
+// 	class Scene;
+// }
 
 #include "../common.hpp"
-#include "../utils/conversions.hpp"
 #include "../entities/game_object.hpp"
 #include "./events/scene_events_handler.hpp"
+#include "../physics/physics_engine.hpp"
+#include "../utils/conversions.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
 #include <mutex>
@@ -61,9 +62,11 @@ namespace plaincraft_core
 		mutable std::list<std::shared_ptr<GameObject>> game_objects_list_;
 
 		SceneEventsHandler scene_events_handler_;
+
+		PhysicsEngine physics_engine_;
 		
 	public:
-		Scene(std::shared_ptr<RenderEngine> render_engine);
+		Scene(std::shared_ptr<RenderEngine> render_engine, PhysicsEngine::PhysicsSettings physics_settings, std::shared_ptr<Map> map);
 		~Scene();
 
 		void AddGameObject(std::shared_ptr<GameObject> game_object_to_add);
@@ -73,6 +76,7 @@ namespace plaincraft_core
 		std::shared_ptr<GameObject> FindGameObjectByName(const std::string& name) const;
 
 		SceneEventsHandler& GetSceneEventsHandler();
+		PhysicsEngine& GetPhysicsEngine();
 	};
 }
 

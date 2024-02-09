@@ -27,17 +27,18 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_GAME
 #define PLAINCRAFT_CORE_GAME
 
-#include "common.hpp"
-#include "scene/scene.hpp"
+#include "assets/assets_manager.hpp"
 #include "camera_operators/camera_operator.hpp"
+#include "common.hpp"
 #include "events/loop_events_handler.hpp"
-#include "world/world_generator.hpp"
+#include "physics/physics_engine.hpp"
+#include "physics_optimization/active_objects_optimizer.hpp"
+#include "scene/scene.hpp"
+#include "state/global_state.hpp"
+#include "utils/fps_counter.hpp"
 #include "world/chunks/chunk_builder.hpp"
 #include "world/chunks/simple_chunk_builder.hpp"
-#include "physics_optimization/active_objects_optimizer.hpp"
-#include "utils/fps_counter.hpp"
-#include "state/global_state.hpp"
-#include "physics/physics_engine.hpp"
+#include "world/world_generator.hpp"
 #include <plaincraft_render_engine.hpp>
 
 namespace plaincraft_core {
@@ -46,22 +47,20 @@ namespace plaincraft_core {
 		GlobalState global_state_;
 
 		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
+		std::shared_ptr<Scene> scene_;
 		std::unique_ptr<CameraOperator> camera_operator_;
 		
-		Cache<Model> models_cache_;
-		Cache<Texture> textures_cache_;
 		Cache<Font> fonts_cache_;
+
+		AssetsManager assets_manager_;
 		
 		LoopEventsHandler loop_events_handler_;
 		FpsCounter fps_counter_;
 
 		float physics_time_step_ = 1.0f / 60.0f;
 
-		Scene scene_;
-		
 		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
-		std::unique_ptr<PhysicsEngine> physics_engine_;
 
 	public:
 		Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> renderEngine);

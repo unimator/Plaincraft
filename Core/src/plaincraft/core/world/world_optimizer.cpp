@@ -29,10 +29,9 @@ SOFTWARE.
 namespace plaincraft_core
 {
     WorldOptimizer::WorldOptimizer(std::shared_ptr<Map> map,
-                                   Cache<Model> &models_cache,
-                                   Cache<Texture> &textures_cache,
-                                   std::shared_ptr<ModelsFactory> models_factory)
-        : map_(map), models_cache_(models_cache), textures_cache_(textures_cache), models_factory_(models_factory)
+                                   AssetsManager &assets_manager,
+                                   ModelsFactory &models_factory)
+        : map_(map), assets_manager_(assets_manager), models_factory_(models_factory)
     {
     }
 
@@ -42,9 +41,9 @@ namespace plaincraft_core
         std::vector<uint32_t> indices;
 
         float r = static_cast<float>(1.f);
-		float g = static_cast<float>(1.f);
-		float b = static_cast<float>(1.f);
-		auto color = glm::vec3(r, g, b);
+        float g = static_cast<float>(1.f);
+        float b = static_cast<float>(1.f);
+        auto color = glm::vec3(r, g, b);
 
         for (auto x = 0; x < Chunk::chunk_size; ++x)
         {
@@ -62,8 +61,8 @@ namespace plaincraft_core
 
                     auto txt_u_factor = 16.0f / 384.0f;
                     auto txt_v_factor = 16.0f / 544.0f;
-                    auto& text_cood = block->GetTextureCoordinates();
-                    auto& [top, bottom, left, right, front, back] = text_cood;
+                    auto &text_cood = block->GetTextureCoordinates();
+                    auto &[top, bottom, left, right, front, back] = text_cood;
 
                     // X axis check
                     if (x == 0 || (x > 0 && chunk.blocks_[x - 1][y][z] == nullptr))
@@ -130,28 +129,19 @@ namespace plaincraft_core
         }
 
         auto mesh = std::make_shared<plaincraft_render_engine::Mesh>(std::move(vertices), std::move(indices));
-        if (models_cache_.Contains(chunk.GetName()))
-        {
-            models_cache_.Remove(chunk.GetName());
-        }
 
         auto drawable_position_x = Chunk::chunk_size * static_cast<float>(chunk.pos_x_);
         auto drawable_position_z = Chunk::chunk_size * static_cast<float>(chunk.pos_z_);
         chunk.GetDrawable()->SetPosition(Vector3d(drawable_position_x, 0, drawable_position_z));
         chunk.GetDrawable()->SetColor(color);
 
-        models_cache_.Store(chunk.GetName(), std::move(models_factory_->CreateModel(mesh)));
-        auto model = models_cache_.Fetch(chunk.GetName());
-        auto minecraft_texture = textures_cache_.Fetch("minecraft-texture");
-        chunk.GetDrawable()->SetModel(model);
-        chunk.GetDrawable()->SetTexture(minecraft_texture);
+        auto model = models_factory_.CreateModel(mesh);
+        auto blocks_texture = assets_manager_.GetTexture("blocks");
+        chunk.GetDrawable()->SetModel(std::move(model));
+        chunk.GetDrawable()->SetTexture(blocks_texture);
     }
 
-    void WorldOptimizer::DisposeChunk(Chunk& chunk)
+    void WorldOptimizer::DisposeChunk(Chunk &chunk)
     {
-        if (models_cache_.Contains(chunk.GetName()))
-        {
-            models_cache_.Remove(chunk.GetName());
-        }
     }
 }

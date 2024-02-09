@@ -29,6 +29,7 @@ SOFTWARE.
 
 #include "../entities/map/map.hpp"
 #include "../entities/map/chunk.hpp"
+#include "../assets/assets_manager.hpp"
 #include <optional>
 #include <functional>
 #include <plaincraft_common.hpp>
@@ -41,15 +42,13 @@ namespace plaincraft_core
     class WorldOptimizer
     {
         std::shared_ptr<Map> map_;
-        Cache<Model> &models_cache_;
-        Cache<Texture> &textures_cache_;
-        std::shared_ptr<ModelsFactory> models_factory_;
+        AssetsManager &assets_manager_;
+        ModelsFactory &models_factory_;
 
     public:
         WorldOptimizer(std::shared_ptr<Map> map,
-                       Cache<Model> &models_cache,
-                       Cache<Texture> &textures_cache,
-                       std::shared_ptr<ModelsFactory> models_factory);
+                       AssetsManager &assets_manager,
+                       ModelsFactory &models_factory);
 
         void OptimizeChunk(Chunk &chunk);
         void DisposeChunk(Chunk &chunk);

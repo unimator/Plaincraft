@@ -53,15 +53,13 @@ namespace plaincraft_render_engine_vulkan
 		  surface_(GetVulkanWindow()->CreateSurface(instance_.GetInstance())),
 		  device_(VulkanDevice(instance_, surface_))
 	{
-		models_factory_ = std::make_unique<VulkanModelsFactory>(VulkanModelsFactory(device_));
-
 		RecreateSwapChain();
-
 		CreateSyncObjects();
 
-		textures_factory_ = std::make_shared<VulkanTexturesFactory>(device_);
-		menu_factory_ = std::make_shared<VulkanMenuFactory>();
-		fonts_factory_ = std::make_shared<VulkanFontsFactory>(device_);
+		models_factory_ = std::make_unique<VulkanModelsFactory>(VulkanModelsFactory(device_));
+		textures_factory_ = std::make_unique<VulkanTexturesFactory>(device_);
+		menu_factory_ = std::make_unique<VulkanMenuFactory>();
+		fonts_factory_ = std::make_unique<VulkanFontsFactory>(device_);
 	}
 
 	VulkanRenderEngine::~VulkanRenderEngine()

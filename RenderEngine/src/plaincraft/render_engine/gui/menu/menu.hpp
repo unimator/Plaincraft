@@ -66,7 +66,7 @@ namespace plaincraft_render_engine
         uint32_t GetWidth() const;
 
         void SetHeight(uint32_t height);
-        uint32_t GetHeight() const;
+        uint32_t GetHeight() const;        
     };
 }
 

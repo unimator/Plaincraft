@@ -94,11 +94,11 @@ namespace plaincraft_render_engine_vulkan
 		auto &frame_descriptor_sets = descriptor_sets_[frame_config_->image_index];
 		auto &material_descriptor_set = frame_descriptor_sets.materials_descriptor_set;
 
-		if (!texture.expired() && !material_descriptor_set.contains(texture.lock()))
+		if (!material_descriptor_set.contains(texture) && texture != nullptr)
 		{
-			auto vulkan_texture = std::dynamic_pointer_cast<VulkanTexture>(texture.lock());
+			auto vulkan_texture = std::dynamic_pointer_cast<VulkanTexture>(texture);
 			auto texture_descriptor_set = CreateMaterialDescriptorSet(vulkan_texture->GetImageView().GetImageView(), vulkan_texture->GetSampler());
-			material_descriptor_set.insert(std::pair(texture.lock(), texture_descriptor_set));
+			material_descriptor_set.insert(std::pair(texture, texture_descriptor_set));
 		}
 	}
 
@@ -138,7 +138,7 @@ namespace plaincraft_render_engine_vulkan
 		for (auto &drawable : drawables_list_)
 		{
 			auto texture = drawable->GetTexture();
-			drawables_grouped[texture.lock()].push_back(*drawable);
+			drawables_grouped[texture].push_back(*drawable);
 		}
 
 		auto i = 0;
@@ -188,13 +188,7 @@ namespace plaincraft_render_engine_vulkan
 										1,
 										&dynamic_offset);
 
-				auto draw_model = drawable.get().GetModel();
-				if (draw_model.expired())
-				{
-					continue;
-				}
-
-				auto vulkan_model = std::dynamic_pointer_cast<VulkanModel>(draw_model.lock());
+				auto vulkan_model = std::dynamic_pointer_cast<VulkanModel>(drawable.get().GetModel());
 				vulkan_model->Bind(command_buffer);
 				vulkan_model->Draw(command_buffer);
 

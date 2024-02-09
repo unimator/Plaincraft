@@ -27,6 +27,7 @@ SOFTWARE.
 #ifndef PLAINCRAFT_RENDER_ENGINE_FONTS_FACTORY
 #define PLAINCRAFT_RENDER_ENGINE_FONTS_FACTORY
 
+#include "font_utils.hpp"
 #include "font.hpp"
 #include <vector>
 #include <memory>
@@ -37,7 +38,11 @@ namespace plaincraft_render_engine
 {
     class FontsFactory
     {
+    protected:
+        std::unique_ptr<FontUtils> font_utils_;
+
     public:
+        FontsFactory(std::unique_ptr<FontUtils> font_utils);
         virtual std::vector<std::pair<std::string, std::shared_ptr<Font>>> LoadStandardFonts() = 0;
     };
 }

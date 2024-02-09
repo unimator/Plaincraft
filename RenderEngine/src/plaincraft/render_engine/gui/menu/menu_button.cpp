@@ -29,4 +29,9 @@ SOFTWARE.
 namespace plaincraft_render_engine
 {
     MenuButton::MenuButton(const std::string name) : name_(name) {}
+
+    const std::string &MenuButton::GetName() const
+    {
+        return name_;
+    }
 }

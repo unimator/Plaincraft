@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include "vulkan_menu.hpp"
+#include "../font/vulkan_font.hpp"
 
 namespace plaincraft_render_engine_vulkan
 {
@@ -36,18 +37,24 @@ namespace plaincraft_render_engine_vulkan
 
     void VulkanMenu::Draw(const FrameConfig &frame_config)
     {
+        bool is_visible;
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
 
-        // ImGui::SetNextWindowPos({static_cast<float>(GetPositionX()), static_cast<float>(GetPositionY())});
-        // ImGui::SetNextWindowSize({static_cast<float>(GetWidth()), static_cast<float>(GetHeight())});
-        // ImGui::SetNextWindowBgAlpha(0.0f);
-        // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::SetNextWindowPos({static_cast<float>(GetPositionX()), static_cast<float>(GetPositionY())});
+        ImGui::SetNextWindowSize({static_cast<float>(GetWidth()), static_cast<float>(GetHeight())});
+        ImGui::SetNextWindowBgAlpha(0.0f);
 
-        // ImGui::PushFont(font_.get());
-        // ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-        // for(auto& button : GetButtons())
-        // {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushFont(std::static_pointer_cast<VulkanFont>(GetFont())->GetImFont());
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
-        // }
+        ImGui::Begin("Menu", &is_visible, window_flags);
+        for (auto &button : GetButtons())
+        {
+            ImGui::Button(button->GetName().c_str());
+        }
+        ImGui::End();
+        ImGui::PopFont();
+        ImGui::PopStyleVar();
     }
 }

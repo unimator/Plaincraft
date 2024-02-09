@@ -24,44 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
-
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
-#include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder_base.hpp"
-#include "./chunks/chunks_processor.hpp"
-#include <vector>
-#include <functional>
-#include <memory>
-#include <tuple>
+#include "assets_manager.hpp"
 
 namespace plaincraft_core
 {
-    class WorldGenerator final
+    AssetsManager::AssetsManager(std::shared_ptr<RenderEngine> render_engine) : render_engine_(render_engine) {}
+
+    std::shared_ptr<Model> AssetsManager::GetModel(std::string name)
     {
-        std::shared_ptr<Scene> scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
+        if (!models_cache_.Contains(name))
+        {
+            auto &asset = model_assets[name];
+            auto obj_file = read_file_raw(asset.path);
+            auto mesh = std::move(Mesh::LoadWavefront(obj_file.data()));
+            auto model = render_engine_->GetModelsFactory()->CreateModel(std::move(mesh));
+            models_cache_.Store(asset.name, std::move(model));
+        }
 
-        ChunksProcessor chunks_processor_;
+        return models_cache_.Fetch(name);
+    }
 
-    public:
-        WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                       std::unique_ptr<ChunkBuilderBase> chunk_builder,
-                       std::shared_ptr<Scene> scene,
-                       std::shared_ptr<Map> map,
-                       std::shared_ptr<GameObject> origin_entity);
+    std::shared_ptr<Texture> AssetsManager::GetTexture(std::string name)
+    {
+        if (!textures_cache_.Contains(name))
+        {
+            auto &asset = texture_assets[name];
+            auto image_file = load_bmp_image_from_file(asset.path);
+            auto texture = render_engine_->GetTexturesFactory()->LoadFromImage(image_file);
+            textures_cache_.Store(asset.name, std::move(texture));
+        }
 
-        void OnLoopFrameTick(float delta_time);
-
-    private:
-        void ReloadGrid();
-
-        void Log();
-    };
+        return textures_cache_.Fetch(name);
+    }
 }
-
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR

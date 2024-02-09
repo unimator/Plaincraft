@@ -69,7 +69,7 @@ namespace plaincraft_core
         std::unique_ptr<ChunkBuilderBase> chunk_builder_;
         std::unique_ptr<WorldOptimizer> world_optimizer_;
         Metric metric_;
-        std::reference_wrapper<Scene> scene_;
+        std::shared_ptr<Scene> scene_;
 
         std::list<std::shared_ptr<Chunk>> requested_chunks_;
         std::list<std::shared_ptr<Chunk>> rejected_chunks_;
@@ -94,7 +94,7 @@ namespace plaincraft_core
         ChunksProcessor(
             std::unique_ptr<ChunkBuilderBase> chunk_builder,
             std::unique_ptr<WorldOptimizer> world_optimizer,
-            Scene &scene,
+            std::shared_ptr<Scene> scene,
             Metric metric);
 
         ChunksProcessor(const ChunksProcessor &other) = delete;

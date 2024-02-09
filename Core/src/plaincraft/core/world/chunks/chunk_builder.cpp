@@ -36,7 +36,7 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-	ChunkBuilder::ChunkBuilder(Scene &scene,
+	ChunkBuilder::ChunkBuilder(std::shared_ptr<Scene> scene,
 							   uint64_t seed)
 		: scene_(scene),
 		  seed_(seed),
@@ -99,7 +99,7 @@ namespace plaincraft_core
 
 		if (i == 0 && j == 0 && k == 0)
 		{
-			scene_.RemoveGameObject(chunk);
+			scene_->RemoveGameObject(chunk);
 		}
 
 		auto &blocks = chunk->GetData();

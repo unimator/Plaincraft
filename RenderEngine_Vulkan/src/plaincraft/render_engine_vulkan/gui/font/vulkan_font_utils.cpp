@@ -24,44 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
+#include "vulkan_font_utils.hpp"
+#include "vulkan_font.hpp"
+#include <imgui.h>
 
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
-#include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder_base.hpp"
-#include "./chunks/chunks_processor.hpp"
-#include <vector>
-#include <functional>
-#include <memory>
-#include <tuple>
-
-namespace plaincraft_core
+namespace plaincraft_render_engine_vulkan
 {
-    class WorldGenerator final
+    float VulkanFontUtils::CalcStringWidth(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font)
     {
-        std::shared_ptr<Scene> scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
+        auto font_im = std::static_pointer_cast<VulkanFont>(font)->GetImFont();
 
-        ChunksProcessor chunks_processor_;
+        ImGui::PushFont(font_im);
+        auto result = ImGui::CalcTextSize(text.c_str()).x;
+        ImGui::PopFont();
 
-    public:
-        WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                       std::unique_ptr<ChunkBuilderBase> chunk_builder,
-                       std::shared_ptr<Scene> scene,
-                       std::shared_ptr<Map> map,
-                       std::shared_ptr<GameObject> origin_entity);
+        return result;
+    }
 
-        void OnLoopFrameTick(float delta_time);
+    float VulkanFontUtils::CalcStringHeight(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font)
+    {
+        auto font_im = std::static_pointer_cast<VulkanFont>(font)->GetImFont();
 
-    private:
-        void ReloadGrid();
+        ImGui::PushFont(font_im);
+        auto result = ImGui::CalcTextSize(text.c_str()).y;
+        ImGui::PopFont();
 
-        void Log();
-    };
+        return result;
+    }
 }
-
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR

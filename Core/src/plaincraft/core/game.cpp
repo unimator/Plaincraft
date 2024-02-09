@@ -24,27 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "game.hpp"
-#include "entities/game_object.hpp"
-#include "world/world_generator.hpp"
-#include "entities/map/map.hpp"
-#include "utils/conversions.hpp"
 #include "camera_operators/eyes/camera_operator_eyes.hpp"
 #include "camera_operators/follow/camera_operator_follow.hpp"
+#include "entities/game_object.hpp"
+#include "entities/map/map.hpp"
+#include "game.hpp"
+#include "initialization/scene_builder.hpp"
 #include "physics/physics_object.hpp"
-#include <iostream>
+#include "utils/conversions.hpp"
+#include "world/world_generator.hpp"
 #include <ctime>
-#include <string>
-#include <random>
 #include <exception>
-#include <typeinfo>
+#include <iostream>
+#include <random>
 #include <stdexcept>
+#include <string>
+#include <typeinfo>
 
 namespace plaincraft_core
 {
 	Game::Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine)
 		: render_engine_(std::move(render_engine)),
-		  scene_(Scene(render_engine_)),
+		  assets_manager_(render_engine_),
 		  fps_counter_(GetLoopEventsHandler())
 	{
 		std::random_device dev;
@@ -71,82 +72,35 @@ namespace plaincraft_core
 
 	Scene &Game::GetScene()
 	{
-		return scene_;
+		return *scene_;
 	}
 
 	void Game::Initialize()
 	{
-		std::shared_ptr<GameObject> player;
+		SceneBuilder scene_builder(render_engine_, assets_manager_);
+		scene_ = scene_builder.CreateScene();
 
-		auto sphere_model_obj = read_file_raw("Assets/Models/sphere_half.obj");
-		std::shared_ptr<Mesh> sphere_mesh = std::move(Mesh::LoadWavefront(sphere_model_obj.data()));
-		auto sphere_model = render_engine_->GetModelsFactory()->CreateModel(sphere_mesh);
-		models_cache_.Store("sphere_half", std::move(sphere_model));
-
-		auto capsule_model_obj = read_file_raw("Assets/Models/capsule_half.obj");
-		std::shared_ptr<Mesh> capsule_mesh = std::move(Mesh::LoadWavefront(capsule_model_obj.data()));
-		auto capsule_model = render_engine_->GetModelsFactory()->CreateModel(capsule_mesh);
-		models_cache_.Store("capsule_half", std::move(capsule_model));
-
-		auto player_cuboid_obj = read_file_raw("Assets/Models/player_cuboid.obj");
-		std::shared_ptr<Mesh> player_cuboid_mesh = std::move(Mesh::LoadWavefront(player_cuboid_obj.data()));
-		auto player_cuboid_model = render_engine_->GetModelsFactory()->CreateModel(player_cuboid_mesh);
-		models_cache_.Store("player_cuboid", std::move(player_cuboid_model));
-
-		auto cube_obj = read_file_raw("Assets/Models/cube.obj");
-		std::shared_ptr<Mesh> cube_mesh = std::move(Mesh::LoadWavefront(cube_obj.data()));
-		auto cube_model = render_engine_->GetModelsFactory()->CreateModel(cube_mesh);
-		models_cache_.Store("cube", std::move(cube_model));
-
-		auto minecraft_texture_image = load_bmp_image_from_file("Assets/Textures/minecraft-textures.png");
-		auto minecraft_texture = render_engine_->GetTexturesFactory()->LoadFromImage(minecraft_texture_image);
-		textures_cache_.Store("minecraft-texture", std::move(minecraft_texture));
-
-		player = std::make_shared<GameObject>();
-		player->SetName("player");
-
-		auto player_model = models_cache_.Fetch("player_cuboid");
-		auto drawable = std::make_shared<Drawable>();
-		drawable->SetModel(player_model);
-		drawable->SetTexture(textures_cache_.Fetch("minecraft-texture"));
-		drawable->SetScale(1.0f);
-		drawable->SetColor(Vector3d(1.0f, 1.0f, 1.0f));
-		player->SetDrawable(drawable);
-
-		auto player_physics_object = std::make_shared<PhysicsObject>();
-		auto player_position = Vector3d(8.0f, 55.0f, 16.0f);
-		auto player_size = Vector3d(0.8f, 1.8f, 0.8f);
-		player_physics_object->position = player_position;
-		player_physics_object->size = player_size;
-		player_physics_object->friction = 10.0f;
-		player_physics_object->type = PhysicsObject::ObjectType::Dynamic;
-		player->SetPhysicsObject(player_physics_object);
-
-		scene_.AddGameObject(player);
+		auto player = scene_->FindGameObjectByName("player");
 
 		// camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
 		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
-		auto map = std::make_shared<Map>();
-		map->SetName("map");
-		scene_.AddGameObject(map);
-		PhysicsEngine::PhysicsSettings physics_settings{Vector3d(0.0f, -9.81, 0.0f)};
-		physics_engine_ = std::make_unique<PhysicsEngine>(physics_settings, map);
-		physics_engine_->AddObject(player_physics_object);
+		auto map = std::dynamic_pointer_cast<Map>(scene_->FindGameObjectByName("map"));
 
 		auto seed = global_state_.GetSeed();
 		// auto chunk_builder = std::make_unique<SimpleChunkBuilder>(scene_);
 		auto chunk_builder = std::make_unique<ChunkBuilder>(scene_, seed);
-		auto world_optimizer = std::make_unique<WorldOptimizer>(map, models_cache_, textures_cache_, render_engine_->GetModelsFactory());
+		auto world_optimizer = std::make_unique<WorldOptimizer>(map, assets_manager_, *(render_engine_->GetModelsFactory()));
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
 
-		auto fonts_factory = render_engine_->GetFontsFactory();
+		auto &fonts_factory = render_engine_->GetFontsFactory();
 		auto default_fonts = fonts_factory->LoadStandardFonts();
 
-		auto menu_factory = render_engine_->GetMenuFactory();
+		auto &menu_factory = render_engine_->GetMenuFactory();
 		std::shared_ptr<Menu> in_game_menu = menu_factory->CreateMenu();
+		in_game_menu->SetFont(default_fonts[0].second);
 		in_game_menu->AddButton(std::make_unique<MenuButton>("Quit"));
 		in_game_menu->SetPositionX(10);
 		in_game_menu->SetPositionY(10);
@@ -197,8 +151,8 @@ namespace plaincraft_core
 		char buffer[0x20];
 		memset(buffer, 0, 0x20);
 
-		auto player = scene_.FindGameObjectByName("player");
-		auto map = std::dynamic_pointer_cast<Map>(scene_.FindGameObjectByName("map"));
+		auto player = scene_->FindGameObjectByName("player");
+		auto map = std::dynamic_pointer_cast<Map>(scene_->FindGameObjectByName("map"));
 
 		do
 		{
@@ -214,7 +168,7 @@ namespace plaincraft_core
 			Profiler::Start(info);
 			while (accumulator >= physics_time_step_)
 			{
-				physics_engine_->Step(physics_time_step_);
+				scene_->GetPhysicsEngine().Step(physics_time_step_);
 				accumulator -= physics_time_step_;
 			}
 			Profiler::End(info);

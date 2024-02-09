@@ -33,7 +33,7 @@ namespace plaincraft_core
 {
     WorldGenerator::WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
                                    std::unique_ptr<ChunkBuilderBase> world_generator,
-                                   Scene &scene,
+                                   std::shared_ptr<Scene> scene,
                                    std::shared_ptr<Map> map,
                                    std::shared_ptr<GameObject> origin_entity)
         : scene_(scene),

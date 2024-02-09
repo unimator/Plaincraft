@@ -24,44 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_WORLD_GENERATOR
-#define PLAINCRAFT_CORE_WORLD_GENERATOR
+#ifndef PLAINCRAFT_CORE_SCENE_BUILDER
+#define PLAINCRAFT_CORE_SCENE_BUILDER
 
-#include "../entities/map/map.hpp"
-#include "../entities/game_object.hpp"
+#include <plaincraft_render_engine.hpp>
+#include "../assets/assets_manager.hpp"
 #include "../scene/scene.hpp"
-#include "./world_optimizer.hpp"
-#include "./chunks/chunk_builder_base.hpp"
-#include "./chunks/chunks_processor.hpp"
-#include <vector>
-#include <functional>
 #include <memory>
-#include <tuple>
 
 namespace plaincraft_core
 {
-    class WorldGenerator final
-    {
-        std::shared_ptr<Scene> scene_;
-        std::shared_ptr<Map> map_;
-        std::shared_ptr<GameObject> origin_entity_;
+    using namespace plaincraft_render_engine;
 
-        ChunksProcessor chunks_processor_;
+    class SceneBuilder
+    {
+    private:
+        AssetsManager &assets_manager_;
+        std::shared_ptr<RenderEngine> render_engine_;
 
     public:
-        WorldGenerator(std::unique_ptr<WorldOptimizer> world_optimizer,
-                       std::unique_ptr<ChunkBuilderBase> chunk_builder,
-                       std::shared_ptr<Scene> scene,
-                       std::shared_ptr<Map> map,
-                       std::shared_ptr<GameObject> origin_entity);
+        SceneBuilder(std::shared_ptr<RenderEngine> render_engine, AssetsManager &assets_manager);
 
-        void OnLoopFrameTick(float delta_time);
+        std::unique_ptr<Scene> CreateScene();
 
     private:
-        void ReloadGrid();
-
-        void Log();
     };
 }
 
-#endif // PLAINCRAFT_CORE_WORLD_GENERATOR
+#endif // PLAINCRAFT_CORE_SCENE_BUILDER

@@ -57,13 +57,13 @@ namespace plaincraft_render_engine {
 		std::vector<std::shared_ptr<GuiWidget>> widgets_list_;
 		std::mutex widgets_list_mutex_;
 
-		std::shared_ptr<TexturesFactory> textures_factory_;
-		std::shared_ptr<ModelsFactory> models_factory_;
-		std::shared_ptr<MenuFactory> menu_factory_;
-		std::shared_ptr<FontsFactory> fonts_factory_;
+		std::unique_ptr<TexturesFactory> textures_factory_;
+		std::unique_ptr<ModelsFactory> models_factory_;
+		std::unique_ptr<MenuFactory> menu_factory_;
+		std::unique_ptr<FontsFactory> fonts_factory_;
 
 	public:
-		virtual ~RenderEngine();
+		virtual ~RenderEngine() = 0;
 		
 		auto GetCamera() const -> const std::shared_ptr<Camera>& { return camera_; }
 		auto GetWindow() -> std::shared_ptr<Window> { return window_; }
@@ -76,14 +76,12 @@ namespace plaincraft_render_engine {
 		
 		void GetCursorPosition(double* cursor_position_x, double* cursor_position_y);
 
-
-		plaincraft_common::Cache<Texture>& GetTexturesRepository();
 		plaincraft_common::Cache<Font>& GetFontsRepository();
 
-		std::shared_ptr<TexturesFactory> GetTexturesFactory();
-		std::shared_ptr<ModelsFactory> GetModelsFactory();
-		std::shared_ptr<MenuFactory> GetMenuFactory();
-		std::shared_ptr<FontsFactory> GetFontsFactory();
+		std::unique_ptr<TexturesFactory>& GetTexturesFactory();
+		std::unique_ptr<ModelsFactory>& GetModelsFactory();
+		std::unique_ptr<MenuFactory>& GetMenuFactory();
+		std::unique_ptr<FontsFactory>& GetFontsFactory();
 		
 		virtual void RenderFrame(const FrameConfig& frame_config) = 0;
 

@@ -77,7 +77,7 @@ namespace plaincraft_core
     ChunksProcessor::ChunksProcessor(
         std::unique_ptr<ChunkBuilderBase> chunk_builder,
         std::unique_ptr<WorldOptimizer> world_optimizer,
-        Scene &scene,
+        std::shared_ptr<Scene> scene,
         Metric metric)
         : chunk_builder_(std::move(chunk_builder)),
           world_optimizer_(std::move(world_optimizer)),
@@ -255,7 +255,7 @@ namespace plaincraft_core
                 if (chunk_builder_->GenerateChunkStep(current_to_create_))
                 {
                     world_optimizer_->OptimizeChunk(*current_to_create_);
-                    scene_.get().AddGameObject(current_to_create_);
+                    scene_->AddGameObject(current_to_create_);
                     current_to_create_ = stop_processing ? nullptr : GetNextChunkToCreate();
                 }
             }

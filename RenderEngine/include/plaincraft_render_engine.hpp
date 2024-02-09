@@ -36,6 +36,7 @@ SOFTWARE.
 #include "../src/plaincraft/render_engine/utils/image/image.hpp"
 #include "../src/plaincraft/render_engine/camera/camera.hpp"
 
+#include "../src/plaincraft/render_engine/gui/font/font_utils.hpp"
 #include "../src/plaincraft/render_engine/gui/font/font.hpp"
 #include "../src/plaincraft/render_engine/gui/font/fonts_factory.hpp"
 
