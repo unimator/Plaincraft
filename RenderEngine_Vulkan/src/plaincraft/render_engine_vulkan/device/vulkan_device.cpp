@@ -33,24 +33,25 @@ SOFTWARE.
 #include <set>
 #include <string>
 
-namespace plaincraft_render_engine_vulkan {
-    VulkanDevice::VulkanDevice(const VulkanInstance& instance, VkSurfaceKHR surface)
-    {
-        PickPhysicalDevice(instance, surface);
-        CreateLogicalDevice(surface);
+namespace plaincraft_render_engine_vulkan
+{
+	VulkanDevice::VulkanDevice(const VulkanInstance &instance, VkSurfaceKHR surface)
+	{
+		PickPhysicalDevice(instance, surface);
+		CreateLogicalDevice(surface);
 		CreateSyncObjects();
 		CreateQueues(surface);
 		CreateCommandPool(surface);
-    }
+	}
 
-    VulkanDevice::~VulkanDevice()
-    {
+	VulkanDevice::~VulkanDevice()
+	{
 		vkDestroyCommandPool(device_, graphics_command_pool_, nullptr);
 		vkDestroyCommandPool(device_, transfer_command_pool_, nullptr);
 		vkDestroyDevice(device_, nullptr);
-    }
+	}
 
-    void VulkanDevice::PickPhysicalDevice(const VulkanInstance& instance, VkSurfaceKHR surface)
+	void VulkanDevice::PickPhysicalDevice(const VulkanInstance &instance, VkSurfaceKHR surface)
 	{
 		uint32_t device_count = 0;
 		vkEnumeratePhysicalDevices(instance.GetInstance(), &device_count, nullptr);
@@ -78,21 +79,21 @@ namespace plaincraft_render_engine_vulkan {
 		}
 	}
 
-    void VulkanDevice::CreateLogicalDevice(VkSurfaceKHR surface)
-    {
-        auto indices = FindQueueFamilyIndices(physical_device_, surface);
+	void VulkanDevice::CreateLogicalDevice(VkSurfaceKHR surface)
+	{
+		auto indices = FindQueueFamilyIndices(physical_device_, surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
 		std::set<uint32_t> unique_queue_families = {indices.graphics_family.value(), indices.present_family.value()};
 
-		float queue_priority = 1.0f;
+		std::vector<float> queue_priorities = {1.0f, 1.0f};
 		for (auto queue_family : unique_queue_families)
 		{
 			VkDeviceQueueCreateInfo device_queue_create_info{};
 			device_queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 			device_queue_create_info.queueFamilyIndex = queue_family;
 			device_queue_create_info.queueCount = queue_family == indices.graphics_family.value() ? 2 : 1;
-			device_queue_create_info.pQueuePriorities = &queue_priority;
+			device_queue_create_info.pQueuePriorities = queue_priorities.data();
 			queue_create_infos.push_back(device_queue_create_info);
 		}
 
@@ -109,19 +110,19 @@ namespace plaincraft_render_engine_vulkan {
 
 #define NODEBUG
 #ifndef NODEBUG
-        device_create_info.enabledLayerCount = 0;
+		device_create_info.enabledLayerCount = 0;
 #else
-        device_create_info.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
-        device_create_info.ppEnabledLayerNames = VALIDATION_LAYERS.data();
+		device_create_info.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
+		device_create_info.ppEnabledLayerNames = VALIDATION_LAYERS.data();
 #endif // NODEBUG
 
 		if (vkCreateDevice(physical_device_, &device_create_info, nullptr, &device_) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device");
 		}
-    }
+	}
 
-    bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
+	bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 	{
 		auto indices = FindQueueFamilyIndices(device, surface);
 
@@ -203,8 +204,10 @@ namespace plaincraft_render_engine_vulkan {
 		VkPhysicalDeviceMemoryProperties device_memory_properties;
 		vkGetPhysicalDeviceMemoryProperties(physical_device, &device_memory_properties);
 
-		for (uint32_t i = 0; i < device_memory_properties.memoryTypeCount; ++i) {
-			if ((type_filter & (1 << i)) && (device_memory_properties.memoryTypes[i].propertyFlags & memory_properties) == memory_properties) {
+		for (uint32_t i = 0; i < device_memory_properties.memoryTypeCount; ++i)
+		{
+			if ((type_filter & (1 << i)) && (device_memory_properties.memoryTypes[i].propertyFlags & memory_properties) == memory_properties)
+			{
 				return i;
 			}
 		}
@@ -212,20 +215,20 @@ namespace plaincraft_render_engine_vulkan {
 		throw std::runtime_error("Failed to find suitable memory type");
 	}
 
-	VkFormat VulkanDevice::FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const
+	VkFormat VulkanDevice::FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const
 	{
 		auto physical_device = physical_device_;
 
-		for(VkFormat format : candidates)
+		for (VkFormat format : candidates)
 		{
 			VkFormatProperties format_properties;
 			vkGetPhysicalDeviceFormatProperties(physical_device, format, &format_properties);
 
-			if(tiling == VK_IMAGE_TILING_LINEAR && (format_properties.linearTilingFeatures & features) == features)
+			if (tiling == VK_IMAGE_TILING_LINEAR && (format_properties.linearTilingFeatures & features) == features)
 			{
 				return format;
 			}
-			else if(tiling == VK_IMAGE_TILING_OPTIMAL && (format_properties.optimalTilingFeatures & features) == features)
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (format_properties.optimalTilingFeatures & features) == features)
 			{
 				return format;
 			}
@@ -238,8 +241,8 @@ namespace plaincraft_render_engine_vulkan {
 	{
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
-	
-    VkCommandBuffer VulkanDevice::BeginSingleTimeCommands(VkCommandPool command_pool) const
+
+	VkCommandBuffer VulkanDevice::BeginSingleTimeCommands(VkCommandPool command_pool) const
 	{
 		VkCommandBufferAllocateInfo allocate_info{};
 		allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -263,10 +266,10 @@ namespace plaincraft_render_engine_vulkan {
 	{
 		vkEndCommandBuffer(command_buffer);
 
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &command_buffer;
+		VkSubmitInfo submit_info{};
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &command_buffer;
 
 		vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
 		vkQueueWaitIdle(queue);

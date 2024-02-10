@@ -30,7 +30,9 @@ SOFTWARE.
 #include "assets/assets_manager.hpp"
 #include "camera_operators/camera_operator.hpp"
 #include "common.hpp"
+#include "controllers/entity_input_controller.hpp"
 #include "events/loop_events_handler.hpp"
+#include "input/input_stack.hpp"
 #include "physics/physics_engine.hpp"
 #include "physics_optimization/active_objects_optimizer.hpp"
 #include "scene/scene.hpp"
@@ -45,6 +47,7 @@ namespace plaincraft_core {
 	class Game {
 	private:
 		GlobalState global_state_;
+		std::shared_ptr<Menu> in_game_menu_;
 
 		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::shared_ptr<Scene> scene_;
@@ -56,9 +59,11 @@ namespace plaincraft_core {
 		
 		LoopEventsHandler loop_events_handler_;
 		FpsCounter fps_counter_;
+		InputStack input_stack_;
 
 		float physics_time_step_ = 1.0f / 60.0f;
 
+		std::unique_ptr<EntityInputController> player_input_controller_;
 		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
 

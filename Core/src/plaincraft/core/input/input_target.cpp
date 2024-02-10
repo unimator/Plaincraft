@@ -24,16 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "player.hpp"
+#include "input_target.hpp"
 
 namespace plaincraft_core
 {
-    // Player::Player() {}
+    InputTarget::InputTarget(InputTarget::TargetType target_type) : target_type_(target_type) {}
 
-    // std::shared_ptr<Player> Player::CreateInstance(std::shared_ptr<Camera> camera)
-    // {
-    //     auto result = std::make_shared<Player>();
-    //     result->entity_input_controller_ = std::make_unique<EntityInputController>(result, camera);
-    //     return result;
-    // }
+    InputTarget::TargetType InputTarget::GetTargetType() const
+    {
+        return target_type_;
+    }
 }

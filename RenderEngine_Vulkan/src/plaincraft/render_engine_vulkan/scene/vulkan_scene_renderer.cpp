@@ -109,6 +109,11 @@ namespace plaincraft_render_engine_vulkan
 
 	void VulkanSceneRenderer::Render()
 	{
+		if(drawables_list_.empty())
+		{
+			return;
+		}
+
 		if (drawables_list_.size() > buffers_instance_count_)
 		{
 			RecreateEntitiesBuffers();

@@ -43,6 +43,7 @@ PRIVATE
     src/plaincraft/core/camera_operators/eyes/camera_operator_eyes.cpp
     src/plaincraft/core/camera_operators/follow/camera_operator_follow.cpp
     src/plaincraft/core/camera_operators/camera_operator.cpp
+    src/plaincraft/core/controllers/entity_input_controller.cpp
     src/plaincraft/core/entities/blocks/block.cpp
     src/plaincraft/core/entities/blocks/dirt.cpp
     src/plaincraft/core/entities/blocks/stone.cpp
@@ -52,6 +53,8 @@ PRIVATE
     src/plaincraft/core/entities/player/player.cpp
     src/plaincraft/core/entities/game_object.cpp
     src/plaincraft/core/events/loop_events_handler.cpp
+    src/plaincraft/core/input/input_stack.cpp
+    src/plaincraft/core/input/input_target.cpp
     src/plaincraft/core/initialization/scene_builder.cpp
     src/plaincraft/core/physics/physics_engine.cpp
     src/plaincraft/core/physics/physics_object.cpp

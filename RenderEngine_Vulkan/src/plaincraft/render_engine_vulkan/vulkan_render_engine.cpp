@@ -64,6 +64,10 @@ namespace plaincraft_render_engine_vulkan
 
 	VulkanRenderEngine::~VulkanRenderEngine()
 	{
+		// quick fix -> clear it on scene death
+		std::lock_guard guard(drawables_list_mutex_);
+		drawables_list_.clear();
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 		{
 			vkDestroySemaphore(device_.GetDevice(), render_finished_semaphores_[i], nullptr);

@@ -24,16 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "player.hpp"
+#include "input_stack.hpp"
+#include <iostream>
 
 namespace plaincraft_core
 {
-    // Player::Player() {}
+    void InputStack::Push(InputTarget &input_target)
+    {
+        input_targets_.push_back(std::ref(input_target));
+    }
 
-    // std::shared_ptr<Player> Player::CreateInstance(std::shared_ptr<Camera> camera)
-    // {
-    //     auto result = std::make_shared<Player>();
-    //     result->entity_input_controller_ = std::make_unique<EntityInputController>(result, camera);
-    //     return result;
-    // }
+    void InputStack::Pop()
+    {
+        input_targets_.pop_back();
+    }
+
+    void InputStack::SingleClickHandler(int key, int scancode, int action, int mods)
+    {
+        if (input_targets_.empty())
+        {
+            return;
+        }
+
+        for (std::vector<std::reference_wrapper<InputTarget>>::reverse_iterator input_target = input_targets_.rbegin();
+             input_target != input_targets_.rend();
+             ++input_target)
+        {
+            auto &key_mappings = input_target->get().key_mappings;
+
+            if (key_mappings.contains(key))
+            {
+                auto &action_callback = key_mappings[key];
+                action_callback(scancode, action, mods);
+            }
+
+            if (input_target->get().GetTargetType() == InputTarget::TargetType::Blocking)
+            {
+                break;
+            }
+        }
+    }
+
 }

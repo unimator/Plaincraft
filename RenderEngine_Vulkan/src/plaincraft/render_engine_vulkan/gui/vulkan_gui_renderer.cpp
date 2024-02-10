@@ -91,6 +91,10 @@ namespace plaincraft_render_engine_vulkan
 
     for (auto &widget : widgets_list_)
     {
+      if(!widget->IsVisible())
+      {
+        continue;
+      }
       ImGui::PushFont(details_font_.get());
       widget->Draw(frame_config_->frame_config);
       ImGui::PopFont();

@@ -24,13 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_COMPONENT
-#define PLAINCRAFT_CORE_COMPONENT
+#ifndef PLAINCRAFT_CORE_INPUT_STACK
+#define PLAINCRAFT_CORE_INPUT_STACK
 
-namespace plaincraft_core {
-    class Component {
+#include "input_target.hpp"
+#include <vector>
+#include <functional>
 
+namespace plaincraft_core
+{
+    class InputStack
+    {
+    private:
+        std::vector<std::reference_wrapper<InputTarget>> input_targets_;
+
+    public:
+        void Push(InputTarget& input_target);
+        void Pop();
+
+        void SingleClickHandler(int key, int scancode, int action, int mods);
     };
 }
 
-#endif // PLAINCRAFT_CORE_COMPONENT
+#endif // PLAINCRAFT_CORE_INPUT_STACK

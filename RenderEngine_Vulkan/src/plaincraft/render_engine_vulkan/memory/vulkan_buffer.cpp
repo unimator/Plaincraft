@@ -67,9 +67,10 @@ namespace plaincraft_render_engine_vulkan
         other.memory_property_flags_ = 0;
     }
 
-    VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer &&other) noexcept
+    VulkanBuffer &VulkanBuffer::operator=(VulkanBuffer &&other) noexcept
     {
-        if(this == &other) {
+        if (this == &other)
+        {
             return *this;
         }
 
@@ -133,9 +134,9 @@ namespace plaincraft_render_engine_vulkan
         }
     }
 
-    void VulkanBuffer::CopyFromBuffer(const VulkanBuffer& other)
+    void VulkanBuffer::CopyFromBuffer(const VulkanBuffer &other)
     {
-        auto& device = device_.get();
+        auto &device = device_.get();
         auto command_buffer = device.BeginSingleTimeCommands(device.GetTransferCommandPool());
 
         VkBufferCopy copy_region{};
@@ -147,7 +148,7 @@ namespace plaincraft_render_engine_vulkan
         device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
     }
 
-    VulkanBuffer VulkanBuffer::MoveBuffer(const VulkanDevice& device, VulkanBuffer&& buffer, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties)
+    VulkanBuffer VulkanBuffer::MoveBuffer(const VulkanDevice &device, VulkanBuffer &&buffer, VkBufferUsageFlags buffer_usage_flags, VkMemoryPropertyFlags memory_properties)
     {
         VulkanBuffer result(device, buffer.GetInstanceSize(), buffer.GetInstanceCount(), buffer_usage_flags, memory_properties);
 

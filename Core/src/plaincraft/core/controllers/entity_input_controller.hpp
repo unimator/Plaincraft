@@ -24,54 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
-#define PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#ifndef PLAINCRAFT_CORE_ENTITY_INPUT_CONTROLLER
+#define PLAINCRAFT_CORE_ENTITY_INPUT_CONTROLLER
 
-#include <plaincraft_core.hpp>
-#include <unordered_map>
+#include "../entities/game_object.hpp"
+#include "../input/input_target.hpp"
+#include <plaincraft_render_engine.hpp>
 #include <memory>
-#include <functional>
 
-using namespace plaincraft_core;
-
-namespace plaincraft_runner
+namespace plaincraft_core
 {
-    class KeyMappingController : public std::enable_shared_from_this<KeyMappingController>
+    class EntityInputController
     {
     private:
-        std::shared_ptr<GameObject> player_;
-        std::shared_ptr<Camera> camera_;
-        Game& game_instance_;
+        InputTarget input_target_;
 
-        typedef void (KeyMappingController::*KeyPressedCallback)(int action, int mods);
-        std::unordered_map<int, KeyPressedCallback> key_mappings_;
+        std::shared_ptr<GameObject> target_entity_;
+        std::shared_ptr<Camera> camera_;
 
         float movement_speed_ = 0.125f * 500.0f;
         float maximum_speed_ = 3.0f;
 
         bool forward_ = false, backward_ = false, left_ = false, right_ = false, jump_ = false, crouch_ = false;
 
-        KeyMappingController(Game& game_instance);
-
     public:
-        static std::shared_ptr<KeyMappingController> CreateInstance(Game& game_instance_);
+        EntityInputController(std::shared_ptr<GameObject> target_entity, std::shared_ptr<Camera> camera);
 
-        void Setup();
+        InputTarget& GetInputTarget();
 
-    private:
-        void OnKeyPressed(int key, int scancode, int action, int mods);
         void OnLoopTick(float delta_time);
 
-// Key actions
-        void MoveForward(int action, int mods);
-        void MoveBackward(int action, int mods);
-        void MoveLeft(int action, int mods);
-        void MoveRight(int action, int mods);
-        void Jump(int action, int mods);
-        void Crouch(int action, int mods);
-        void ToggleDebugInfo(int action, int mods);
-        void ToggleMenu(int action, int mods);
+        void MoveForward(int scancode, int action, int mods);
+        void MoveBackward(int scancode, int action, int mods);
+        void MoveLeft(int scancode, int action, int mods);
+        void MoveRight(int scancode, int action, int mods);
+        void Jump(int scancode, int action, int mods);
+        void Crouch(int scancode, int action, int mods);
+        void ToggleDebugInfo(int scancode, int action, int mods);
+        void ToggleMenu(int scancode, int action, int mods);
     };
 }
 
-#endif // PLAINCRAFT_RUNNER_KEYMAPPING_CONTROLLER
+#endif // PLAINCRAFT_CORE_ENTITY_INPUT_CONTROLLER

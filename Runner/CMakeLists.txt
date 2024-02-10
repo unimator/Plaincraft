@@ -25,7 +25,7 @@ SOFTWARE.
 ]]
 
 set(TARGET_NAME "Runner")
-add_executable(${TARGET_NAME} "src/runner/main.cpp" "src/runner/input/key_mapping_controller.cpp")
+add_executable(${TARGET_NAME} "src/runner/main.cpp")
 
 if (CMAKE_COMPILER_IS_GNUCC)
     target_compile_options(${TARGET_NAME} PRIVATE "-Wall -Wextra")

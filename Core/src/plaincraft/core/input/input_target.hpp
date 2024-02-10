@@ -24,16 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "player.hpp"
+#ifndef PLAINCRAFT_CORE_INPUT_TARGET
+#define PLAINCRAFT_CORE_INPUT_TARGET
+
+#include <functional>
+#include <unordered_map>
 
 namespace plaincraft_core
 {
-    // Player::Player() {}
+    class InputTarget
+    {
+    public:
+        enum TargetType
+        {
+            Passive,
+            Blocking
+        } target_type_;
 
-    // std::shared_ptr<Player> Player::CreateInstance(std::shared_ptr<Camera> camera)
-    // {
-    //     auto result = std::make_shared<Player>();
-    //     result->entity_input_controller_ = std::make_unique<EntityInputController>(result, camera);
-    //     return result;
-    // }
+    private:
+        using KeyPressedCallback = std::function<void(int scancode, int action, int mods)>;
+
+    public:
+        InputTarget(InputTarget::TargetType type);
+        
+        std::unordered_map<int, KeyPressedCallback> key_mappings;
+
+        TargetType GetTargetType() const;
+    };
 }
+
+#endif // PLAINCRAFT_CORE_INPUT_TARGET

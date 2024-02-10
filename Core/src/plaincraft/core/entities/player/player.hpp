@@ -27,13 +27,23 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_PLAYER
 #define PLAINCRAFT_CORE_PLAYER
 
+#include <plaincraft_render_engine.hpp>
 #include "../game_object.hpp"
+#include "../../controllers/entity_input_controller.hpp"
+#include <memory>
+#include <functional>
 
 namespace plaincraft_core
 {
-    class Player : public GameObject 
+    class Player : public GameObject//, public std::enable_shared_from_this<Player>
     {
-        private: 
+        // private: 
+        //     std::unique_ptr<EntityInputController> entity_input_controller_;
+
+        //     Player();
+
+        // public:
+        //     static std::shared_ptr<Player> CreateInstance(std::shared_ptr<Camera> camera);
     };
 }
 
