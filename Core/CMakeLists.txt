@@ -44,6 +44,7 @@ PRIVATE
     src/plaincraft/core/camera_operators/follow/camera_operator_follow.cpp
     src/plaincraft/core/camera_operators/camera_operator.cpp
     src/plaincraft/core/controllers/entity_input_controller.cpp
+    src/plaincraft/core/controllers/in_game_menu_controller.cpp
     src/plaincraft/core/entities/blocks/block.cpp
     src/plaincraft/core/entities/blocks/dirt.cpp
     src/plaincraft/core/entities/blocks/stone.cpp

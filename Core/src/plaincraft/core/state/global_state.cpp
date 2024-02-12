@@ -57,14 +57,4 @@ namespace plaincraft_core
     {
         return is_running_;
     }
-
-    void GlobalState::SetIsInGameMenuVisible(bool is_visible)
-    {
-        is_in_game_menu_visible_ = is_visible;
-    }
-
-    bool GlobalState::GetIsInGameMenuVisible() const
-    {
-        return is_in_game_menu_visible_;
-    }
 }

@@ -27,28 +27,34 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_INPUT_TARGET
 #define PLAINCRAFT_CORE_INPUT_TARGET
 
+#include <plaincraft_common.hpp>
+#include "input_stack.hpp"
 #include <functional>
 #include <unordered_map>
 
 namespace plaincraft_core
 {
+    using namespace plaincraft_common;
+
     class InputTarget
     {
     public:
         enum TargetType
         {
             Passive,
+            SemiBlocking,
             Blocking
         } target_type_;
 
-    private:
-        using KeyPressedCallback = std::function<void(int scancode, int action, int mods)>;
+        using KeyPressedEventTrigger = EventTrigger<int, int, int>;
 
     public:
         InputTarget(InputTarget::TargetType type);
-        
-        std::unordered_map<int, KeyPressedCallback> key_mappings;
 
+        std::unordered_map<int, KeyPressedEventTrigger> key_mappings;
+        EventTrigger<InputStack::StackEventType> on_input_stack_change;
+
+        void SetTargetType(TargetType target_type);
         TargetType GetTargetType() const;
     };
 }

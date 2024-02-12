@@ -30,6 +30,11 @@ namespace plaincraft_core
 {
     InputTarget::InputTarget(InputTarget::TargetType target_type) : target_type_(target_type) {}
 
+    void InputTarget::SetTargetType(TargetType target_type)
+    {
+        target_type_ = target_type;
+    }
+
     InputTarget::TargetType InputTarget::GetTargetType() const
     {
         return target_type_;

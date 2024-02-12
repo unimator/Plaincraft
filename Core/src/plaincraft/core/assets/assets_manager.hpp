@@ -38,6 +38,7 @@ namespace plaincraft_core
 
     class AssetsManager
     {
+    private:
         Cache<Model> models_cache_;
         Cache<Texture> textures_cache_;
 

@@ -29,6 +29,7 @@ SOFTWARE.
 
 #include "../entities/game_object.hpp"
 #include "../input/input_target.hpp"
+#include "../input/input_stack.hpp"
 #include <plaincraft_render_engine.hpp>
 #include <memory>
 
@@ -60,8 +61,7 @@ namespace plaincraft_core
         void MoveRight(int scancode, int action, int mods);
         void Jump(int scancode, int action, int mods);
         void Crouch(int scancode, int action, int mods);
-        void ToggleDebugInfo(int scancode, int action, int mods);
-        void ToggleMenu(int scancode, int action, int mods);
+        void InputStateChanged(InputStack::StackEventType stack_event_type);
     };
 }
 

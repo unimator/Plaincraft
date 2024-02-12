@@ -94,6 +94,14 @@ namespace plaincraft_core
 		auto world_optimizer = std::make_unique<WorldOptimizer>(map, assets_manager_, *(render_engine_->GetModelsFactory()));
 		world_updater_ = std::make_unique<WorldGenerator>(std::move(world_optimizer), std::move(chunk_builder), scene_, map, player);
 
+		auto &fonts_factory = render_engine_->GetFontsFactory();
+		auto default_fonts = fonts_factory->LoadStandardFonts();
+
+		for (auto &default_font : default_fonts)
+		{
+			fonts_cache_.Store(default_font.first, default_font.second);
+		}
+
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
 
 		GetWindowEventsHandler().key_pressed_event_trigger.AddSubscription(&input_stack_, &InputStack::SingleClickHandler);
@@ -102,18 +110,8 @@ namespace plaincraft_core
 		loop_events_handler_.loop_event_trigger.AddSubscription(player_input_controller_.get(), &EntityInputController::OnLoopTick);
 		input_stack_.Push(std::ref(player_input_controller_->GetInputTarget()));
 
-		auto &fonts_factory = render_engine_->GetFontsFactory();
-		auto default_fonts = fonts_factory->LoadStandardFonts();
-
-		auto &menu_factory = render_engine_->GetMenuFactory();
-		in_game_menu_ = menu_factory->CreateMenu();
-		in_game_menu_->SetFont(default_fonts[0].second);
-		in_game_menu_->AddButton(std::make_unique<MenuButton>("Quit"));
-		in_game_menu_->SetPositionX(10);
-		in_game_menu_->SetPositionY(10);
-		in_game_menu_->SetWidth(200);
-		in_game_menu_->SetHeight(200);
-		render_engine_->AddWidget(in_game_menu_);
+		in_game_menu_controller_ = std::make_unique<InGameMenuController>(render_engine_, fonts_cache_, input_stack_);
+		input_stack_.Push(std::ref(in_game_menu_controller_->GetInputTarget()));
 	}
 
 	void Game::Run()
@@ -167,8 +165,6 @@ namespace plaincraft_core
 			delta_time = static_cast<float>(current_time - last_time);
 			delta_time = glm::clamp(delta_time, 0.0f, 1.0f);
 			accumulator += delta_time;
-
-			in_game_menu_->SetIsVisible(global_state_.GetIsInGameMenuVisible());
 
 			last_time = current_time;
 

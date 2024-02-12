@@ -47,9 +47,6 @@ namespace plaincraft_core
 
             void SetIsRunning(bool is_running);
             bool GetIsRunning() const;
-
-            void SetIsInGameMenuVisible(bool is_visible);
-            bool GetIsInGameMenuVisible() const;
     };
 }
 

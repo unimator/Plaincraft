@@ -24,18 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "input_target.hpp"
 #include "input_stack.hpp"
-#include <iostream>
+#include <stack>
 
 namespace plaincraft_core
 {
     void InputStack::Push(InputTarget &input_target)
     {
         input_targets_.push_back(std::ref(input_target));
+        for(auto& input_target : input_targets_)
+        {
+            input_target.get().on_input_stack_change.Trigger(StackEventType::Push);
+        }
     }
 
     void InputStack::Pop()
     {
+        for(auto& input_target : input_targets_)
+        {
+            input_target.get().on_input_stack_change.Trigger(StackEventType::Pop);
+        }
         input_targets_.pop_back();
     }
 
@@ -46,23 +55,37 @@ namespace plaincraft_core
             return;
         }
 
-        for (std::vector<std::reference_wrapper<InputTarget>>::reverse_iterator input_target = input_targets_.rbegin();
-             input_target != input_targets_.rend();
-             ++input_target)
+        auto callbacks = std::stack<std::reference_wrapper<InputTarget::KeyPressedEventTrigger>>();
+
+        for (std::vector<std::reference_wrapper<InputTarget>>::reverse_iterator input_target_it = input_targets_.rbegin();
+             input_target_it != input_targets_.rend();
+             ++input_target_it)
         {
-            auto &key_mappings = input_target->get().key_mappings;
+            auto &input_target = input_target_it->get();
+            auto &key_mappings = input_target.key_mappings;
 
             if (key_mappings.contains(key))
             {
                 auto &action_callback = key_mappings[key];
-                action_callback(scancode, action, mods);
+                callbacks.push(action_callback);
+
+                if (input_target.GetTargetType() == InputTarget::TargetType::SemiBlocking)
+                {
+                    break;
+                }
             }
 
-            if (input_target->get().GetTargetType() == InputTarget::TargetType::Blocking)
+            if (input_target.GetTargetType() == InputTarget::TargetType::Blocking)
             {
                 break;
             }
         }
-    }
 
+        while (!callbacks.empty())
+        {
+            auto &callback = callbacks.top();
+            callback.get().Trigger(scancode, action, mods);
+            callbacks.pop();
+        }
+    }
 }

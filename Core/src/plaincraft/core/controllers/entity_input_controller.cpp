@@ -32,12 +32,13 @@ namespace plaincraft_core
     EntityInputController::EntityInputController(std::shared_ptr<GameObject> target_entity, std::shared_ptr<Camera> camera)
         : input_target_(InputTarget::TargetType::Blocking), target_entity_(target_entity), camera_(camera)
     {
-        input_target_.key_mappings[GLFW_KEY_W] = std::bind(&EntityInputController::MoveForward, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        input_target_.key_mappings[GLFW_KEY_S] = std::bind(&EntityInputController::MoveBackward, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        input_target_.key_mappings[GLFW_KEY_A] = std::bind(&EntityInputController::MoveLeft, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        input_target_.key_mappings[GLFW_KEY_D] = std::bind(&EntityInputController::MoveRight, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        input_target_.key_mappings[GLFW_KEY_SPACE] = std::bind(&EntityInputController::Jump, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        input_target_.key_mappings[GLFW_KEY_LEFT_CONTROL] = std::bind(&EntityInputController::Crouch, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        input_target_.key_mappings[GLFW_KEY_W].AddSubscription(this, &EntityInputController::MoveForward);
+        input_target_.key_mappings[GLFW_KEY_S].AddSubscription(this, &EntityInputController::MoveBackward);
+        input_target_.key_mappings[GLFW_KEY_A].AddSubscription(this, &EntityInputController::MoveLeft);
+        input_target_.key_mappings[GLFW_KEY_D].AddSubscription(this, &EntityInputController::MoveRight);
+        input_target_.key_mappings[GLFW_KEY_SPACE].AddSubscription(this, &EntityInputController::Jump);
+        input_target_.key_mappings[GLFW_KEY_LEFT_CONTROL].AddSubscription(this, &EntityInputController::Crouch);
+        input_target_.on_input_stack_change.AddSubscription(this, &EntityInputController::InputStateChanged);
     }
 
     InputTarget &EntityInputController::GetInputTarget()
@@ -147,5 +148,13 @@ namespace plaincraft_core
             auto current_velocity = target_entity_->GetPhysicsObject()->velocity;
             target_entity_->GetPhysicsObject()->velocity += target;
         }
+    }
+
+    void EntityInputController::InputStateChanged(InputStack::StackEventType stack_event_type)
+    {
+        forward_ = false;
+        backward_ = false;
+        left_ = false;
+        right_ = false;
     }
 }

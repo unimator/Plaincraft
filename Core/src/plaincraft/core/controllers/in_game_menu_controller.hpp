@@ -24,34 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAINCRAFT_CORE_INPUT_STACK
-#define PLAINCRAFT_CORE_INPUT_STACK
+#ifndef PLAINCRAFT_CORE_IN_GAME_MENU_CONTROLLER
+#define PLAINCRAFT_CORE_IN_GAME_MENU_CONTROLLER
 
-#include <vector>
-#include <functional>
+#include <plaincraft_render_engine.hpp>
+#include "../input/input_stack.hpp"
+#include "../input/input_target.hpp"
+#include <memory>
 
 namespace plaincraft_core
 {
-    class InputTarget;
+    using namespace plaincraft_render_engine;
 
-    class InputStack
+    class InGameMenuController
     {
-    public:
-        enum class StackEventType
-        {
-            Pop,
-            Push
-        };
-
     private:
-        std::vector<std::reference_wrapper<InputTarget>> input_targets_;
+        InputTarget input_target_;
+        InputTarget menu_input_target_;
+
+        std::shared_ptr<Menu> in_game_menu_;
+
+        std::shared_ptr<RenderEngine> render_engine_;
+        Cache<Font> &fonts_cache_;
+        InputStack &input_stack_;
 
     public:
-        void Push(InputTarget &input_target);
-        void Pop();
+        InGameMenuController(std::shared_ptr<RenderEngine> render_engine, Cache<Font> &fonts_cache, InputStack &input_stack);
 
-        void SingleClickHandler(int key, int scancode, int action, int mods);
+        InputTarget &GetInputTarget();
+
+        void OpenMenu(int scancode, int action, int mods);
+        void CloseMenu(int scancode, int action, int mods);
     };
 }
 
-#endif // PLAINCRAFT_CORE_INPUT_STACK
+#endif // PLAINCRAFT_CORE_IN_GAME_MENU_CONTROLLER

@@ -31,6 +31,7 @@ SOFTWARE.
 #include "camera_operators/camera_operator.hpp"
 #include "common.hpp"
 #include "controllers/entity_input_controller.hpp"
+#include "controllers/in_game_menu_controller.hpp"
 #include "events/loop_events_handler.hpp"
 #include "input/input_stack.hpp"
 #include "physics/physics_engine.hpp"
@@ -64,6 +65,7 @@ namespace plaincraft_core {
 		float physics_time_step_ = 1.0f / 60.0f;
 
 		std::unique_ptr<EntityInputController> player_input_controller_;
+		std::unique_ptr<InGameMenuController> in_game_menu_controller_;
 		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
 
