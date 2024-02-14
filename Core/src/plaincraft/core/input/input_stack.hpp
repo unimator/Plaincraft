@@ -27,11 +27,15 @@ SOFTWARE.
 #ifndef PLAINCRAFT_CORE_INPUT_STACK
 #define PLAINCRAFT_CORE_INPUT_STACK
 
+#include <plaincraft_render_engine.hpp>
 #include <vector>
 #include <functional>
+#include <memory>
 
 namespace plaincraft_core
 {
+    using namespace plaincraft_render_engine;
+
     class InputTarget;
 
     class InputStack
@@ -45,12 +49,18 @@ namespace plaincraft_core
 
     private:
         std::vector<std::reference_wrapper<InputTarget>> input_targets_;
+        std::shared_ptr<RenderEngine> render_engine_;
 
     public:
+        InputStack(std::shared_ptr<RenderEngine> render_engine);
+
         void Push(InputTarget &input_target);
         void Pop();
 
         void SingleClickHandler(int key, int scancode, int action, int mods);
+
+    private:
+        void Apply(InputTarget &input_target);
     };
 }
 

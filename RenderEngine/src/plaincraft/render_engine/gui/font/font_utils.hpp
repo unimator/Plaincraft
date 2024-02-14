@@ -37,8 +37,8 @@ namespace plaincraft_render_engine
     class FontUtils
     {
     public:
-        virtual float CalcStringWidth(std::string text, std::shared_ptr<Font> font) = 0;
-        virtual float CalcStringHeight(std::string text, std::shared_ptr<Font> font) = 0;
+        virtual float CalcStringWidth(std::string text, std::shared_ptr<Font> font) const = 0;
+        virtual float CalcStringHeight(std::string text, std::shared_ptr<Font> font) const = 0;
     };
 }
 

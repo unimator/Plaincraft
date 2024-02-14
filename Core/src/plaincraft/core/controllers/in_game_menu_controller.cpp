@@ -31,11 +31,13 @@ namespace plaincraft_core
 {
     InGameMenuController::InGameMenuController(
         std::shared_ptr<RenderEngine> render_engine,
+        GlobalState &global_state,
         Cache<Font> &fonts_cache,
         InputStack &input_stack)
-        : input_target_(InputTarget::TargetType::Passive),
-          menu_input_target_(InputTarget::TargetType::Blocking),
+        : input_target_(InputTarget::TargetType::Passive, InputTarget::CursorVisibility::Hidden),
+          menu_input_target_(InputTarget::TargetType::Blocking, InputTarget::CursorVisibility::Visible),
           render_engine_(render_engine),
+          global_state_(global_state),
           fonts_cache_(fonts_cache),
           input_stack_(input_stack)
     {
@@ -57,12 +59,29 @@ namespace plaincraft_core
 
         input_stack_.Push(menu_input_target_);
 
+        auto window = render_engine_->GetWindow();
+        auto width = window->GetWidth();
+        auto height = window->GetHeight();
+
+        auto &font_utils = render_engine_->GetFontsFactory()->GetFontUtils();
+
+        auto standard_font = fonts_cache_.Fetch("standard");
+        auto button_height = font_utils.CalcStringHeight("Quit", standard_font);
+
         auto &menu_factory = render_engine_->GetMenuFactory();
+
+        auto quit_button = std::make_unique<MenuButton>("Quit");
+        quit_button->on_button_click.AddSubscription(this, &InGameMenuController::QuitCallback);
+
+        auto resume_button = std::make_unique<MenuButton>("Resume");
+        resume_button->on_button_click.AddSubscription(this, &InGameMenuController::ResumeCallback);
+
         in_game_menu_ = menu_factory->CreateMenu();
         in_game_menu_->SetFont(fonts_cache_.Fetch("standard"));
-        in_game_menu_->AddButton(std::make_unique<MenuButton>("Quit"));
+        in_game_menu_->AddButton(std::move(resume_button));
+        in_game_menu_->AddButton(std::move(quit_button));
         in_game_menu_->SetPositionX(10);
-        in_game_menu_->SetPositionY(10);
+        in_game_menu_->SetPositionY(height - 2 * button_height - 30);
         in_game_menu_->SetWidth(200);
         in_game_menu_->SetHeight(200);
         render_engine_->AddWidget(in_game_menu_);
@@ -75,6 +94,17 @@ namespace plaincraft_core
             return;
         }
 
+        render_engine_->RemoveWidget(in_game_menu_);
+        input_stack_.Pop();
+    }
+
+    void InGameMenuController::QuitCallback()
+    {
+        global_state_.SetIsRunning(false);
+    }
+
+    void InGameMenuController::ResumeCallback()
+    {
         render_engine_->RemoveWidget(in_game_menu_);
         input_stack_.Pop();
     }

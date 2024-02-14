@@ -30,24 +30,30 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-    float VulkanFontUtils::CalcStringWidth(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font)
+    using namespace plaincraft_render_engine;
+
+    float VulkanFontUtils::CalcStringWidth(std::string text, std::shared_ptr<Font> font) const
     {
         auto font_im = std::static_pointer_cast<VulkanFont>(font)->GetImFont();
 
+        ImGui::NewFrame();
         ImGui::PushFont(font_im);
         auto result = ImGui::CalcTextSize(text.c_str()).x;
         ImGui::PopFont();
+        ImGui::EndFrame();
 
         return result;
     }
 
-    float VulkanFontUtils::CalcStringHeight(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font)
+    float VulkanFontUtils::CalcStringHeight(std::string text, std::shared_ptr<Font> font) const
     {
         auto font_im = std::static_pointer_cast<VulkanFont>(font)->GetImFont();
 
+        ImGui::NewFrame();
         ImGui::PushFont(font_im);
         auto result = ImGui::CalcTextSize(text.c_str()).y;
         ImGui::PopFont();
+        ImGui::EndFrame();
 
         return result;
     }

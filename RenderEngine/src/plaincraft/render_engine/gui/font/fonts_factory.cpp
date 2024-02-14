@@ -32,4 +32,9 @@ namespace plaincraft_render_engine
         : font_utils_(std::move(font_utils))
     {
     }
+
+    const FontUtils& FontsFactory::GetFontUtils() const
+    {
+        return *(font_utils_.get());
+    }
 }

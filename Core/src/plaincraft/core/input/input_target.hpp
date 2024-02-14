@@ -46,16 +46,25 @@ namespace plaincraft_core
             Blocking
         } target_type_;
 
+        enum CursorVisibility
+        {
+            Visible,
+            Hidden
+        } cursor_visibility_;
+
         using KeyPressedEventTrigger = EventTrigger<int, int, int>;
 
     public:
-        InputTarget(InputTarget::TargetType type);
+        InputTarget(TargetType type, CursorVisibility cursor_visibility);
 
         std::unordered_map<int, KeyPressedEventTrigger> key_mappings;
         EventTrigger<InputStack::StackEventType> on_input_stack_change;
 
         void SetTargetType(TargetType target_type);
         TargetType GetTargetType() const;
+
+        void SetCursorVisibility(CursorVisibility cursur_visibility);
+        CursorVisibility GetCursorVisibility() const;
     };
 }
 

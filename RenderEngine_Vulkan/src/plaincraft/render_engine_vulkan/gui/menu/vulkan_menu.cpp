@@ -51,7 +51,11 @@ namespace plaincraft_render_engine_vulkan
         ImGui::Begin("Menu", &is_visible, window_flags);
         for (auto &button : GetButtons())
         {
-            ImGui::Button(button->GetName().c_str());
+            auto clicked = ImGui::Button(button->GetName().c_str());
+            if(clicked)
+            {
+                button->on_button_click.Trigger();
+            }
         }
         ImGui::End();
         ImGui::PopFont();

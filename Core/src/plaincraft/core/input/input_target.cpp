@@ -28,7 +28,8 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
-    InputTarget::InputTarget(InputTarget::TargetType target_type) : target_type_(target_type) {}
+    InputTarget::InputTarget(TargetType target_type, CursorVisibility cursor_visibility) 
+        : target_type_(target_type), cursor_visibility_(cursor_visibility) {}
 
     void InputTarget::SetTargetType(TargetType target_type)
     {
@@ -38,5 +39,15 @@ namespace plaincraft_core
     InputTarget::TargetType InputTarget::GetTargetType() const
     {
         return target_type_;
+    }
+
+    void InputTarget::SetCursorVisibility(CursorVisibility cursor_visibility)
+    {
+        cursor_visibility_ = cursor_visibility;
+    }
+
+    InputTarget::CursorVisibility InputTarget::GetCursorVisibility() const
+    {
+        return cursor_visibility_;
     }
 }

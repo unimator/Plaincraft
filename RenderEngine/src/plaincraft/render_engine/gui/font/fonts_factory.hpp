@@ -43,7 +43,10 @@ namespace plaincraft_render_engine
 
     public:
         FontsFactory(std::unique_ptr<FontUtils> font_utils);
+
         virtual std::vector<std::pair<std::string, std::shared_ptr<Font>>> LoadStandardFonts() = 0;
+
+        const FontUtils& GetFontUtils() const;
     };
 }
 

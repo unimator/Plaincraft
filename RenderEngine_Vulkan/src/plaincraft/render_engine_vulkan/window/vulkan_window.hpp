@@ -52,6 +52,8 @@ namespace plaincraft_render_engine_vulkan
         auto WasResized() -> bool const {return was_resized_;}
         void ResetWasResized() {was_resized_ = false;}
 
+        void SetCursorVisible(bool is_visible) override;
+
     private:
         void Initialize();
     };

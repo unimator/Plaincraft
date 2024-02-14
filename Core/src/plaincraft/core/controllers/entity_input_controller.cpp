@@ -30,7 +30,7 @@ SOFTWARE.
 namespace plaincraft_core
 {
     EntityInputController::EntityInputController(std::shared_ptr<GameObject> target_entity, std::shared_ptr<Camera> camera)
-        : input_target_(InputTarget::TargetType::Blocking), target_entity_(target_entity), camera_(camera)
+        : input_target_(InputTarget::TargetType::Blocking, InputTarget::CursorVisibility::Hidden), target_entity_(target_entity), camera_(camera)
     {
         input_target_.key_mappings[GLFW_KEY_W].AddSubscription(this, &EntityInputController::MoveForward);
         input_target_.key_mappings[GLFW_KEY_S].AddSubscription(this, &EntityInputController::MoveBackward);

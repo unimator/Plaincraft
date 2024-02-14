@@ -60,6 +60,9 @@ namespace plaincraft_render_engine_vulkan
         device.EndSingleTimeCommands(device.GetTransferCommandPool(), command_buffer, device.GetTransferQueue());
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+
         return result;
     }
 }

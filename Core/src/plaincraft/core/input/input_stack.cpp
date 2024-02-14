@@ -30,22 +30,29 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
+    InputStack::InputStack(std::shared_ptr<RenderEngine> render_engine) : render_engine_(render_engine) {}
+
     void InputStack::Push(InputTarget &input_target)
     {
         input_targets_.push_back(std::ref(input_target));
-        for(auto& input_target : input_targets_)
+        for (auto &input_target : input_targets_)
         {
             input_target.get().on_input_stack_change.Trigger(StackEventType::Push);
         }
+        Apply(input_target);
     }
 
     void InputStack::Pop()
     {
-        for(auto& input_target : input_targets_)
+        for (auto &input_target : input_targets_)
         {
             input_target.get().on_input_stack_change.Trigger(StackEventType::Pop);
         }
         input_targets_.pop_back();
+        if (input_targets_.size() > 0)
+        {
+            Apply(input_targets_.back());
+        }
     }
 
     void InputStack::SingleClickHandler(int key, int scancode, int action, int mods)
@@ -87,5 +94,11 @@ namespace plaincraft_core
             callback.get().Trigger(scancode, action, mods);
             callbacks.pop();
         }
+    }
+
+    void InputStack::Apply(InputTarget &input_target)
+    {
+        auto &window = *(render_engine_->GetWindow().get());
+        window.SetCursorVisible(input_target.GetCursorVisibility() == InputTarget::CursorVisibility::Visible);
     }
 }

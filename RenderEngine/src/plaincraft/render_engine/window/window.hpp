@@ -56,6 +56,8 @@ namespace plaincraft_render_engine
 
         uint32_t GetWidth() const;
         uint32_t GetHeight() const;
+
+        virtual void SetCursorVisible(bool is_visible) = 0;
     };
 }
 

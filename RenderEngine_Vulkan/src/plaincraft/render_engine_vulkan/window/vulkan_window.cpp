@@ -85,4 +85,9 @@ namespace plaincraft_render_engine_vulkan
 		}
 		return surface;
 	}
+
+	void VulkanWindow::SetCursorVisible(bool is_visible)
+	{
+		glfwSetInputMode(instance_, GLFW_CURSOR, is_visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+	}
 }

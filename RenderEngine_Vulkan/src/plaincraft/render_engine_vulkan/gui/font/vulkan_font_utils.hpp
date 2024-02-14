@@ -31,11 +31,13 @@ SOFTWARE.
 
 namespace plaincraft_render_engine_vulkan
 {
-    class VulkanFontUtils : public plaincraft_render_engine::FontUtils
+    using namespace plaincraft_render_engine;
+
+    class VulkanFontUtils : public FontUtils
     {
     public:
-        float CalcStringWidth(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font) override;
-        float CalcStringHeight(std::string text, std::shared_ptr<plaincraft_render_engine::Font> font) override;
+        float CalcStringWidth(std::string text, std::shared_ptr<Font> font) const override;
+        float CalcStringHeight(std::string text, std::shared_ptr<Font> font) const override;
     };
 }
 

@@ -34,7 +34,6 @@ namespace plaincraft_core
     class GlobalState final {
         private:
             bool is_debug_info_visible_;
-            bool is_in_game_menu_visible_;
             uint64_t seed_;
             bool is_running_{true};
 

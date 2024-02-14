@@ -45,9 +45,10 @@ SOFTWARE.
 namespace plaincraft_core
 {
 	Game::Game(std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine)
-		: render_engine_(std::move(render_engine)),
+		: render_engine_(render_engine),
 		  assets_manager_(render_engine_),
-		  fps_counter_(GetLoopEventsHandler())
+		  fps_counter_(GetLoopEventsHandler()),
+		  input_stack_(render_engine)
 	{
 		std::random_device dev;
 		std::mt19937 rng(dev());
@@ -110,7 +111,7 @@ namespace plaincraft_core
 		loop_events_handler_.loop_event_trigger.AddSubscription(player_input_controller_.get(), &EntityInputController::OnLoopTick);
 		input_stack_.Push(std::ref(player_input_controller_->GetInputTarget()));
 
-		in_game_menu_controller_ = std::make_unique<InGameMenuController>(render_engine_, fonts_cache_, input_stack_);
+		in_game_menu_controller_ = std::make_unique<InGameMenuController>(render_engine_, global_state_, fonts_cache_, input_stack_);
 		input_stack_.Push(std::ref(in_game_menu_controller_->GetInputTarget()));
 	}
 

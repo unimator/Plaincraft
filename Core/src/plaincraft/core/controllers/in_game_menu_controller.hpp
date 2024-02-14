@@ -30,6 +30,7 @@ SOFTWARE.
 #include <plaincraft_render_engine.hpp>
 #include "../input/input_stack.hpp"
 #include "../input/input_target.hpp"
+#include "../state/global_state.hpp"
 #include <memory>
 
 namespace plaincraft_core
@@ -45,16 +46,25 @@ namespace plaincraft_core
         std::shared_ptr<Menu> in_game_menu_;
 
         std::shared_ptr<RenderEngine> render_engine_;
+        GlobalState &global_state_;
         Cache<Font> &fonts_cache_;
         InputStack &input_stack_;
 
     public:
-        InGameMenuController(std::shared_ptr<RenderEngine> render_engine, Cache<Font> &fonts_cache, InputStack &input_stack);
+        InGameMenuController(
+            std::shared_ptr<RenderEngine> render_engine,
+            GlobalState &global_state,
+            Cache<Font> &fonts_cache,
+            InputStack &input_stack);
 
         InputTarget &GetInputTarget();
 
         void OpenMenu(int scancode, int action, int mods);
         void CloseMenu(int scancode, int action, int mods);
+
+    private:
+        void QuitCallback();
+        void ResumeCallback();
     };
 }
 
