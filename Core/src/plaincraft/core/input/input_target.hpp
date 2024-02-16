@@ -53,11 +53,13 @@ namespace plaincraft_core
         } cursor_visibility_;
 
         using KeyPressedEventTrigger = EventTrigger<int, int, int>;
+        using MouseMovementTrigger = EventTrigger<double, double, float>;
 
     public:
         InputTarget(TargetType type, CursorVisibility cursor_visibility);
 
         std::unordered_map<int, KeyPressedEventTrigger> key_mappings;
+        MouseMovementTrigger mouse_movement;
         EventTrigger<InputStack::StackEventType> on_input_stack_change;
 
         void SetTargetType(TargetType target_type);

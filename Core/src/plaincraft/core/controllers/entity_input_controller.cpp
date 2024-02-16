@@ -102,10 +102,11 @@ namespace plaincraft_core
 
     void EntityInputController::OnLoopTick(float delta_time)
     {
+        const auto &physics_object = target_entity_->GetPhysicsObject();
+
         if (forward_ || backward_ || left_ || right_ || jump_ || crouch_)
         {
             const auto direction = camera_->direction;
-            const auto &physics_object = target_entity_->GetPhysicsObject();
             Vector3d target{};
 
             if (forward_)
@@ -126,13 +127,14 @@ namespace plaincraft_core
             }
             if (glm::length(target) > 0.000001f)
             {
+                auto &movement_speed = physics_object->is_grounded ? ground_movement_speed_ : air_movement_speed_;
                 target = glm::normalize(target);
-                target *= movement_speed_ * delta_time;
+                target *= movement_speed * delta_time;
             }
 
             if (jump_ && physics_object->is_grounded)
             {
-                target += Vector3d(0, 6.0f, 0);
+                target += Vector3d(0, 5.0f, 0);
                 physics_object->is_grounded = false;
             }
             if (crouch_)

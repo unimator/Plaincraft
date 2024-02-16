@@ -43,7 +43,8 @@ namespace plaincraft_core
         std::shared_ptr<GameObject> target_entity_;
         std::shared_ptr<Camera> camera_;
 
-        float movement_speed_ = 0.125f * 500.0f;
+        float air_movement_speed_ = 0.125f * 50.0f;
+        float ground_movement_speed_ = 0.125f * 500.0f;
         float maximum_speed_ = 3.0f;
 
         bool forward_ = false, backward_ = false, left_ = false, right_ = false, jump_ = false, crouch_ = false;

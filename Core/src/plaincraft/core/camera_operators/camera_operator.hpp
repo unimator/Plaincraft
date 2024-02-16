@@ -40,7 +40,11 @@ namespace plaincraft_core {
     public:
         CameraOperator(std::shared_ptr<Camera> camera);
 
-        virtual void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) = 0;
+        virtual void HandleCameraMovement(double delta_horiz, double delta_vert, float delta_time) = 0;
+        void OnLoopFrameTick(float delta_time);
+
+    protected:
+        virtual void UpdatePosition() = 0;
     };
 }
 

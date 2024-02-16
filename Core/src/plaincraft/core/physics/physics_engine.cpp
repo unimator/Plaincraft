@@ -58,18 +58,19 @@ namespace plaincraft_core
     {
         for (auto &physic_object : dynamic_objects_)
         {
-            if (abs(time_step * physic_object->velocity.x * physic_object->friction) < abs(physic_object->velocity.x))
+            auto friction = physic_object->is_grounded ? physic_object->friction : physics_settings_.air_friction;
+            if (abs(time_step * physic_object->velocity.x * friction) < abs(physic_object->velocity.x))
             {
-                physic_object->velocity.x -= time_step * physic_object->velocity.x * physic_object->friction;
+                physic_object->velocity.x -= time_step * physic_object->velocity.x * friction;
             }
             else
             {
                 physic_object->velocity.x = 0.0f;
             }
 
-            if (abs(time_step * physic_object->velocity.z * physic_object->friction) < abs(physic_object->velocity.z))
+            if (abs(time_step * physic_object->velocity.z * friction) < abs(physic_object->velocity.z))
             {
-                physic_object->velocity.z -= time_step * physic_object->velocity.z * physic_object->friction;
+                physic_object->velocity.z -= time_step * physic_object->velocity.z * friction;
             }
             else
             {

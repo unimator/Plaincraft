@@ -42,7 +42,10 @@ namespace plaincraft_core
     public:
         CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target);
 
-        void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
+        void HandleCameraMovement(double delta_horiz, double delta_vert, float delta_time) override;
+
+    protected:
+        void UpdatePosition() override;
     };
 }
 

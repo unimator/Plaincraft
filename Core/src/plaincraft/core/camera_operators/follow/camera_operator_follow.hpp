@@ -30,8 +30,10 @@ SOFTWARE.
 #include "../../entities/game_object.hpp"
 #include "../camera_operator.hpp"
 
-namespace plaincraft_core {
-    class CameraOperatorFollow : public CameraOperator {
+namespace plaincraft_core
+{
+    class CameraOperatorFollow : public CameraOperator
+    {
     private:
         std::shared_ptr<GameObject> follow_target_;
         float distance_to_target_;
@@ -39,7 +41,10 @@ namespace plaincraft_core {
     public:
         CameraOperatorFollow(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target, float distance_to_target = 6.0f);
 
-        void HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time) override;
+        void HandleCameraMovement(double delta_horiz, double delta_vert, float delta_time) override;
+
+    protected:
+        void UpdatePosition() override;
     };
 }
 

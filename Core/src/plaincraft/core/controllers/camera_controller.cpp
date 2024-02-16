@@ -24,16 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "camera_operator.hpp"
+#include "camera_controller.hpp"
 
-namespace plaincraft_core {
-    using namespace plaincraft_render_engine;
-
-    CameraOperator::CameraOperator(std::shared_ptr<Camera> camera) 
-    : camera_(camera) { }
-
-    void CameraOperator::OnLoopFrameTick(float delta_time)
+namespace plaincraft_core
+{
+    CameraController::CameraController(std::shared_ptr<CameraOperator> camera_operator)
+        : input_target_(InputTarget::TargetType::Passive, InputTarget::CursorVisibility::Hidden), camera_operator_(camera_operator)
     {
-        UpdatePosition();
+        input_target_.mouse_movement.AddSubscription(this, &CameraController::OnMouseMovement);
+    }
+
+    InputTarget& CameraController::GetInputTarget()
+    {
+        return input_target_;
+    }
+
+    void CameraController::OnMouseMovement(double delta_horiz, double delta_vert, float delta_time)
+    {
+        camera_operator_->HandleCameraMovement(delta_horiz, delta_vert, delta_time);
     }
 }

@@ -44,6 +44,7 @@ namespace plaincraft_core
         struct PhysicsSettings
         {
             Vector3d gravity = Vector3d(0.0f, -9.81f, 0.0f);
+            float air_friction = 1.2f;
         };
 
     private:

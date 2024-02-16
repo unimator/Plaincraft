@@ -31,10 +31,13 @@ SOFTWARE.
 
 namespace plaincraft_core
 {
+    using namespace plaincraft_common;
+
     class LoopEventsHandler final
     {
     public:
-        plaincraft_common::EventTrigger<float> loop_event_trigger;
+        EventTrigger<float> loop_event_trigger;
+        EventTrigger<double, double, float> mouse_movement_trigger;
     };
 }
 

@@ -58,6 +58,7 @@ namespace plaincraft_core
         void Pop();
 
         void SingleClickHandler(int key, int scancode, int action, int mods);
+        void MouseMovement(double delta_horiz, double delta_vert, float delta_time);
 
     private:
         void Apply(InputTarget &input_target);

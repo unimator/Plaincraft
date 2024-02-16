@@ -62,7 +62,7 @@ namespace plaincraft_core
             return;
         }
 
-        auto callbacks = std::stack<std::reference_wrapper<InputTarget::KeyPressedEventTrigger>>();
+        auto key_callbacks = std::stack<std::reference_wrapper<InputTarget::KeyPressedEventTrigger>>();
 
         for (std::vector<std::reference_wrapper<InputTarget>>::reverse_iterator input_target_it = input_targets_.rbegin();
              input_target_it != input_targets_.rend();
@@ -74,7 +74,7 @@ namespace plaincraft_core
             if (key_mappings.contains(key))
             {
                 auto &action_callback = key_mappings[key];
-                callbacks.push(action_callback);
+                key_callbacks.push(action_callback);
 
                 if (input_target.GetTargetType() == InputTarget::TargetType::SemiBlocking)
                 {
@@ -88,11 +88,36 @@ namespace plaincraft_core
             }
         }
 
-        while (!callbacks.empty())
+        while (!key_callbacks.empty())
         {
-            auto &callback = callbacks.top();
+            auto &callback = key_callbacks.top();
             callback.get().Trigger(scancode, action, mods);
-            callbacks.pop();
+            key_callbacks.pop();
+        }
+    }
+
+    void InputStack::MouseMovement(double delta_horiz, double delta_vert, float delta_time)
+    {
+        if (input_targets_.empty())
+        {
+            return;
+        }
+
+        auto mouse_callbacks = std::stack<std::reference_wrapper<InputTarget::MouseMovementTrigger>>();
+
+        for (std::vector<std::reference_wrapper<InputTarget>>::reverse_iterator input_target_it = input_targets_.rbegin();
+             input_target_it != input_targets_.rend();
+             ++input_target_it)
+        {
+            auto &input_target = input_target_it->get();
+            auto &mouse_movement = input_target.mouse_movement;
+
+            mouse_movement.Trigger(delta_horiz, delta_vert, delta_time);
+
+            if (input_target.GetTargetType() == InputTarget::TargetType::Blocking)
+            {
+                break;
+            }
         }
     }
 

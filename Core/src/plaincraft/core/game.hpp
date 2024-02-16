@@ -30,6 +30,7 @@ SOFTWARE.
 #include "assets/assets_manager.hpp"
 #include "camera_operators/camera_operator.hpp"
 #include "common.hpp"
+#include "controllers/camera_controller.hpp"
 #include "controllers/entity_input_controller.hpp"
 #include "controllers/in_game_menu_controller.hpp"
 #include "events/loop_events_handler.hpp"
@@ -52,7 +53,7 @@ namespace plaincraft_core {
 
 		std::shared_ptr<plaincraft_render_engine::RenderEngine> render_engine_;
 		std::shared_ptr<Scene> scene_;
-		std::unique_ptr<CameraOperator> camera_operator_;
+		std::shared_ptr<CameraOperator> camera_operator_;
 		
 		Cache<Font> fonts_cache_;
 
@@ -66,6 +67,7 @@ namespace plaincraft_core {
 
 		std::unique_ptr<EntityInputController> player_input_controller_;
 		std::unique_ptr<InGameMenuController> in_game_menu_controller_;
+		std::unique_ptr<CameraController> camera_controller_;
 		std::unique_ptr<WorldGenerator> world_updater_;
 		std::unique_ptr<ActiveObjectsOptimizer> active_objects_optimizer_;
 

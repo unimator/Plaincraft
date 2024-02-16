@@ -26,14 +26,16 @@ SOFTWARE.
 
 #include "camera_operator_eyes.hpp"
 
-namespace plaincraft_core {
+namespace plaincraft_core
+{
     using namespace plaincraft_render_engine;
 
     CameraOperatorEyes::CameraOperatorEyes(std::shared_ptr<Camera> camera, std::shared_ptr<GameObject> follow_target)
         : CameraOperator(camera), follow_target_(follow_target)
-    { }
+    {
+    }
 
-    void CameraOperatorEyes::HandleCameraMovement(double delta_horiz, double delta_vert, double delta_time)
+    void CameraOperatorEyes::HandleCameraMovement(double delta_horiz, double delta_vert, float delta_time)
     {
         const float camera_sensitivity = 32.0f;
 
@@ -43,11 +45,13 @@ namespace plaincraft_core {
         camera_->yaw += delta_horiz;
         camera_->pitch += delta_vert;
 
-        if (camera_->pitch > 89.0f) {
+        if (camera_->pitch > 89.0f)
+        {
             camera_->pitch = 89.0f;
         }
 
-        if (camera_->pitch < -89.0f) {
+        if (camera_->pitch < -89.0f)
+        {
             camera_->pitch = -89.0f;
         }
 
@@ -55,7 +59,10 @@ namespace plaincraft_core {
         camera_->direction.y = static_cast<float>(sin(glm::radians(camera_->pitch)));
         camera_->direction.z = static_cast<float>(sin(glm::radians(camera_->yaw)) * cos(glm::radians(camera_->pitch)));
         camera_->direction = glm::normalize(camera_->direction);
+    }
 
+    void CameraOperatorEyes::UpdatePosition()
+    {
         camera_->position = follow_target_->GetPhysicsObject()->position;
         camera_->position.y += 0.75;
     }

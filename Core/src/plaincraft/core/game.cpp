@@ -84,8 +84,8 @@ namespace plaincraft_core
 
 		auto player = scene_->FindGameObjectByName("player");
 
-		// camera_operator_ = std::make_unique<CameraOperatorFollow>(render_engine_->GetCamera(), player);
-		camera_operator_ = std::make_unique<CameraOperatorEyes>(render_engine_->GetCamera(), player);
+		// camera_operator_ = std::make_shared<CameraOperatorFollow>(render_engine_->GetCamera(), player);
+		camera_operator_ = std::make_shared<CameraOperatorEyes>(render_engine_->GetCamera(), player);
 
 		auto map = std::dynamic_pointer_cast<Map>(scene_->FindGameObjectByName("map"));
 
@@ -104,8 +104,10 @@ namespace plaincraft_core
 		}
 
 		loop_events_handler_.loop_event_trigger.AddSubscription(world_updater_.get(), &WorldGenerator::OnLoopFrameTick);
+		loop_events_handler_.loop_event_trigger.AddSubscription(camera_operator_.get(), &CameraOperator::OnLoopFrameTick);
 
 		GetWindowEventsHandler().key_pressed_event_trigger.AddSubscription(&input_stack_, &InputStack::SingleClickHandler);
+		loop_events_handler_.mouse_movement_trigger.AddSubscription(&input_stack_, &InputStack::MouseMovement);
 
 		player_input_controller_ = std::make_unique<EntityInputController>(player, render_engine_->GetCamera());
 		loop_events_handler_.loop_event_trigger.AddSubscription(player_input_controller_.get(), &EntityInputController::OnLoopTick);
@@ -113,6 +115,9 @@ namespace plaincraft_core
 
 		in_game_menu_controller_ = std::make_unique<InGameMenuController>(render_engine_, global_state_, fonts_cache_, input_stack_);
 		input_stack_.Push(std::ref(in_game_menu_controller_->GetInputTarget()));
+
+		camera_controller_ = std::make_unique<CameraController>(camera_operator_);
+		input_stack_.Push(std::ref(camera_controller_->GetInputTarget()));
 	}
 
 	void Game::Run()
@@ -169,6 +174,8 @@ namespace plaincraft_core
 
 			last_time = current_time;
 
+			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
+
 			Profiler::ProfileInfo info;
 			info.name = "Physics";
 			Profiler::Start(info);
@@ -189,8 +196,11 @@ namespace plaincraft_core
 				loop_events_handler_.loop_event_trigger.Trigger(delta_time);
 			});
 
-			render_engine_->GetCursorPosition(&cursor_position_x, &cursor_position_y);
-			camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
+			MEASURE("mouse movement", {
+				loop_events_handler_.mouse_movement_trigger.Trigger(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
+			});
+
+			//camera_operator_->HandleCameraMovement(cursor_position_x - last_cursor_position_x_, last_cursor_position_y_ - cursor_position_y, delta_time);
 
 			plaincraft_render_engine::FrameConfig frame_config{
 				global_state_.GetDebugInfoVisibility()};
