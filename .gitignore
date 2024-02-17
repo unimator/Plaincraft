@@ -393,3 +393,5 @@ FodyWeavers.xsd
 
 # CMake build directiory
 build/
+
+!Assets/Models/*.obj
